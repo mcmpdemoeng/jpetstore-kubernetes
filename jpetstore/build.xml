@@ -1,0 +1,243 @@
+<?xml version="1.0"?>
+
+<project name="jpetstore" basedir="." default="usage">
+
+	<property name="name" value="jpetstore"/>
+
+	<property name="war.dir" value="war"/>
+	<property name="src.dir" value="src"/>
+	<property name="client.dir" value="client"/>
+	<property name="build.dir" value=".classes"/>
+	<property name="weblib.dir" value="${war.dir}/WEB-INF/lib"/>
+	<property name="dist.dir" value="dist"/>
+	<property name="test.build.dir" value="build/test"/>
+	<property name="test.src.dir" value="test"/>
+	<property name="test.reports" value="build/reports"/>
+	<property name="cobertura.dir" value="build/cobertura" />
+
+	<property name="spring.root" value="springroot"/>
+
+
+	<path id="master-classpath">
+
+		<fileset dir="${spring.root}/lib/axis">
+			<include name="axis.jar"/>
+		</fileset>
+		<fileset dir="${spring.root}/lib/ibatis">
+			<include name="ibatis*.jar"/>
+		</fileset>
+		<fileset dir="${spring.root}/lib/j2ee">
+			<include name="jaxrpc.jar"/>
+			<include name="servlet-api.jar"/>
+		</fileset>
+		<fileset dir="${spring.root}/lib/jakarta-commons">
+			<include name="commons-logging.jar"/>
+		</fileset>
+		<fileset dir="${spring.root}/lib/struts">
+			<include name="struts.jar"/>
+		</fileset>
+		<fileset dir="${spring.root}/dist">
+			<include name="spring.jar"/>
+		</fileset>
+		<fileset dir="${spring.root}/dist/modules">
+			<include name="spring-webmvc.jar"/>
+		</fileset>
+
+	</path>
+	
+	<path id="build-classpath">
+		<fileset dir="${spring.root}/lib/junit">
+			<include name="junit-4.4.jar"/>
+		</fileset>
+		<fileset dir="${spring.root}/dist">
+			<include name="spring.jar"/>
+		</fileset>
+	</path>
+	
+	<path id="cobertura-classpath">
+	    <fileset dir="${spring.root}/lib/cobertura">
+	        <include name="*.jar" />
+	    </fileset>
+	</path>
+
+	<taskdef classpathref="cobertura-classpath" resource="tasks.properties" />
+
+
+	<target name="usage">
+
+		<echo message=""/>
+		<echo message="Spring JPetStore build file"/>
+		<echo message="------------------------------------------------------"/>
+		<echo message=""/>
+		<echo message="Available targets are:"/>
+		<echo message=""/>
+		<echo message="clean    --> Clean output dirs"/>
+		<echo message="build    --> Compile main Java sources and copy libraries"/>
+		<echo message="warfile  --> Build the web application archive"/>
+		<echo message="all      --> Clean, build, warfile"/>
+		<echo message=""/>
+
+	</target>
+
+
+	<target name="clean" description="Clean output dirs (build, weblib, dist)">
+
+		<delete dir="${build.dir}"/>
+		<delete dir="${weblib.dir}"/>
+		<delete dir="${dist.dir}"/>
+		<delete file="client/${name}.jar"/>
+		<delete dir="${test.reports}"/>
+		<delete dir="${test.build.dir}"/>
+		<delete dir="${test.reports}"/>
+
+	</target>
+
+
+	<target name="build" description="Compile main source tree java files into class files, generate jar files">
+
+		<mkdir dir="${build.dir}"/>
+
+		<javac destdir="${build.dir}" source="1.4" target="1.4" debug="true"
+				deprecation="false" optimize="false" failonerror="true">
+			<src path="${src.dir}"/>
+			<classpath refid="master-classpath"/>
+		</javac>
+
+		<copy todir="${build.dir}" preservelastmodified="true">
+			<fileset dir="${src.dir}">
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+
+		<mkdir dir="${weblib.dir}"/>
+
+		<jar jarfile="${weblib.dir}/${name}.jar" compress="true" basedir="${build.dir}"/>
+
+		<copy todir="${weblib.dir}" preservelastmodified="true">
+			<fileset dir="${spring.root}/lib/aspectj">
+				<include name="aspectjweaver.jar"/>
+			</fileset>
+			<fileset dir="${spring.root}/lib/axis">
+				<include name="axis.jar"/>
+				<include name="wsdl4j.jar"/>
+			</fileset>
+			<fileset dir="${spring.root}/lib/caucho">
+				<include name="hessian*.jar"/>
+			</fileset>
+			<fileset dir="${spring.root}/lib/hsqldb">
+				<include name="hsqldb.jar"/>
+			</fileset>
+			<fileset dir="${spring.root}/lib/ibatis">
+				<include name="ibatis-*.jar"/>
+			</fileset>
+			<fileset dir="${spring.root}/lib/j2ee">
+				<include name="jaxrpc.jar"/>
+				<include name="jstl.jar"/>
+			</fileset>
+			<fileset dir="${spring.root}/lib/jakarta-commons">
+				<include name="commons-beanutils.jar"/>
+				<include name="commons-collections.jar"/>
+				<include name="commons-dbcp.jar"/>
+				<include name="commons-digester.jar"/>
+				<include name="commons-discovery.jar"/>
+				<include name="commons-logging.jar"/>
+				<include name="commons-pool.jar"/>
+				<include name="commons-validator.jar"/>
+			</fileset>
+			<fileset dir="${spring.root}/lib/jakarta-taglibs">
+				<include name="standard.jar"/>
+			</fileset>
+      <fileset dir="${spring.root}/lib/jaxws">
+        <include name="saaj-api.jar"/>
+      </fileset>
+			<fileset dir="${spring.root}/lib/struts">
+				<include name="struts.jar"/>
+			</fileset>
+			<fileset dir="${spring.root}/dist">
+				<include name="spring.jar"/>
+			</fileset>
+			<fileset dir="${spring.root}/dist/modules">
+				<include name="spring-webmvc.jar"/>
+			</fileset>
+
+		</copy>
+
+		<copy file="${weblib.dir}/${name}.jar" tofile="${client.dir}/${name}.jar"/>
+
+	</target>
+
+
+	<target name="dist" depends="warfile">
+		<!--
+			Delegate to warfile target by depending on it. dist is just to offer
+			a generic target name across all Spring sample apps that may be used
+			for autobuilds testing.
+		-->
+	</target>
+
+
+	<target name="warfile" depends="build" description="Build the web application archive">
+
+		<mkdir dir="${dist.dir}"/>
+
+		<war warfile="${dist.dir}/${name}.war" basedir="${war.dir}" webxml="${war.dir}/WEB-INF/web.xml">
+			<include name="*"/>
+			<include name="images/**"/>
+			<include name="WEB-INF/*.*"/>
+			<include name="WEB-INF/lib/**"/>
+			<include name="WEB-INF/jsp/**"/>
+			<include name="WEB-INF/classes/**"/>
+			<exclude name="WEB-INF/web.xml"/>
+			<exclude name="**/.*"/>
+		</war>
+	</target>
+	
+	<target name="instrument" depends="build">
+		<mkdir dir="${cobertura.dir}"/>
+		<cobertura-instrument todir="${cobertura.dir}" >
+			<ignore regex="org.slf4j.LoggerFactory" />
+			<fileset dir="${build.dir}">
+			    <include name="**/*.class" />
+			    <exclude name="**/*Test.class" />
+			</fileset>
+		</cobertura-instrument>
+	</target>
+	
+	<target name="test-compile" depends="instrument">
+	    <mkdir dir="${test.build.dir}"/>
+	    <javac srcdir="${test.src.dir}" destdir="${test.build.dir}" includeantruntime="false">
+	        <classpath>
+	        	<path refid="build-classpath"/>
+	        	<pathelement location="${build.dir}"/>
+	        </classpath>
+	    </javac>
+	</target>
+
+	  <target name="test" depends="test-compile">
+	  	<mkdir dir="${test.reports}"/>
+	    <junit printsummary="on" haltonfailure="yes" fork="true">
+	    	<sysproperty key="net.sourceforge.cobertura.datafile"
+	    			file="${basedir}/cobertura.ser" />
+	    	<classpath location="${cobertura.dir}" />
+	        <classpath>
+	          <path refid="build-classpath"/>
+	          <pathelement location="${build.dir}"/>
+	          <pathelement location="${test.build.dir}"/>
+	        </classpath>
+	    	<classpath refid="cobertura-classpath" />
+	        <formatter type="xml" />
+	        <batchtest todir="${test.reports}">
+	            <fileset dir="${test.src.dir}" includes="**/*Test.java" />
+	        </batchtest>
+	    </junit>
+	  </target>
+	
+	<target name="coveragereport" depends="test">
+		<cobertura-report format="xml" destdir="${test.reports}" srcdir="${src.dir}" />
+	</target>
+
+
+	<target name="all" depends="clean,build,warfile" description="Clean,build,warfile"/>
+	<target name="runtest" depends="clean,coveragereport" description="runs test"/>
+
+</project>

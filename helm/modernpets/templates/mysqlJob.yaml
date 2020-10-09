@@ -1,0 +1,31 @@
+{{- if (.Values.isDBAAS) }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jpetstoredb
+spec:
+  template:
+    spec:
+      containers:
+      - name: jpetstoredb
+        image: {{ .Values.image.repository }}/jpetstoredb
+        command: ["python",  "/src/create_db.py"]
+        env:
+          - name: mysqlUrl
+            valueFrom:
+              secretKeyRef:
+                name: mysql-creds
+                key: mysql.url
+          - name: mysqlUser
+            valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+          - name: mysqlPass
+            valueFrom:
+              secretKeyRef:
+                name: mysql-creds
+                key: mysql.password
+      restartPolicy: Never
+  backoffLimit: 4
+{{- end }}

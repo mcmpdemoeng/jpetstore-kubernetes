@@ -1,0 +1,52 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+spec:
+  replicas: 1
+  selector:
+      matchLabels:
+        app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+      - name: jpetstoreweb
+        image: {{ .Values.image.repository }}/jpetstorefinal
+        imagePullPolicy: Always
+        env:
+          - name: VERSION
+            value: "1"
+          - name: mysqlUrl
+            valueFrom:
+              secretKeyRef:
+                name: mysql-creds
+                key: mysql.url
+          - name: mysqlUser
+            valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+          - name: mysqlPass
+            valueFrom:
+              secretKeyRef:
+                name: mysql-creds
+                key: mysql.password
+          - name: mysqldb
+            valueFrom:
+              secretKeyRef:
+                name: mysql-creds
+                key: mysql.db
+        ports:
+        - containerPort: 9080
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+
