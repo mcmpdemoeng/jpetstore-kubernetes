@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: jpetstoreweb
-        image: {{ .Values.image.repository }}/jpetstorefinal
+        image: {{ .Values.image.repository }}/jpetstoreweb
         imagePullPolicy: Always
         env:
           - name: VERSION
