@@ -11,8 +11,6 @@ spec:
     metadata:
       labels:
         app: jpetstoreweb
-      annotations:
-        sidecar.istio.io/inject: "true"
     spec:
       containers:
       - name: jpetstoreweb

@@ -15,30 +15,13 @@ build-petstore:
 	cd jpetstore/db && docker build . -t $(REGISTRY)/$(NAMESPACE)/jpetstoredb
 	docker push $(REGISTRY)/$(NAMESPACE)/jpetstoredb
 
-build-mmssearch:
-	cd mmssearch && docker build . -t $(REGISTRY)/$(NAMESPACE)/mmssearch
-	docker push $(REGISTRY)/$(NAMESPACE)/mmssearch
-
-create-secrets:
-	cd mmssearch && kubectl create secret generic mms-secret --from-file=mms-secrets=./mms-secrets.json
-	
 deploy-using-helm:
 	cd helm && helm install --name jpetstore ./modernpets
-	cd helm && helm install --name mmssearch ./mmssearch
 
 remove-deployments:
 	helm delete jpetstore --purge
-	helm delete mmssearch --purge
 
 remove-images:
 	ibmcloud cr image-rm $(REGISTRY)/$(NAMESPACE)/jpetstoredb
 	ibmcloud cr image-rm $(REGISTRY)/$(NAMESPACE)/jpetstoreweb
-	ibmcloud cr image-rm $(REGISTRY)/$(NAMESPACE)/mmssearch
 
-remove-secrets:
-	kubectl delete secret mms-secret
-
-rolling-update:
-	cd mmssearch && docker build . -t $(REGISTRY)/$(NAMESPACE)/mmssearch
-	docker push $(REGISTRY)/$(NAMESPACE)/mmssearch
-	kubectl patch deployment mmssearch-mmssearch -p '{"spec":{"template":{"metadata":{"annotations":{"date":$(TIMESTAMP)}}}}}'
