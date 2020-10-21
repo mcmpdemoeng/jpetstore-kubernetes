@@ -5,7 +5,7 @@ This demo modernizes an existing Java web application (JPetStore) by:
 1. building Docker containers from the legacy stack
 2. moving the app to Azure Kubernetes Service
 
-![](readme_images/architecture.png)
+![](readme_images/dbaas.png)
 
 [![Containerized Applications with IBM Cloud Kubernetes Service](readme_images/youtube_play.png)](https://youtu.be/26RjSa0UZp0 "Containerized Applications with IBM Cloud Kubernetes")
 
@@ -39,13 +39,8 @@ cd jpetstore-kubernetes
 
 ### Create Kubernetes secrets
 
-Next, use the `kubectl` command to allow your Kubernetes cluster access to the secrets you just created. This will allow it to access the visual recognition and Twilio services(Optional Part):
+Next, use the `kubectl` command to allow your Kubernetes cluster access to the secrets you just created.
 
-```bash
-# from the jpetstore-kubernetes directory
-cd mmssearch
-kubectl create secret generic mms-secret --from-file=mms-secrets=./mms-secrets.json
-```
 Encode mysql server secrets using base64, put the same in secrets.yaml file and run the following command.
 
 ```bash
