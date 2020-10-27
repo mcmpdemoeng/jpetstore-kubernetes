@@ -9,6 +9,8 @@ image:
   pullPolicy: Always
   pullSecret: ""
 
+namespace: ""
+
 ingress:
   enabled: true
   hosts:
