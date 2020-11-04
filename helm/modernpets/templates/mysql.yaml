@@ -27,11 +27,6 @@ spec:
               secretKeyRef:
                 name: mysql-creds
                 key: mysql.password
-          - name: MYSQL_DATABASE
-            valueFrom:
-              secretKeyRef:
-                name: mysql-creds
-                key: mysql.db
           - name: MYSQL_USER
             valueFrom:
                 secretKeyRef:

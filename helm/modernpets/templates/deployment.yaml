@@ -34,11 +34,6 @@ spec:
               secretKeyRef:
                 name: mysql-creds
                 key: mysql.password
-          - name: mysqldb
-            valueFrom:
-              secretKeyRef:
-                name: mysql-creds
-                key: mysql.db
         ports:
         - containerPort: 9080
         readinessProbe:
