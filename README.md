@@ -11,7 +11,7 @@ This demo modernizes an existing Java web application (JPetStore) by:
 
 ## Before you begin
 
-Follow the below steps to create IBM Cloud services and resources used in this demo. You will create a Kubernetes cluster.
+Follow the below steps to create resources used in this demo. You will create a Kubernetes cluster.
 
 1. Create azure database for mysql servers and note down username, servername and password.[](https://docs.microsoft.com/en-us/azure/mysql/quickstart-create-mysql-server-database-using-azure-portal)
 2. Create kubernetes service from MCMP Store or from azure portal[](https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough).
@@ -50,7 +50,7 @@ Encode mysql server secrets using base64, put the same in secrets.yaml file and 
 
 ## Build and push the container images
 
-The docker images for each of the micro-services need to be built and then pushed to a container registry. Here are the steps for pushing to your IBM Cloud private registry, but be aware that you could also push them to a public registry.
+The docker images for each of the micro-services need to be built and then pushed to a container registry. Here are the steps for pushing to your private registry, but be aware that you could also push them to a public registry.
 
 1. Add secrets related to repository into values.yaml
 
