@@ -14,4 +14,8 @@ namespace: ""
 ingress:
   enabled: true
   hosts:
-    - jpetstore.<Ingress Subdomain> # Ex: jpetstore.myclustername.us-south.containers.appdomain.cloud 
+    - jpetstore-web.app # Ex: jpetstore.myclustername.us-south.containers.appdomain.cloud 
+
+isLB: true
+
+httpHost: petstore-web.app

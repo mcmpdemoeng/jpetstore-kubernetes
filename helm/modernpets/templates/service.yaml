@@ -1,3 +1,4 @@
+{{- if (.Values.isLB) }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -5,13 +6,12 @@ metadata:
     app: jpetstoreweb
   name: jpetstore
 spec:
-  type: LoadBalancer  # use LoadBalancer as type here
-  loadBalancerIP: {{ .Values.IP }}
+  type: LoadBalancer
   ports:
     - port: 9080
   selector:
     app: jpetstoreweb
-
+{{- end }}
 ---
 apiVersion: v1
 kind: Service
@@ -25,3 +25,19 @@ spec:
   ports:
   - port: 3306
     targetPort: 3306
+
+---
+{{- if not (.Values.isLB) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    app: jpetstoreweb
+spec:
+  selector:
+    app: jpetstoreweb
+  ports:
+  - port: 80
+    targetPort: 9080
+{{- end }}
