@@ -1,0 +1,7 @@
+JPETSTOREWEB="${MCMPDEMO_DOCKER}/jpetstoreweb:${BUILD_NUMBER}"
+JPETSTOREDB="${MCMPDEMO_DOCKER}/jpetstoredb:latest"
+docker build -t $JPETSTOREWEB ./jpetstore
+docker build -t $JPETSTOREDB .
+docker login ${MCMPDEMO_DOCKER} -u ${ACR_ID} -p ${ACR_PASSWORD}
+docker push $JPETSTOREWEB
+docker push $JPETSTOREDB
