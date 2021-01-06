@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: jpetstoredb
-        image: "{{ .Values.image.repository }}/jpetstoredblocal:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repository }}/jpetstoredblocal:latest"
         imagePullPolicy: Always
         ports:
         - containerPort: 3306
