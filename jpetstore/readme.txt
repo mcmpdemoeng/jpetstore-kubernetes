@@ -34,6 +34,9 @@ messages or the like. The inclusion of two web tier alternatives outlines the
 differences as well as the similarities in the respective programming model,
 and also illustrates the different configuration styles.
 
+
+test
+
 This version of JPetStore also demonstrates various remoting options with Spring:
 Hessian, Burlap, RMI, and Web Services via Apache Axis. They are all provided
 out-of-the-box by the default web application (note that RMI is commented out
