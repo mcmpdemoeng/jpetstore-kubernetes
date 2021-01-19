@@ -25,3 +25,4 @@ remove-images:
 	ibmcloud cr image-rm $(REGISTRY)/$(NAMESPACE)/jpetstoredb
 	ibmcloud cr image-rm $(REGISTRY)/$(NAMESPACE)/jpetstoreweb
 
+
