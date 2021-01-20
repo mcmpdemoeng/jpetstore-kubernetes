@@ -26,3 +26,6 @@ remove-images:
 	ibmcloud cr image-rm $(REGISTRY)/$(NAMESPACE)/jpetstoreweb
 
 
+
+
+
