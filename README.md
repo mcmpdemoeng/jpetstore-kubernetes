@@ -2,8 +2,8 @@
 
 This demo modernizes an existing Java web application (JPetStore) by:
 
-1. building Docker containers from the legacy stack
-2. moving the app to Azure Kubernetes Service
+1. building Docker containers from the legacy stack.
+2. moving the app to Azure Kubernetes Service.
 
 ![](readme_images/dbaas.png)
 
