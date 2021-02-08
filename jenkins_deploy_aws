@@ -1,0 +1,12 @@
+NAMESPACE="petstore"
+LOCATION="us-east-2"
+
+docker login ${MCMPDEMO_DOCKER} -u ${ACR_ID} -p ${ACR_PASSWORD}
+
+
+helm package --destination $JENKINS_HOME/modernpets ./helm/modernpets
+helm upgrade --install --wait --set image.repository=$MCMPDEMO_DOCKER --set image.tag=$BUILD_NUMBER --set mysql.url=$MYSQL_URL --set mysql.username=$MYSQL_USER --set mysql.password=$MYSQL_PASSWORD --set isDBAAS=True --set isLB=True --namespace=$NAMESPACE --create-namespace petstore3 $JENKINS_HOME/modernpets/modernpets-0.1.5.tgz --kubeconfig $KUBECONFIG
+
+app=$(kubectl get -o jsonpath={.status.loadBalancer.ingress[0].hostname} services jpetstore -n $NAMESPACE | base64 | tr -d '\r')
+echo "App Url(in base64 encoded format):"
+echo $app | tr -d ' '
