@@ -4,11 +4,12 @@ kind: Service
 metadata:
   labels:
     app: jpetstoreweb
-  name: jpetstore
+  name: jpetstore-nodeport
 spec:
-  type: LoadBalancer
+  type: NodePort
   ports:
     - port: 9080
+      targetPort: 9080
   selector:
     app: jpetstoreweb
 {{- end }}
