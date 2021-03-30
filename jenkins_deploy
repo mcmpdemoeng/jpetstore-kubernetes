@@ -1,4 +1,9 @@
 NAMESPACE="petstore"
 docker login ${MCMPDEMO_DOCKER} -u ${ACR_ID} -p ${ACR_PASSWORD}
 helm package --destination $JENKINS_HOME/modernpets ./helm/modernpets
+helm repo add --username ${HELM_USER} --password ${HELM_PASSWORD} ibmcb-pkg-helm-virtual https://ibmcb-docker-local.artifactory.swg-devops.com/artifactory/ibmcb-pkg-helm-virtual
+helm repo update
+helm upgrade --install --set global.imageCredentials.username=${HELM_USER},global.imageCredentials.password=${HELM_PASSWORD} --wait prometheus-operator ibmcb-pkg-helm-virtual/mcmp-monitoring --namespace=cb-monitoring --create-namespace --kubeconfig $KUBECONFIG
 helm upgrade --install --wait --set image.repository=$MCMPDEMO_DOCKER --set image.tag=$BUILD_NUMBER --set mysql.url=$MYSQL_URL --set mysql.username=$MYSQL_USER --set mysql.password=$MYSQL_PASSWORD --set isDBAAS=True --set isLB=False --set httpHost=$PETSTORE_HOST --namespace=$NAMESPACE --create-namespace petstore3 $JENKINS_HOME/modernpets/modernpets-0.1.5.tgz --kubeconfig $KUBECONFIG
+app=$(kubectl get  ingress -n $NAMESPACE |base64 | tr -d '\r')
+echo app running at $app
