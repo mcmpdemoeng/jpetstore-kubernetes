@@ -4,7 +4,11 @@ kind: Ingress
 metadata:
   name: jpetstoreweb
   annotations:
+    {{ if not (.Values.isIKS) }}
     kubernetes.io/ingress.class: addon-http-application-routing
+    {{ else }}
+    ingress.bluemix.net/hsts: enabled=true maxAge=31536000 includeSubdomains=true
+    {{ end }}
   labels:
     app: jpetstoreweb
 spec:
