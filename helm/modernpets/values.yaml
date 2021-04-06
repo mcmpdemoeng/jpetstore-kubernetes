@@ -20,4 +20,4 @@ isLB: true
 
 httpHost: petstore-web.app
 
-isIKS: true
+isIKS: false
