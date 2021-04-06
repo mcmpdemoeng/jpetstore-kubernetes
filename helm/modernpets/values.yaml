@@ -19,3 +19,5 @@ ingress:
 isLB: true
 
 httpHost: petstore-web.app
+
+isIKS: true
