@@ -1,0 +1,3 @@
+helm repo add --username ${HELM_USER} --password ${HELM_PASSWORD} --force-update ibmcb-pkg-helm-virtual https://ibmcb-docker-local.artifactory.swg-devops.com/artifactory/ibmcb-pkg-helm-virtual
+helm repo update
+helm upgrade --install --set global.imageCredentials.username=${HELM_USER},global.imageCredentials.password=${HELM_PASSWORD} --wait prometheus-operator1 ibmcb-pkg-helm-virtual/mcmp-monitoring --namespace=cb-monitoring --create-namespace --force --kubeconfig $KUBECONFIGAKS
