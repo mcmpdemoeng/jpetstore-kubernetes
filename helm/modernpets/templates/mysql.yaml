@@ -37,4 +37,6 @@ spec:
               secretKeyRef:
                 name: mysql-creds
                 key: mysql.password
+          - name: MYSQL_DATABASE
+            value: jpetstore
 {{- end }}
