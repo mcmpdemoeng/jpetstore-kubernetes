@@ -1,5 +1,4 @@
 NAMESPACE="petstore"
-LOCATION="us-east-2"
 
 docker login ${MCMPDEMO_DOCKER} -u ${ACR_ID} -p ${ACR_PASSWORD}
 
@@ -10,3 +9,18 @@ helm upgrade --install --wait --set image.repository=$MCMPDEMO_DOCKER --set imag
 app=$(kubectl get -o jsonpath={.status.loadBalancer.ingress[0].hostname} services jpetstore -n $NAMESPACE | base64 | tr -d '\r')
 echo "App Url(in base64 encoded format):"
 echo $app | tr -d ' '
+
+
+sg=$(aws eks describe-cluster --name $CLUSTER_NAME --query cluster.resourcesVpcConfig.clusterSecurityGroupId --output text)
+
+echo "sg: $sg"
+
+aws ec2 authorize-security-group-ingress --group-id $sg --ip-permissions IpProtocol=-1,FromPort=0,IpRanges=[{"CidrIp=0.0.0.0/0"}],Ipv6Ranges=[{"CidrIpv6=::/0"}],ToPort=65535
+
+
+node_ip=$(kubectl get nodes -o json --output jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}')
+node_port=$(kubectl get svc jpetstore-nodeport -n petstore -o json --output jsonpath='{.spec.ports[0].nodePort}')
+
+petstore_url="http://$node_ip:$node_port"
+
+echo "Access Petstore at: $petstore_url"
