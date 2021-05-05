@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: prometheus-ui
+  namespace: monitoring
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  # Use the host you used in your kubernetes Ingress Configurations
+  - host: prom.petstoreiks-a667bfc9edb420e24a2cb071ae46cb42-0000.us-south.containers.appdomain.cloud
+    http:
+      paths:
+      - backend:
+          serviceName: prometheus-service
+          servicePort: 8080

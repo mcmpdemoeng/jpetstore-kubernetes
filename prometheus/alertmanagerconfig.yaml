@@ -1,0 +1,26 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: alertmanager-config
+  namespace: monitoring
+data:
+  config.yml: |-
+    global: null
+    route:
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 10s
+      repeat_interval: 30m
+      routes:
+        - receiver: slack_demo
+          match:
+            severity: slack
+          group_wait: 10s
+          repeat_interval: 1m
+    receivers:
+    - name: slack_demo
+      slack_configs:
+      - api_url: https://hooks.slack.com/services/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
+        channel: '#alert-manager-petstore'
+        title: "test"
+        text: "Alert for IKS cluster"
+        send_resolved: true
