@@ -13,17 +13,6 @@ data:
       group_by: ['alertname', 'priority']
       group_wait: 10s
       repeat_interval: 30m
-      routes:
-        - receiver: slack_demo
-        # Send severity=slack alerts to slack.
-          match:
-            severity: slack
-          group_wait: 10s
-          repeat_interval: 1m
  
     receivers:
     - name: watchdog
-    - name: slack_demo
-      slack_configs:
-      - api_url: <slack-url>
-        channel: '#alert-manager-petstore'
