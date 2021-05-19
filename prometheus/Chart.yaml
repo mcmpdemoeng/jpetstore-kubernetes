@@ -1,5 +1,0 @@
-apiVersion: v1
-appVersion: "1.0"
-description: Prometheus installation
-name: prometheus
-version: 0.1.5
