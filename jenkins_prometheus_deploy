@@ -1,0 +1,11 @@
+ns=$(kubectl get ns --kubeconfig $KUBECONFIGAKS | grep monitoring | awk '{print $1}')
+
+if [ -z "$ns" ] || [ "$ns" != "monitoring" ]; then
+	kubectl create ns monitoring --kubeconfig $KUBECONFIGAKS
+    kubectl apply -f ./prometheus -n monitoring --kubeconfig $KUBECONFIGAKS
+    sleep 1m
+    kubectl apply -f ./alertmanager/AlertManagerConfigmap.yaml -n monitoring --kubeconfig $KUBECONFIGAKS
+    kubectl apply -f ./alertmanager/AlertTemplateConfigMap.yaml -n monitoring --kubeconfig $KUBECONFIGAKS
+    kubectl apply -f ./alertmanager/Deployment.yaml -n monitoring --kubeconfig $KUBECONFIGAKS
+    kubectl apply -f ./alertmanager/Service.yaml -n monitoring --kubeconfig $KUBECONFIGAKS
+fi
