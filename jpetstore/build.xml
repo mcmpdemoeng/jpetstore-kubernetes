@@ -97,7 +97,7 @@
 
 		<mkdir dir="${build.dir}"/>
 
-		<javac destdir="${build.dir}" source="1.4" target="1.4" debug="true"
+		<javac destdir="${build.dir}" source="7" target="7" debug="true"
 				deprecation="false" optimize="false" failonerror="true">
 			<src path="${src.dir}"/>
 			<classpath refid="master-classpath"/>
