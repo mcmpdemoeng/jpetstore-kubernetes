@@ -6,15 +6,26 @@ app_url=$(echo $x | base64 -d | awk '{ print $3 }' - | sed -n '2p')
 status=$(curl -o /dev/null -s -w "%{http_code}\n" ${app_url})
 if [[ $status == 200 ]]; then
     echo "status code is $status"
-    echo """
-<?xml version="1.0" encoding="UTF-8" ?>
-<testsuite errors="0" failures="0" hostname="jenkin--vm" name="petstore application functional test" skipped="0" tests="1" time="0.1">
-<testcase classname="petstore web application" name="start" time="0.1" />
-</testsuite>""">test.xml
+    echo $PWD
+    cat > test.xml <<- EOM
+<testsuites>
+  <testsuite tests="1" failures="0" time="0.100" name="package/name">
+        <properties>
+            <property name="go.version" value="1.0"></property>
+        </properties>
+        <testcase classname="PetstoreWebApplication" name="TestOne" time="0.100"></testcase>
+  </testsuite>
+</testsuites>
+EOM
 else
-   echo """
-<?xml version="1.0" encoding="UTF-8" ?>
-<testsuite errors="0" failures="1" hostname="jenkin--vm" name="petstore application functional test" skipped="0" tests="1" time="0.1">
-<testcase classname="petstore web application" name="start" time="0.1" />
-</testsuite>""">test.xml
+   cat > test.xml <<- EOM
+<testsuites>
+  <testsuite tests="1" failures="1" time="0.100" name="package/name">
+        <properties>
+            <property name="go.version" value="1.0"></property>
+        </properties>
+        <testcase classname="PetstoreWebApplication" name="TestOne" time="0.100"></testcase>
+  </testsuite>
+</testsuites>
+EOM
 fi
