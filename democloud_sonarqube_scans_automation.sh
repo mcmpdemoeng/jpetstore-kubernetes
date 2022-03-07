@@ -11,17 +11,17 @@ rm apache-maven-3.8.4-bin.tar.gz
 
 echo run scans
 
-SONAR_HOST=$( echo $DEMOCLOUD_SONARQUBE_HOST | base64 -d )
+SONAR_HOST=$(echo $DEMOCLOUD_SONARQUBE_HOST | base64 -d)
 
 cd angular
-../sonar-scanner-4.6.2.2472-linux/bin/sonar-scanner -Dsonar.projectKey=angular-ui -Dsonar.sources=. -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=5eef695f764ac4693fcdba6ceab205accfd3210d
+../sonar-scanner-4.6.2.2472-linux/bin/sonar-scanner -Dsonar.projectKey=angular-ui -Dsonar.sources=. -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=${SONARQUBE_DEMOCLOUD_TOKEN}
 
 cd ..
 
 cd external-issues
-../sonar-scanner-4.6.2.2472-linux/bin/sonar-scanner -Dsonar.projectKey=go -Dsonar.sources=. -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=bb5c5d215c99559660ada7dedbaac0dc4d6afce1
+../sonar-scanner-4.6.2.2472-linux/bin/sonar-scanner -Dsonar.projectKey=go -Dsonar.sources=. -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=${SONARQUBE_DEMOCLOUD_TOKEN}
 
 cd ..
 
 cd security
-../apache-maven-3.8.4/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=Democloud---Java-Sample-Project -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=1ab33b9b5658f2897ce283bd004597f0f293b90d
+../apache-maven-3.8.4/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=Democloud---Java-Sample-Project -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=${SONARQUBE_DEMOCLOUD_TOKEN}
