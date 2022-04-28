@@ -1,5 +1,5 @@
 import requests
-import json
+import base64
 import os
 
 def get_order_number_details(tenant_system_user_name,tenant_system_user_api_key,petstore_order_number,tenant_api_url):
@@ -19,13 +19,19 @@ if __name__ == "__main__":
     order_details = get_order_number_details(tenant_system_user_name,tenant_system_user_api_key,petstore_order_number,tenant_api_url)
 
     fqdn = None
+    kubeconfig = None
 
     for r in order_details["resources"]:
 
         # Get kubeconfig infor and FQDN
         if r["resourceType"] == "Microsoft.ContainerService/ManagedClusters":
             for output in r["templateOutputProperties"]:
+                
                 if output["type"] == "properties":
                     fqdn = output["value"]["Addon Profiles"]["Http Application Routing"]["Config"]["HTTP Application Routing Zone Name"]
 
-    print("\n%s\n"%(fqdn))
+                if output["type"] == "kubeconfig" and output["value"]["kubeconfigs"][0]["name"] == "clusterAdmin":
+                    kubeconfig = output["value"]["kubeconfigs"][0]["value"]
+                    kubeconfig = str(base64.b64decode(kubeconfig), "utf-8")
+
+    print("\n%s\n%s\n"%(fqdn,kubeconfig))
