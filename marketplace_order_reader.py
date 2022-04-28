@@ -18,4 +18,14 @@ if __name__ == "__main__":
 
     order_details = get_order_number_details(tenant_system_user_name,tenant_system_user_api_key,petstore_order_number,tenant_api_url)
 
-    print(order_details)
+    fqdn = None
+
+    for r in order_details["resources"]:
+
+        # Get kubeconfig infor and FQDN
+        if r["resourceType"] == "Microsoft.ContainerService/ManagedClusters":
+            for output in r["templateOutputProperties"]:
+                if output["type"] == "properties":
+                    fqdn = output["Addon Profiles"]["Http Application Routing"]["Config"]["HTTP Application Routing Zone Name"]
+
+    print("\n%s\n"%(fqdn))
