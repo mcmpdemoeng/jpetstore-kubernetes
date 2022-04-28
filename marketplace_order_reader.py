@@ -46,9 +46,9 @@ if __name__ == "__main__":
 
                 if output["type"] == "properties":
 
-                    db_url = base64.encode(output["value"]["Fully Qualified Domain Name"])
+                    db_url = base64.encode(output["value"]["Fully Qualified Domain Name"].encode('ascii'))
                     db_user = output["value"]["Administrator Login"] + "@" + db_server_name
-                    db_user = base64(db_user)
+                    db_user = base64(db_user.encode('ascii'))
     # Save files
     file_names =    [ "kubeconfig", "fqdn", "db_url", "db_user" ]
     file_contents = [ kubeconfig, fqdn, db_url, db_user ]
