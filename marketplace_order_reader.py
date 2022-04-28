@@ -11,7 +11,7 @@ def get_order_number_details(tenant_system_user_name,tenant_system_user_api_key,
     response = requests.get(url=ENDPOINT, headers=headers)
     response = response.json()
 
-    data["service_instance_id"] = response["orderItems"][0]["services"][0]["serviceInventoryId"]
+    data["service_instance_id"] = response["data"]["orderItems"][0]["services"][0]["serviceInventoryId"]
 
     return data
 
