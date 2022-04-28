@@ -20,6 +20,9 @@ if __name__ == "__main__":
 
     fqdn = None
     kubeconfig = None
+    db_url = None
+    db_user = None
+    db_server_name = None
 
     for r in order_details["resources"]:
 
@@ -34,9 +37,23 @@ if __name__ == "__main__":
                     kubeconfig = output["value"]["kubeconfigs"][0]["value"]
                     kubeconfig = str(base64.b64decode(kubeconfig), "utf-8")
 
-    # Save env vars and files
-    os.environ["petstore_fqdn"] = fqdn
-    
-    kubeconfig_file = open("kuneconfig", "w")
-    kubeconfig_file.write(kubeconfig)
-    kubeconfig_file.close()
+        # Get database user, password and url 
+        if r["resourceType"] == "Microsoft.DBforMySQL/servers":
+
+            db_server_name = r["name"]
+            
+            for output in r["templateOutputProperties"]:
+
+                if output["type"] == "properties":
+
+                    db_url = base64.encode(output["value"]["Fully Qualified Domain Name"])
+                    db_user = output["value"]["Administrator Login"] + "@" + db_server_name
+                    db_user = base64(db_user)
+    # Save files
+    file_names =    [ "kubeconfig", "fqdn", "db_url", "db_user" ]
+    file_contents = [ kubeconfig, fqdn, db_url, db_user ]
+        
+    for i in range(len(file_names)):
+        tmp_file = open(file_names[i], "w")
+        tmp_file.write(file_contents[i])
+        tmp_file.close()
