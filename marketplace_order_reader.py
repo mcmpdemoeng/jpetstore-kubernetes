@@ -26,6 +26,6 @@ if __name__ == "__main__":
         if r["resourceType"] == "Microsoft.ContainerService/ManagedClusters":
             for output in r["templateOutputProperties"]:
                 if output["type"] == "properties":
-                    fqdn = output["Addon Profiles"]["Http Application Routing"]["Config"]["HTTP Application Routing Zone Name"]
+                    fqdn = output["value"]["Addon Profiles"]["Http Application Routing"]["Config"]["HTTP Application Routing Zone Name"]
 
     print("\n%s\n"%(fqdn))
