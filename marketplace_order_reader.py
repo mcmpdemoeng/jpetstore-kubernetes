@@ -33,7 +33,7 @@ if __name__ == "__main__":
                 if output["type"] == "properties":
                     fqdn = output["value"]["Addon Profiles"]["Http Application Routing"]["Config"]["HTTP Application Routing Zone Name"]
 
-                if output["type"] == "kubeconfig" and output["value"]["kubeconfigs"][0]["name"] == "clusterUser":
+                if output["type"] == "kubeconfig" and output["value"]["kubeconfigs"][0]["name"] == "clusterAdmin":
                     kubeconfig = output["value"]["kubeconfigs"][0]["value"]
                     kubeconfig = str(base64.b64decode(kubeconfig), "utf-8")
 
