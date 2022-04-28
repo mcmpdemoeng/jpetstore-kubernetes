@@ -6,7 +6,7 @@ def get_order_number_details(tenant_system_user_name,tenant_system_user_api_key,
     
     data = {}
 
-    ENDPOINT = "{0}/v5/api/orders/{1}/detail".format(tenant_api_url, order_number)
+    ENDPOINT = "{0}v5/api/orders/{1}/detail".format(tenant_api_url, order_number)
     headers = { 'username': tenant_system_user_name, 'apikey': tenant_system_user_api_key}
     response = requests.get(url=ENDPOINT, headers=headers)
     print(ENDPOINT)
