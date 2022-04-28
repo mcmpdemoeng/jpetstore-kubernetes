@@ -50,7 +50,7 @@ if __name__ == "__main__":
                     db_user = output["value"]["Administrator Login"] + "@" + db_server_name
                     
     # Save files
-    file_names =    [ "kubeconfig", "fqdn", "db_url", "db_user" ]
+    file_names =    [ "tmp_kube_config.txt", "fqdn", "db_url", "db_user" ]
     file_contents = [ kubeconfig, fqdn, db_url, db_user ]
         
     for i in range(len(file_names)):
