@@ -34,4 +34,9 @@ if __name__ == "__main__":
                     kubeconfig = output["value"]["kubeconfigs"][0]["value"]
                     kubeconfig = str(base64.b64decode(kubeconfig), "utf-8")
 
-    print("\n%s\n%s\n"%(fqdn,kubeconfig))
+    # Save env vars and files
+    os.environ["petstore_fqdn"] = fqdn
+    
+    kubeconfig_file = open("kuneconfig", "w")
+    kubeconfig_file.write(kubeconfig)
+    kubeconfig_file.close()
