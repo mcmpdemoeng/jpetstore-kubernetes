@@ -1,0 +1,232 @@
+# This is a basic workflow to help you get started with Actions
+name: CI/CD Pipeline
+
+# Controls when the action will run.
+on:
+  workflow_dispatch:
+  # Uncomment if you want to add parameters to the manual workflow
+  # inputs:
+  #   logLevel:
+  #     description: 'Log level'
+  #     required: true
+  #     default: 'warning'
+  #   tags:
+  #     description: 'Test scenario tags'
+
+  # Uncomment these lines if you want your pipeline work with pushes and pull requests automatically
+  # Triggers the workflow on push or pull request events but only for the main branch
+  # push:
+  #   branches:
+  #     - master
+  # pull_request:
+  #   branches:
+  #     - master
+
+# All the environment variables are defined here
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  TENANT_API_URL: ${{secrets.TENANT_API_URL}}
+  TENANT_SYSTEM_USER_NAME: ${{secrets.TENANT_SYSTEM_USER_NAME}}
+  TENANT_SYSTEM_USER_API_KEY: ${{secrets.TENANT_SYSTEM_USER_API_KEY}}
+  ORDER_NUMBER: ${{secrets.ORDER_NUMBER}}
+  BEARER_TOKEN: ${{secrets.BEARER_TOKEN}}
+  WORKSPACE: ${{ github.workspace }}
+  RUN_ID: ${{ github.run_id }}
+  BRANCH: ${{github.ref_name}}
+  REPO: ${{github.repository}}
+  COMMIT: ${{github.sha}}
+  TOKEN_NAME: 'githubactionstoken'
+  SERVICE_NAME: 'Petstore on AKS Github Actions'
+  PROVIDER: 'Azure'
+  NAMESPACE: 'jpetstore'
+  BUILD_ENGINE: 'Github Actions'
+  TEST_TYPE: 'unit'
+  TEST_FILE_TYPE: 'xunit'
+  TEST_ENGINE: 'XUNIT'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel (if there is no dependency)
+jobs:
+  # Job used to create docker images, publish them and publish build info
+  build:
+    name: Build docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Python set up
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+
+      - name: Install Python dependencies
+        run: |
+          python --version
+          pip install -r publish_data/requirements.txt
+
+      - name: Set Github Short SHA & TIMESTAMP
+        run: |
+          echo "SHORT_SHA=`git rev-parse --short HEAD`" >> $GITHUB_ENV
+          echo "TIMESTAMP=`date -u +%Y%m%d%H%M%S`" >> $GITHUB_ENV
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
+
+      - name: Build Docker Images
+        id: docker_build_status
+        env:
+          JPETSTOREWEB: ${{env.DOCKER_USERNAME}}/jpetstoreweb
+          JPETSTOREDB: ${{env.DOCKER_USERNAME}}/jpetstoredb
+          BUILD_TAG: ${{github.run_number}}-${{github.ref_name}}-${{env.SHORT_SHA}}-${{env.TIMESTAMP}}
+        run: |
+          echo "Building docker images..."
+          startdate=$(date +%s)
+          docker build -t ${{env.JPETSTOREWEB}}:${{env.BUILD_TAG}} -t ${{env.JPETSTOREWEB}}:latest ./jpetstore
+          docker build -t ${{env.JPETSTOREDB}}:${{env.BUILD_TAG}} -t ${{env.JPETSTOREDB}}:latest .
+          docker push ${{env.JPETSTOREWEB}}:${{env.BUILD_TAG}}
+          docker push ${{env.JPETSTOREWEB}}:latest
+          docker push ${{env.JPETSTOREDB}}:${{env.BUILD_TAG}}
+          docker push ${{env.JPETSTOREDB}}:latest
+          enddate=$(date +%s)
+          echo "BUILD_DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
+
+      - name: Printing build time
+        run: |
+          echo "The build time process took ${{env.BUILD_DURATION_TIME}} s"
+
+      - name: Publishing data to DevOps Intelligence Build
+        if: always()
+        env:
+          BUILD_STATUS: ${{steps.docker_build_status.outcome}}
+        run: |
+          python ./publish_data/publish.py --build
+
+  # Job used for deploy app to AKS and publish deploy info
+  deploy:
+    name: AKS Deployment & IBM DevOps Intelligence Publish Deploy
+    runs-on: ubuntu-latest
+    needs: [Build]
+    outputs:
+      test_status: ${{ steps.test_status.outcome }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Python set up
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+
+      - name: Install Python dependencies
+        run: |
+          python --version
+          pip install -r publish_data/requirements.txt
+
+      - name: Generate Kubeconfig & DB Secrets
+        run: |
+          python marketplace_order_reader.py
+
+      - name: JDK 11 set up
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Test jpetstore application
+        id: test_status
+        run: |
+          cd jpetstore
+          ant runtest
+
+      - name: Save unit test into artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: unit-test
+          path: |
+            jpetstore/build/reports/TEST-*.xml
+
+      - name: Deploy into AKS
+        id: aks_deployment_status
+        run: |
+          startdate=$(date +%s)
+          helm version
+          kubectl delete job jpetstoredb --ignore-not-found -n ${{env.NAMESPACE}} --kubeconfig tmp_kube_config
+          helm package --destination ${{env.WORKSPACE}}/modernpets ./helm/modernpets
+          helm upgrade --install --wait --set image.repository=${{env.DOCKER_USERNAME}} --set image.tag='latest' --set mysql.url=$(cat db_url | base64) --set mysql.username=$(cat db_user | base64) --set mysql.password=$(cat db_password | base64) --set isDBAAS=True --set isLB=False --set httpHost=$(cat fqdn) --namespace=${{env.NAMESPACE}} --create-namespace ${{env.NAMESPACE}} ${{env.WORKSPACE}}/modernpets/modernpets-0.1.5.tgz --kubeconfig tmp_kube_config
+          app=$(kubectl get  ingress -n ${{env.NAMESPACE}} --kubeconfig tmp_kube_config | base64 | tr -d '\r')
+          app_decoded=$(kubectl get  ingress -n ${{env.NAMESPACE}} --kubeconfig tmp_kube_config | tr -d '\r')
+          enddate=$(date +%s)
+          echo app running at $app_decoded
+          chmod +x result.sh
+          ./result.sh $app
+          echo "DEPLOY_DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
+
+      - name: Print deploy time
+        run: |
+          echo "The deploy time process took ${{env.DEPLOY_DURATION_TIME}} s"
+
+      - name: Create monitoring apps
+        run: |
+          ns=$(kubectl get ns --kubeconfig tmp_kube_config | grep monitoring | awk '{print $1}')
+          if [ -z "$ns" ] || [ "$ns" != "monitoring" ]; then
+              kubectl create ns monitoring --kubeconfig tmp_kube_config
+              kubectl apply -f ./prometheus -n monitoring --kubeconfig tmp_kube_config
+              sleep 1m
+              kubectl apply -f ./alertmanager/AlertManagerConfigmap.yaml -n monitoring --kubeconfig tmp_kube_config
+              kubectl apply -f ./alertmanager/AlertTemplateConfigMap.yaml -n monitoring --kubeconfig tmp_kube_config
+              kubectl apply -f ./alertmanager/Deployment.yaml -n monitoring --kubeconfig tmp_kube_config
+              kubectl apply -f ./alertmanager/Service.yaml -n monitoring --kubeconfig tmp_kube_config
+          fi
+
+      - name: Publish deployment information to IBM DevOps Intelligence
+        if: always()
+        env:
+          DEPLOYMENT_STATUS: ${{steps.aks_deployment_status.outcome}}
+        run: |
+          python ./publish_data/publish.py --deploy
+
+  # Job used for publish test info
+  test:
+    name: IBM DevOps Intelligence Publish Tests
+    runs-on: ubuntu-latest
+    needs: [build, deploy]
+    if: always() # set always
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Python set up
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+
+      - name: Install Python dependencies
+        run: |
+          python --version
+          pip install -r publish_data/requirements.txt
+
+      - name: Download Unit Test artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: unit-test
+
+      - name: Get artifact name
+        run: |
+          ls | grep *.xml
+          echo "TEST_FILE=${{env.WORKSPACE}}/$(ls | grep *.xml)" >> $GITHUB_ENV
+
+      - name: Publish test information to IBM DevOps Intelligence
+        env:
+          TEST_STATUS: ${{needs.deploy.outputs.test_status}}
+        run: |
+          echo "Status of creation of test: ${{env.TEST_STATUS}}"
+          if [[ ${{env.TEST_STATUS}} == "success" ]]; then
+            python ./publish_data/publish.py --test
+          else
+            echo "The workflow failed. Not able to send the UNIT TEST Results."
+          fi
