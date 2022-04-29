@@ -24,8 +24,9 @@ on:
 
 # All the environment variables are defined here
 env:
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+  DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+  DOCKER_URL: '${{secrets.DOCKER_URL}}/${{secrets.DOCKER_USERNAME}}'
   TENANT_API_URL: ${{secrets.TENANT_API_URL}}
   TENANT_SYSTEM_USER_NAME: ${{secrets.TENANT_SYSTEM_USER_NAME}}
   TENANT_SYSTEM_USER_API_KEY: ${{secrets.TENANT_SYSTEM_USER_API_KEY}}
@@ -70,27 +71,28 @@ jobs:
           echo "SHORT_SHA=`git rev-parse --short HEAD`" >> $GITHUB_ENV
           echo "TIMESTAMP=`date -u +%Y%m%d%H%M%S`" >> $GITHUB_ENV
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ env.DOCKER_USERNAME }}
-          password: ${{ env.DOCKER_PASSWORD }}
+      # - name: Login to DockerHub
+      #   uses: docker/login-action@v1
+      #   with:
+      #     username: ${{ env.DOCKER_USERNAME }}
+      #     password: ${{ env.DOCKER_PASSWORD }}
 
       - name: Build Docker Images
         id: docker_build_status
         env:
-          JPETSTOREWEB: ${{env.DOCKER_USERNAME}}/jpetstoreweb
-          JPETSTOREDB: ${{env.DOCKER_USERNAME}}/jpetstoredb
+          JPETSTOREWEB: '${{env.DOCKER_URL}}/jpetstoreweb'
+          JPETSTOREDB: '${{env.DOCKER_URL}}/jpetstoredb'
           BUILD_TAG: ${{github.run_number}}-${{github.ref_name}}-${{env.SHORT_SHA}}-${{env.TIMESTAMP}}
         run: |
           echo "Building docker images..."
           startdate=$(date +%s)
-          docker build -t ${{env.JPETSTOREWEB}}:${{env.BUILD_TAG}} -t ${{env.JPETSTOREWEB}}:latest ./jpetstore
-          docker build -t ${{env.JPETSTOREDB}}:${{env.BUILD_TAG}} -t ${{env.JPETSTOREDB}}:latest .
-          docker push ${{env.JPETSTOREWEB}}:${{env.BUILD_TAG}}
-          docker push ${{env.JPETSTOREWEB}}:latest
-          docker push ${{env.JPETSTOREDB}}:${{env.BUILD_TAG}}
-          docker push ${{env.JPETSTOREDB}}:latest
+          docker build -t '${{env.JPETSTOREWEB}}:${{env.BUILD_TAG}}' -t '${{env.JPETSTOREWEB}}:latest' ./jpetstore
+          docker build -t '${{env.JPETSTOREDB}}:${{env.BUILD_TAG}}' -t '${{env.JPETSTOREDB}}:latest' .
+          docker login ${{env.DOCKER_URL}} -u '${{env.DOCKER_USERNAME}}' -p '${{env.DOCKER_PASSWORD}}'
+          docker push '${{env.JPETSTOREWEB}}:${{env.BUILD_TAG}}'
+          docker push '${{env.JPETSTOREWEB}}:latest'
+          docker push '${{env.JPETSTOREDB}}:${{env.BUILD_TAG}}'
+          docker push '${{env.JPETSTOREDB}}:latest'
           enddate=$(date +%s)
           echo "BUILD_DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
 
