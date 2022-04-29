@@ -6,7 +6,7 @@ from common_utils.constants import (
     BRANCH,
     BUILD_ENGINE,
     COMMIT,
-    DURATION_TIME,
+    BUILD_DURATION_TIME,
     RUN_ID,
     BUILD_URL_TEMPLATE,
     BUILD_STATUS,
@@ -34,7 +34,7 @@ def post_build_data(tenant_url, bearer_token):
 
         body.built_at = date.isoformat("T") + "Z"
 
-        body.duration = DURATION_TIME * 1000000000
+        body.duration = BUILD_DURATION_TIME * 1000000000
 
         body.href = ENDPOINT
 

@@ -13,8 +13,8 @@ on:
   #   tags:
   #     description: 'Test scenario tags'
 
-  # Triggers the workflow on push or pull request events but only for the main branch
   # Uncomment these lines if you want your pipeline work with pushes and pull requests automatically
+  # Triggers the workflow on push or pull request events but only for the main branch
   # push:
   #   branches:
   #     - master
@@ -40,6 +40,10 @@ env:
   SERVICE_NAME: 'Petstore on AKS Github Actions'
   PROVIDER: 'Azure'
   NAMESPACE: 'jpetstore'
+  BUILD_ENGINE: 'Github Actions'
+  TEST_TYPE: 'unit'
+  TEST_FILE_TYPE: 'xunit'
+  TEST_ENGINE: 'XUNIT'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel (if there is no dependency)
 jobs:
@@ -88,17 +92,16 @@ jobs:
           docker push ${{env.JPETSTOREDB}}:${{env.BUILD_TAG}}
           docker push ${{env.JPETSTOREDB}}:latest
           enddate=$(date +%s)
-          echo "DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
+          echo "BUILD_DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
 
       - name: Printing build time
         run: |
-          echo "The build time process took ${{env.DURATION_TIME}} s"
+          echo "The build time process took ${{env.BUILD_DURATION_TIME}} s"
 
       - name: Publishing data to DevOps Intelligence Build
         if: always()
         env:
           BUILD_STATUS: ${{steps.docker_build_status.outcome}}
-          BUILD_ENGINE: 'Github Actions'
         run: |
           python ./publish_data/publish.py --build
 
@@ -161,12 +164,11 @@ jobs:
           echo app running at $app_decoded
           chmod +x result.sh
           ./result.sh $app
-          echo "DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
-          echo $DURATION_TIME
+          echo "DEPLOY_DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
 
       - name: Print deploy time
         run: |
-          echo "The deploy time process took ${{env.DURATION_TIME}} s"
+          echo "The deploy time process took ${{env.DEPLOY_DURATION_TIME}} s"
 
       - name: Create monitoring apps
         run: |
@@ -220,9 +222,6 @@ jobs:
 
       - name: Publish test information to IBM DevOps Intelligence
         env:
-          TEST_TYPE: 'unit'
-          TEST_FILE_TYPE: 'xunit'
-          TEST_ENGINE: 'XUNIT'
           TEST_STATUS: ${{needs.deploy.outputs.test_status}}
         run: |
           echo "Status of creation of test: ${{env.TEST_STATUS}}"

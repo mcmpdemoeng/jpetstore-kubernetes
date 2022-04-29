@@ -3,14 +3,13 @@ from load_data.tokens import tokens
 from common_utils.constants import (
     loggers,
     DeploymentTemplate,
-    DURATION_TIME,
+    DEPLOY_DURATION_TIME,
     HREF,
     PROVIDER,
     RUN_ID,
     DEPLOYMENT_URL_TEMPLATE,
     DEPLOYMENT_STATUS,
     SERVICE_NAME,
-    DEPLOYMENT_RUNNING_APP,
 )
 
 import json, requests, traceback
@@ -30,7 +29,7 @@ def post_deployment_data(tenant_url, bearer_token):
 
         body.deploymentid = RUN_ID
 
-        body.duration = DURATION_TIME * 1000000
+        body.duration = DEPLOY_DURATION_TIME * 1000000
 
         date = datetime.utcnow()
         body.creation_date = date.isoformat("T") + "Z"
