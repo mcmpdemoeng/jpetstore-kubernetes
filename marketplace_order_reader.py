@@ -19,7 +19,7 @@ def get_order_number_details(tenant_system_user_name,tenant_system_user_api_key,
     inputs = None
 
     for c in configs:
-        if c["configGroup"] == "Petstore_Infrastructure_on_Azure_AKS_Parameters":
+        if c["configGroup"] == "Petstore Infrastructure on Azure AKS Parameters":
             inputs = c["config"]
 
     for param in inputs:
