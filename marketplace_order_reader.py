@@ -11,7 +11,20 @@ def get_order_number_details(tenant_system_user_name,tenant_system_user_api_key,
     response = requests.get(url=ENDPOINT, headers=headers)
     response = response.json()
 
+    # service instance id
     data["service_instance_id"] = response["data"]["orderItems"][0]["services"][0]["serviceInventoryId"]
+
+    # database password
+    configs = response["data"]["orderItems"][0]["configInfo"]
+    inputs = None
+
+    for c in configs:
+        if c["configGroup"] == "Configurations parameters":
+            inputs = c["config"]
+
+    for param in inputs:
+        if param["configId"] == "administrator_login_password":
+            data["db_password"] = param["values"][0]["value"]
 
     return data
 
@@ -39,6 +52,7 @@ if __name__ == "__main__":
     db_url = None
     db_user = None
     db_server_name = None
+    db_password = order_details["db_password"]
 
     for r in service_details["resources"]:
 
@@ -66,12 +80,10 @@ if __name__ == "__main__":
                     db_user = output["value"]["Administrator Login"] + "@" + db_server_name
                     
     # Save files
-    file_names =    [ "tmp_kube_config.txt", "fqdn", "db_url", "db_user" ]
-    file_contents = [ kubeconfig, fqdn, db_url, db_user ]
+    file_names =    [ "tmp_kube_config.txt", "fqdn", "db_url", "db_user", "db_password" ]
+    file_contents = [ kubeconfig, fqdn, db_url, db_user, db_password ]
         
     for i in range(len(file_names)):
         tmp_file = open(file_names[i], "w")
         tmp_file.write(file_contents[i])
         tmp_file.close()
-
-# petstorAKSDBJP
