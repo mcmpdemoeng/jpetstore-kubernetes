@@ -19,6 +19,7 @@ def get_order_number_details(tenant_system_user_name,tenant_system_user_api_key,
     inputs = None
 
     for c in configs:
+        print(c)
         if c["configGroup"] == "Configurations parameters":
             inputs = c["config"]
 
