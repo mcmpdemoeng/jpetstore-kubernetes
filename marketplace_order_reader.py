@@ -19,12 +19,11 @@ def get_order_number_details(tenant_system_user_name,tenant_system_user_api_key,
     inputs = None
 
     for c in configs:
-        print(c)
-        if c["configGroup"] == "Configurations parameters":
+        if c["configGroup"] == "Petstore_Infrastructure_on_Azure_AKS_Parameters":
             inputs = c["config"]
 
     for param in inputs:
-        if param["configId"] == "administrator_login_password":
+        if param["configId"] == "administratorLoginPassword":
             data["db_password"] = param["values"][0]["value"]
 
     return data
