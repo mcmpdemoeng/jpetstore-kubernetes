@@ -18,8 +18,10 @@ def get_order_number_details(tenant_system_user_name,tenant_system_user_api_key,
     configs = response["data"]["orderItems"][0]["configInfo"]
     inputs = None
 
+    infrastructure_name = response["data"]["orderItems"][0]["serviceOfferingName"]
+
     for c in configs:
-        if c["configGroup"] == "Petstore Infrastructure on Azure AKS Parameters":
+        if c["configGroup"] == f"{infrastructure_name} Parameters":
             inputs = c["config"]
 
     for param in inputs:
