@@ -9,7 +9,7 @@ PARSER = args_utils.parse_arguments()
 ARGS = PARSER.parse_args()
 LOGGER = loggers.create_logger_module("devops-intelligence-publisher")
 
-TENANT_URL = os.getenv("TENANT_API_URL").replace("-api", "") if os.getenv("TENANT_API_URL", "") is not None else ""
+TENANT_URL = os.getenv("TENANT_URL", "")
 BEARER_TOKEN = os.getenv("BEARER_TOKEN", "")
 
 INFO_MESSAGE = "Publishing data to DevOps Intelligence {0}."
