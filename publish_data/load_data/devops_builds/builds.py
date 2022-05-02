@@ -11,7 +11,7 @@ from common_utils.constants import (
     BUILD_URL_TEMPLATE,
     BUILD_STATUS,
     SERVICE_NAME,
-    HREF,
+    BUILD_HREF,
 )
 
 import json, requests, traceback
@@ -36,7 +36,7 @@ def post_build_data(tenant_url, bearer_token):
 
         body.duration = BUILD_DURATION_TIME * 1000000000
 
-        body.href = ENDPOINT
+        body.href = BUILD_HREF
 
         body.branch = BRANCH
 

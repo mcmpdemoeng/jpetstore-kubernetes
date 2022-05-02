@@ -2,7 +2,6 @@ from load_data.tokens import tokens
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 from common_utils.constants import (
     loggers,
-    HREF,
     TEST_ENGINE,
     TEST_ENVIRONMENT,
     TEST_FILE,
@@ -12,6 +11,7 @@ from common_utils.constants import (
     TEST_TYPE,
     SERVICE_NAME,
     RUN_ID,
+    TEST_HREF,
 )
 
 import requests, traceback
@@ -32,7 +32,7 @@ def post_tests_data(tenant_url, bearer_token):
             ("serviceName", SERVICE_NAME),
             ("fileType", TEST_FILE_TYPE),
             ("testEngine", TEST_ENGINE),
-            ("providerhref", HREF if HREF != "" else tenant_url),
+            ("providerhref", TEST_HREF if TEST_HREF != "" else tenant_url),
             ("environmentname", TEST_ENVIRONMENT if TEST_ENVIRONMENT != "" else SERVICE_NAME),
             ("releasename", TEST_RELEASE if TEST_RELEASE != "" else SERVICE_NAME),
             ("serviceOverride", True),

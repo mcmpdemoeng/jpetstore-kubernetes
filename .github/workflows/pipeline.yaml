@@ -26,7 +26,6 @@ on:
 env:
   DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
   DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
-  DOCKER_URL: '${{secrets.DOCKER_URL}}'
   TENANT_API_URL: ${{secrets.TENANT_API_URL}}
   TENANT_SYSTEM_USER_NAME: ${{secrets.TENANT_SYSTEM_USER_NAME}}
   TENANT_SYSTEM_USER_API_KEY: ${{secrets.TENANT_SYSTEM_USER_API_KEY}}
@@ -41,10 +40,14 @@ env:
   SERVICE_NAME: 'Petstore on AKS Github Actions'
   PROVIDER: 'Azure'
   NAMESPACE: 'jpetstore'
+  BUILD_HREF: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
   BUILD_ENGINE: 'Github Actions'
   TEST_TYPE: 'unit'
   TEST_FILE_TYPE: 'xunit'
   TEST_ENGINE: 'XUNIT'
+  TEST_HREF: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+  TEST_ENVIRONMENT: 'Petstore on AKS Github Actions'
+  TEST_RELEASE: 'Petstore on AKS Github Actions ${{github.run_id}}'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel (if there is no dependency)
 jobs:
@@ -71,17 +74,17 @@ jobs:
           echo "SHORT_SHA=`git rev-parse --short HEAD`" >> $GITHUB_ENV
           echo "TIMESTAMP=`date -u +%Y%m%d%H%M%S`" >> $GITHUB_ENV
 
-      # - name: Login to DockerHub
-      #   uses: docker/login-action@v1
-      #   with:
-      #     username: ${{ env.DOCKER_USERNAME }}
-      #     password: ${{ env.DOCKER_PASSWORD }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
 
       - name: Build Docker Images
         id: docker_build_status
         env:
-          JPETSTOREWEB: '${{env.DOCKER_URL}}/jpetstoreweb'
-          JPETSTOREDB: '${{env.DOCKER_URL}}/jpetstoredb'
+          JPETSTOREWEB: '${{env.DOCKER_USERNAME}}/jpetstoreweb'
+          JPETSTOREDB: '${{env.DOCKER_USERNAME}}/jpetstoredb'
           BUILD_TAG: ${{github.run_number}}-${{github.ref_name}}-${{env.SHORT_SHA}}-${{env.TIMESTAMP}}
         run: |
           echo "Building docker images..."
