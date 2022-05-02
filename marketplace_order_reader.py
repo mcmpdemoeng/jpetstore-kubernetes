@@ -38,10 +38,10 @@ def get_service_details(tenant_system_user_name,tenant_system_user_api_key,servi
 
 if __name__ == "__main__":
 
-    tenant_system_user_name = os.getenv("tenant_system_user_name")
-    tenant_system_user_api_key = os.getenv("tenant_system_user_api_key")
-    order_number = os.getenv("order_number")
-    tenant_api_url = os.getenv("tenant_api_url")
+    tenant_system_user_name = os.getenv("TENANT_SYSTEM_USER_NAME")
+    tenant_system_user_api_key = os.getenv("TENANT_SYSTEM_USER_API_KEY")
+    order_number = os.getenv("ORDER_NUMBER")
+    tenant_api_url = os.getenv("TENANT_API_URL")
 
     order_details = get_order_number_details(tenant_system_user_name,tenant_system_user_api_key,order_number,tenant_api_url)
     
