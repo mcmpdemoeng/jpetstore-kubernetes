@@ -43,6 +43,8 @@ if __name__ == "__main__":
     order_number = os.getenv("order_number")
     tenant_api_url = os.getenv("tenant_api_url")
 
+    print(order_number, tenant_api_url, tenant_system_user_name, tenant_system_user_api_key)
+
     order_details = get_order_number_details(tenant_system_user_name,tenant_system_user_api_key,order_number,tenant_api_url)
     
     service_instance_id = order_details["service_instance_id"]
