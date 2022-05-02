@@ -112,7 +112,6 @@ TEST_HREF = os.getenv("TEST_HREF", "")
 DEPLOYMENT_URL_TEMPLATE = "{0}dash/api/deployments/v3/services/deployments"
 
 DEPLOYMENT_PROVIDERS = ["GoCD", "Travis", "Jenkins", "IBM Cloud", "AWS", "Azure", "Google"]
-DEPLOYMENT_RUNNING_APP = ""
 DEPLOYMENT_STATUS = "deployed" if os.getenv("DEPLOYMENT_STATUS", "") == "success" else "failed"
 DEPLOY_DURATION_TIME = int(os.getenv("DEPLOY_DURATION_TIME", 1))
 DEPLOYMENT_HOSTNAME = os.getenv("DEPLOYMENT_HOSTNAME", "HOSTNAME")
