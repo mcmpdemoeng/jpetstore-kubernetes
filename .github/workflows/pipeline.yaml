@@ -48,6 +48,7 @@ env:
   TEST_HREF: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
   TEST_ENVIRONMENT: 'Petstore on AKS Github Actions'
   TEST_RELEASE: 'Petstore on AKS Github Actions ${{github.run_id}}'
+  DEPLOYMENT_SERVICE_ID: 'Petstore on AKS Github Actions'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel (if there is no dependency)
 jobs:
@@ -170,6 +171,8 @@ jobs:
           chmod +x result.sh
           ./result.sh $app
           echo "DEPLOY_DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
+          echo "DEPLOYMENT_HOSTNAME='http://jpetstore-web.$(cat fqdn)'"
+          echo “\n\nYour application is available at http://jpetstore-web.$(cat fqdn)\n\n”
 
       - name: Print deploy time
         run: |
