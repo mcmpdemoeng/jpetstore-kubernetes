@@ -49,7 +49,7 @@ if __name__ == "__main__":
         tenant_system_user_name = os.getenv("TENANT_SYSTEM_USER_NAME")
         tenant_system_user_api_key = os.getenv("TENANT_SYSTEM_USER_API_KEY")
         order_number = os.getenv("ORDER_NUMBER")
-        tenant_api_url = os.getenv("TENANT_API_URL")
+        tenant_api_url = os.getenv("TENANT_URL")
 
         tenant_api_url = tenant_api_url.replace(".multicloud-ibm.com","-api.multicloud-ibm.com")
 
