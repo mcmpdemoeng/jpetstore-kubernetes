@@ -69,7 +69,6 @@ class DeploymentTemplate:
 TOKEN_NAME = os.getenv("TOKEN_NAME", "tokenapp")
 BROKER = "mcmp:devops-intelligence:service"
 SERVICE_NAME = os.getenv("SERVICE_NAME", "")
-HREF = os.getenv("HREF", "")
 
 RUN_ID = os.getenv("RUN_ID", "")
 BRANCH = os.getenv("BRANCH", "")
@@ -89,6 +88,7 @@ BUILD_URL_TEMPLATE = "{0}dash/api/build/v1/services/builds"
 BUILD_STATUS = "passed" if os.getenv("BUILD_STATUS", "") == "success" else "failed"
 BUILD_ENGINE = os.getenv("BUILD_ENGINE", "")
 BUILD_DURATION_TIME = int(os.getenv("BUILD_DURATION_TIME", 1))
+BUILD_HREF = os.getenv("BUILD_HREF", "")
 
 """
 {0} tenant url (not api url)
@@ -103,6 +103,7 @@ TEST_ENGINE = os.getenv("TEST_ENGINE", "XUNIT")
 TEST_ENVIRONMENT = os.getenv("TEST_ENVIRONMENT", "")
 TEST_RELEASE = os.getenv("TEST_RELEASE", "")
 TEST_FILE = os.getenv("TEST_FILE", "")
+TEST_HREF = os.getenv("TEST_HREF", "")
 
 
 """
@@ -111,6 +112,8 @@ TEST_FILE = os.getenv("TEST_FILE", "")
 DEPLOYMENT_URL_TEMPLATE = "{0}dash/api/deployments/v3/services/deployments"
 
 DEPLOYMENT_PROVIDERS = ["GoCD", "Travis", "Jenkins", "IBM Cloud", "AWS", "Azure", "Google"]
-DEPLOYMENT_RUNNING_APP = ""
 DEPLOYMENT_STATUS = "deployed" if os.getenv("DEPLOYMENT_STATUS", "") == "success" else "failed"
 DEPLOY_DURATION_TIME = int(os.getenv("DEPLOY_DURATION_TIME", 1))
+DEPLOYMENT_HOSTNAME = os.getenv("DEPLOYMENT_HOSTNAME", "HOSTNAME")
+DEPLOYMENT_SERVICE_ID = os.getenv("DEPLOYMENT_SERVICE_ID", "SERVICE_ID")
+DEPLOYMENT_HREF = os.getenv("DEPLOYMENT_HREF", "")

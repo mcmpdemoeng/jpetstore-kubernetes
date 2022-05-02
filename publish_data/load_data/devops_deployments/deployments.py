@@ -4,12 +4,14 @@ from common_utils.constants import (
     loggers,
     DeploymentTemplate,
     DEPLOY_DURATION_TIME,
-    HREF,
-    PROVIDER,
-    RUN_ID,
+    DEPLOYMENT_HOSTNAME,
+    DEPLOYMENT_SERVICE_ID,
+    DEPLOYMENT_HREF,
     DEPLOYMENT_URL_TEMPLATE,
     DEPLOYMENT_STATUS,
     SERVICE_NAME,
+    RUN_ID,
+    PROVIDER,
 )
 
 import json, requests, traceback
@@ -34,15 +36,15 @@ def post_deployment_data(tenant_url, bearer_token):
         date = datetime.utcnow()
         body.creation_date = date.isoformat("T") + "Z"
 
-        body.endpoint_hostname = "DEPLOYMENT_RUNNING_APP"
+        body.endpoint_hostname = DEPLOYMENT_HOSTNAME
 
-        body.endpoint_service_id = "RUN_ID"
+        body.endpoint_service_id = DEPLOYMENT_SERVICE_ID
 
         body.name = SERVICE_NAME
 
         body.provider = PROVIDER
 
-        body.providerhref = HREF if HREF != "" else tenant_url
+        body.providerhref = DEPLOYMENT_HREF if DEPLOYMENT_HREF != "" else tenant_url
 
         body.status = DEPLOYMENT_STATUS
 
