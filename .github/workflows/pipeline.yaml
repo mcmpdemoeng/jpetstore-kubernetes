@@ -172,7 +172,7 @@ jobs:
           ./result.sh $app
           echo "DEPLOY_DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
           echo "DEPLOYMENT_HOSTNAME='http://jpetstore-web.$(cat fqdn)'"
-          echo “\n\nYour application is available at http://jpetstore-web.$(cat fqdn)\n\n”
+          echo “Your application is available at http://jpetstore-web.$(cat fqdn)”
 
       - name: Print deploy time
         run: |
