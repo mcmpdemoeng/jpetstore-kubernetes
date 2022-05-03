@@ -22,7 +22,7 @@ def get_order_number_details(tenant_system_user_name, tenant_system_user_api_key
     infrastructure_name = response["data"]["orderItems"][0]["serviceOfferingName"]
 
     for c in configs:
-        if c["configGroup"] == f"{infrastructure_name} Parameters":
+        if "Parameters" in str(c["configGroup"]):
             inputs = c["config"]
 
     for param in inputs:
