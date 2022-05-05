@@ -67,7 +67,7 @@ This setup assumes that you have ordered a Petstore Service Instance.
    
    ![GithubActions-Setup](images/GithubActions-Setup.png)
 
-2. Now in the current repository, go to `Settings` > `Secrets` > `Actions`. Create the following `repository secrets` in your current project.
+2. Now in the current repository, go to `Settings` > `Secrets` > `Actions`. Create the following `repository secrets`:
    
    - `BEARER_TOKEN`: The bearer token created in the developer console of your tenant.
    - `DOCKER_PASSWORD`: Your personal Docker password or a created access token with Read/Write/Delete privileges.
