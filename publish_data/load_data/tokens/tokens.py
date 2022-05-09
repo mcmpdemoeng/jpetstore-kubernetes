@@ -30,6 +30,7 @@ def get_token(name, tenant_url, bearer_token, path):
         raise Exception("Error when creating a new devops token. Code = " + str(response.status_code))
 
     devops_token = DevOpsToken(response.json())
+    print(devops_token.__dict__)
     with open(f"{name}_TOKEN", "w") as f:
         f.write(devops_token.token)
 
