@@ -1,6 +1,15 @@
-from common_utils.constants import loggers, DevOpsToken, TOKEN_NAME, BROKER, GITHUB_TOKEN
+from common_utils.constants import (
+    loggers,
+    DevOpsToken,
+    TOKEN_NAME,
+    BROKER,
+    GITHUB_API_SECRESTS_ACTIONS_URL,
+    GITHUB_TOKEN,
+    GITHUB_REPO,
+    IS_GITHUB,
+)
 
-import requests, json
+import requests, json, base64
 
 LOGGER = loggers.create_logger_module("devops-intelligence-publisher")
 
@@ -10,10 +19,15 @@ def get_token(name, tenant_url, bearer_token, path):
     existing_token = _find_existing_token(tenant_url, bearer_token, path)
 
     if existing_token is not None:
-        devops_token = existing_token
+        devops_response = existing_token
         with open(f"{name}_TOKEN", "w") as f:
-            f.write(devops_token.token)
-        return devops_token
+            LOGGER.info(f"Creating Token for {name}")
+            f.write(devops_response.token)
+
+        if IS_GITHUB:
+            _github_token_creation(name, devops_response)
+
+        return devops_response
 
     NEW_TOKEN_ENDPOINT = "{0}{1}".format(tenant_url, path)
     LOGGER.info(NEW_TOKEN_ENDPOINT)
@@ -32,11 +46,15 @@ def get_token(name, tenant_url, bearer_token, path):
         LOGGER.error(response.text)
         raise Exception("Error when creating a new devops token. Code = " + str(response.status_code))
 
-    devops_token = DevOpsToken(response.json())
+    devops_response = DevOpsToken(response.json())
     with open(f"{name}_TOKEN", "w") as f:
-        f.write(devops_token.token)
+        LOGGER.info(f"Creating Token for {name}")
+        f.write(devops_response.token)
 
-    return devops_token
+    if IS_GITHUB:
+        _github_token_creation(name, devops_response)
+
+    return devops_response
 
 
 def _find_existing_token(tenant_url, bearer_token, path):
@@ -73,14 +91,29 @@ def _find_existing_token(tenant_url, bearer_token, path):
     return democloud_token
 
 
-def _create_secret_github():
-    # headers = {
-    #     "Authorization": "Bearer {0}".format(GITHUB_TOKEN),
-    #     "accept": "application/vnd.github.v3+json",
-    #     "Content-Type": "application/json",
-    # }
+def _github_token_creation(devops_name, devops_response: DevOpsToken):
 
-    # payload = {
-    #     "encrypted_value":
-    # }
-    pass
+    LOGGER.info(f"Creating Secret Token for {devops_name}")
+
+    with open(f"{devops_name}_TOKEN", "w") as f:
+        f.write(devops_response.token)
+
+    ENDPOINT = GITHUB_API_SECRESTS_ACTIONS_URL.format(GITHUB_REPO, devops_name)
+    print(ENDPOINT)
+    devops_token = str(devops_response.token)
+    devops_token_encoded = base64.b64encode(devops_token.encode("utf-8")).decode("utf-8")
+    print(devops_token_encoded)
+
+    headers = {
+        "Authorization": "Bearer {0}".format(GITHUB_TOKEN),
+        "accept": "application/vnd.github.v3+json",
+        "Content-Type": "application/json",
+    }
+
+    payload = {"encrypted_value": f"{devops_token_encoded}"}
+
+    response = requests.post(url=ENDPOINT, headers=headers, data=payload)
+    if response.status_code != 200 and response.status_code != 201 and response.status_code != 204:
+        LOGGER.error("Error = " + str(response.text))
+
+    LOGGER.info("Creation succeed")

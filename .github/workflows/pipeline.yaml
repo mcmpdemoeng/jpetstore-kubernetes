@@ -33,6 +33,7 @@ env:
   BEARER_TOKEN: ${{secrets.BEARER_TOKEN}}
   GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
   GITHUB_SERVER: ${{github.server_url}}
+  IS_GITHUB: 'true'
   BUILD_TOKEN: ${{secrets.BUILD_TOKEN}}
   TEST_TOKEN: ${{secrets.TEST_TOKEN}}
   DEPLOY_TOKEN: ${{secrets.DEPLOY_TOKEN}}

@@ -134,3 +134,4 @@ GITHUB_API_SECRESTS_ACTIONS_URL = "{GITHUB_SERVER_API}/repos/{0}/actions/{1}"
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 GITHUB_REPO = os.getenv("REPO")
+IS_GITHUB = True if os.getenv("IS_GITHUB").lower() in ["true", "1", "t"] else False
