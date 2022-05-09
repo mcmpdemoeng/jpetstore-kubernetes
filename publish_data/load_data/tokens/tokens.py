@@ -109,8 +109,11 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
         "Accept": "application/vnd.github.v3+json",
     }
 
-    public_key = requests.get(url=PUBLIC_KEY_ENDPOINT, headers=headers)
-    LOGGER.info("Status = " + str(public_key.status_code))
+    response = requests.get(url=PUBLIC_KEY_ENDPOINT, headers=headers)
+    if response.status_code != 200:
+        LOGGER.error("Error Public Key = " + str(response.text))
+
+    public_key = response.json()
 
     devops_token_encrypted = str(_encrypt(public_key["key"], devops_token))
 
@@ -128,7 +131,7 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
     response = requests.put(url=CREATE_SECRET_ENDPOINT, headers=headers, data=payload)
     LOGGER.info(response.json())
     if response.status_code != 200 and response.status_code != 201 and response.status_code != 204:
-        LOGGER.error("Error = " + str(response.text))
+        LOGGER.error("Error Secret Creation = " + str(response.text))
     else:
         LOGGER.info("Creation succeed")
 
