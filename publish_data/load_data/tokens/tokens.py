@@ -62,7 +62,6 @@ def _find_existing_token(tenant_url, bearer_token, path):
     democloud_token = None
 
     TOKENS_ENDPOINT = "{0}{1}".format(tenant_url, path)
-    LOGGER.info(TOKENS_ENDPOINT)
 
     headers = {"Authorization": "Bearer {0}".format(bearer_token), "accept": "application/json"}
 
@@ -99,10 +98,10 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
         f.write(devops_response.token)
 
     ENDPOINT = GITHUB_API_SECRESTS_ACTIONS_URL.format(GITHUB_REPO, devops_name)
-    print(ENDPOINT)
+    LOGGER.info(ENDPOINT)
     devops_token = str(devops_response.token)
     devops_token_encoded = base64.b64encode(devops_token.encode("utf-8")).decode("utf-8")
-    print(devops_token_encoded)
+    LOGGER.info(devops_token_encoded)
 
     headers = {
         "Authorization": "TOKEN {0}".format(GITHUB_TOKEN),
@@ -113,7 +112,7 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
     payload = {"encrypted_value": f"{devops_token_encoded}"}
 
     response = requests.post(url=ENDPOINT, headers=headers, data=payload)
-    print(response.json())
+    LOGGER.info(response.json())
     if response.status_code != 200 and response.status_code != 201 and response.status_code != 204:
         LOGGER.error("Error = " + str(response.text))
     else:
