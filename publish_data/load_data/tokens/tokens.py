@@ -100,7 +100,6 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
 
     SECRET_NAME = f"{devops_name}_TOKEN"
     devops_token = str(devops_response.token)
-    LOGGER.info(devops_token)
 
     PUBLIC_KEY_ENDPOINT = GITHUB_API_SECRESTS_ACTIONS_URL.format(GITHUB_SERVER_API, GITHUB_REPO, "public-key")
     CREATE_SECRET_ENDPOINT = GITHUB_API_SECRESTS_ACTIONS_URL.format(GITHUB_SERVER_API, GITHUB_REPO, SECRET_NAME)
@@ -119,7 +118,6 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
     public_key = response.json()
 
     devops_token_encrypted = _encrypt(public_key["key"], devops_token)
-    LOGGER.info(devops_token_encrypted)
 
     github_repo = GITHUB_REPO.split("/")
 
@@ -131,7 +129,7 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
         "key_id": public_key["key_id"],
     }
 
-    response = requests.put(url=CREATE_SECRET_ENDPOINT, headers=headers, data=payload)
+    response = requests.put(url=CREATE_SECRET_ENDPOINT, headers=headers, data=json.dumps(payload))
     LOGGER.info(response.json())
     if response.status_code != 200 and response.status_code != 201 and response.status_code != 204:
         LOGGER.error("Error Secret Creation = " + str(response.text))
