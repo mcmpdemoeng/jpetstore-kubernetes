@@ -137,4 +137,4 @@ GITHUB_SERVER_API = os.getenv("GITHUB_SERVER", "").replace("github.com", "api.gi
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 # GITHUB_TOKEN = os.getenv("TOKEN_GITHUB")
 GITHUB_REPO = os.getenv("REPO")
-IS_GITHUB = True if os.getenv("IS_GITHUB").lower() in ["true", "1", "t"] else False
+IS_GITHUB = True if os.getenv("IS_GITHUB", "").lower() in ["true", "1", "t"] else False
