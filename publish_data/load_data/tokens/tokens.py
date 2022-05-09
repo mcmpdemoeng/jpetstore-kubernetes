@@ -104,7 +104,7 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
     CREATE_SECRET_ENDPOINT = GITHUB_API_SECRESTS_ACTIONS_URL.format(GITHUB_SERVER_API, GITHUB_REPO, SECRET_NAME)
 
     headers = {
-        "Authorization": "Bearer {0}".format(GITHUB_TOKEN),
+        "Authorization": "token {0}".format(GITHUB_TOKEN),
         "Content-Type": "application/json",
         "Accept": "application/vnd.github.v3+json",
     }
