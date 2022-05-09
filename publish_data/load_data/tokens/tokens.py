@@ -10,8 +10,9 @@ from common_utils.constants import (
     IS_GITHUB,
 )
 from nacl import encoding, public
+from base64 import b64encode
 
-import requests, json, base64
+import requests, json
 
 
 LOGGER = loggers.create_logger_module("devops-intelligence-publisher")
@@ -99,6 +100,7 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
 
     SECRET_NAME = f"{devops_name}_TOKEN"
     devops_token = str(devops_response.token)
+    LOGGER.info(devops_token)
 
     PUBLIC_KEY_ENDPOINT = GITHUB_API_SECRESTS_ACTIONS_URL.format(GITHUB_SERVER_API, GITHUB_REPO, "public-key")
     CREATE_SECRET_ENDPOINT = GITHUB_API_SECRESTS_ACTIONS_URL.format(GITHUB_SERVER_API, GITHUB_REPO, SECRET_NAME)
@@ -117,14 +119,15 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
     public_key = response.json()
 
     devops_token_encrypted = _encrypt(public_key["key"], devops_token)
+    LOGGER.info(devops_token_encrypted)
 
     github_repo = GITHUB_REPO.split("/")
 
     payload = {
         "encrypted_value": devops_token_encrypted,
-        # "owner": github_repo[0],
-        # "repo": github_repo[1],
-        # "secret_name": SECRET_NAME,
+        "owner": github_repo[0],
+        "repo": github_repo[1],
+        "secret_name": SECRET_NAME,
         "key_id": public_key["key_id"],
     }
 
@@ -143,4 +146,4 @@ def _encrypt(public_key: str, secret_value: str) -> str:
     public_key = public.PublicKey(public_key.encode("utf-8"), encoding.Base64Encoder())
     sealed_box = public.SealedBox(public_key)
     encrypted = sealed_box.encrypt(secret_value.encode("utf-8"))
-    return base64.b64encode(encrypted).decode("utf-8")
+    return b64encode(encrypted).decode("utf-8")
