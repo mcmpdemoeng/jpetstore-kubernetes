@@ -135,7 +135,7 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
         LOGGER.error("Error Secret Creation = " + str(response.text))
         return False
 
-    LOGGER.info("Creation succeed")
+    LOGGER.info(f"Creation of {SECRET_NAME} succeed")
     return True
 
 
