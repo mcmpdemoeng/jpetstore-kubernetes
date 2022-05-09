@@ -1,4 +1,4 @@
-from common_utils.constants import loggers, DevOpsToken, TOKEN_NAME, BROKER
+from common_utils.constants import loggers, DevOpsToken, TOKEN_NAME, BROKER, GITHUB_TOKEN
 
 import requests, json
 
@@ -33,7 +33,7 @@ def get_token(name, tenant_url, bearer_token, path):
     with open(f"{name}_TOKEN", "w") as f:
         f.write(devops_token.token)
 
-    return devops_token
+    return devops_token.token
 
 
 def _find_existing_token(tenant_url, bearer_token, path):
@@ -71,4 +71,13 @@ def _find_existing_token(tenant_url, bearer_token, path):
 
 
 def _create_secret_github():
+    # headers = {
+    #     "Authorization": "Bearer {0}".format(GITHUB_TOKEN),
+    #     "accept": "application/vnd.github.v3+json",
+    #     "Content-Type": "application/json",
+    # }
+
+    # payload = {
+    #     "encrypted_value":
+    # }
     pass
