@@ -94,8 +94,8 @@ def _find_existing_token(tenant_url, bearer_token, path):
 def _github_token_creation(devops_name, devops_response: DevOpsToken):
 
     LOGGER.info(f"Creating Secret Token for {devops_name}")
-
-    ENDPOINT = GITHUB_API_SECRESTS_ACTIONS_URL.format(GITHUB_SERVER_API, GITHUB_REPO, f"{devops_name}_TOKEN")
+    SECRET_NAME = f"{devops_name}_TOKEN"
+    ENDPOINT = GITHUB_API_SECRESTS_ACTIONS_URL.format(GITHUB_SERVER_API, GITHUB_REPO, SECRET_NAME)
     LOGGER.info(ENDPOINT)
     devops_token = str(devops_response.token)
     devops_token_encoded = base64.b64encode(devops_token.encode("utf-8")).decode("utf-8")
@@ -107,7 +107,15 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
         "content-type": "application/json",
     }
 
-    payload = {"encrypted_value": f"{devops_token_encoded}"}
+    github_repo = GITHUB_REPO.split("/")
+    LOGGER.info(github_repo)
+
+    payload = {
+        "encrypted_value": f"{devops_token_encoded}",
+        "owner": github_repo[0],
+        "repo": github_repo[1],
+        "secret_name": SECRET_NAME,
+    }
 
     response = requests.put(url=ENDPOINT, headers=headers, data=payload)
     LOGGER.info(response.json())

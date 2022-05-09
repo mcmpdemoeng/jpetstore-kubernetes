@@ -130,7 +130,7 @@ DEPLOYMENT_HREF = os.getenv("DEPLOYMENT_HREF", "")
 {0} github url (not api url)
 """
 
-GITHUB_API_SECRESTS_ACTIONS_URL = "{0}/repos/{1}/actions/{2}"
+GITHUB_API_SECRESTS_ACTIONS_URL = "{0}/repos/{1}/actions/secrets/{2}"
 
 
 GITHUB_SERVER_API = os.getenv("GITHUB_SERVER", "").replace("github.com", "api.github.com")
