@@ -122,7 +122,7 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
 
     payload = {
         "encrypted_value": devops_token_encrypted,
-        "key_id": public_key["key"],
+        "key_id": public_key["key_id"],
     }
 
     response = requests.put(url=CREATE_SECRET_ENDPOINT, headers=headers, data=payload)
