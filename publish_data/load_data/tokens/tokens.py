@@ -110,7 +110,7 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
     }
 
     public_key = requests.get(url=PUBLIC_KEY_ENDPOINT, headers=headers)
-    LOGGER.info("Status = " + public_key.status_code)
+    LOGGER.info("Status = " + str(public_key.status_code))
 
     github_repo = GITHUB_REPO.split("/")
     LOGGER.info(github_repo)
