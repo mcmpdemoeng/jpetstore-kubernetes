@@ -122,9 +122,9 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
 
     payload = {
         "encrypted_value": devops_token_encrypted,
-        "owner": github_repo[0],
-        "repo": github_repo[1],
-        "secret_name": SECRET_NAME,
+        # "owner": github_repo[0],
+        # "repo": github_repo[1],
+        # "secret_name": SECRET_NAME,
         "key_id": public_key["key_id"],
     }
 
