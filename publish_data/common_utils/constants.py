@@ -81,9 +81,9 @@ UTC_FORMAT = "%FT%TZ"
 
 # Tokens if they are already created for publish data to DevOps Intelligence
 
-BUILD_TOKEN = os.getenv("BUILD_TOKEN")
-TEST_TOKEN = os.getenv("TEST_TOKEN")
-DEPLOY_TOKEN = os.getenv("DEPLOY_TOKEN")
+BUILD_TOKEN = os.getenv("BUILD_TOKEN", "")
+TEST_TOKEN = os.getenv("TEST_TOKEN", "")
+DEPLOY_TOKEN = os.getenv("DEPLOY_TOKEN", "")
 
 """
 {0} tenant url (not api url)
