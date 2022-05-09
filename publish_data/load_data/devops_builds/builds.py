@@ -25,7 +25,7 @@ def post_build_data(tenant_url, bearer_token):
     try:
         TOKEN_API = "dash/api/build/v1/config/tokens"
         DEVOPS_BUILD_TOKEN = (
-            BUILD_TOKEN if BUILD_TOKEN is not None else tokens.get_token("BUILD", tenant_url, bearer_token, TOKEN_API)
+            BUILD_TOKEN if BUILD_TOKEN != "" else tokens.get_token("BUILD", tenant_url, bearer_token, TOKEN_API)
         )
         ENDPOINT = BUILD_URL_TEMPLATE.format(tenant_url)
 
