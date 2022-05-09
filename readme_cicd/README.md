@@ -88,6 +88,7 @@ This setup assumes that you have ordered a Petstore Service Instance.
 
 2. Now in the current repository, go to `Settings` > `Secrets` > `Actions`. Create the following `repository secrets`:
    
+   - `GH_TOKEN`: A Github access token.
    - `BEARER_TOKEN`: The bearer token created in the developer console of your tenant.
    - `DOCKER_PASSWORD`: Your personal Docker password or a created access token with Read/Write/Delete privileges.
    - `DOCKER_USERNAME`: Your personal Docker username.
