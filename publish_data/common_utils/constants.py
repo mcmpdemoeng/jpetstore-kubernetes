@@ -132,8 +132,9 @@ DEPLOYMENT_HREF = os.getenv("DEPLOYMENT_HREF", "")
 
 GITHUB_API_SECRESTS_ACTIONS_URL = "{0}/repos/{1}/actions/{2}"
 
-# GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+
 GITHUB_SERVER_API = os.getenv("GITHUB_SERVER", "").replace("github.com", "api.github.com")
-GITHUB_TOKEN = os.getenv("TOKEN_GITHUB")
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+# GITHUB_TOKEN = os.getenv("TOKEN_GITHUB")
 GITHUB_REPO = os.getenv("REPO")
 IS_GITHUB = True if os.getenv("IS_GITHUB").lower() in ["true", "1", "t"] else False
