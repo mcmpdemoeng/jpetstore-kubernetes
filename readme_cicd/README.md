@@ -61,6 +61,25 @@ This setup assumes that you have ordered a Petstore Service Instance.
 
 ## Jenkins
 
+1. Fork the [JPetstore-Kubernetes](https://github.com/mcmpdemoeng/jpetstore-kubernetes) project to your own Github Account. Generate a `Github Access Token` within `Profile` > `Settings` > `Developer Settings` > `Personal Access Token`. Once you are at that [page](https://github.com/settings/apps), create your token and save it.
+
+   ![Github-AccessToken](images/Github-AccessToken.png)
+
+2. Go to the main Democloud's Jenkins [page](http://13.82.103.214:8080/), access with the given username and password. You will see a dashboard like this:
+
+   ![Jenkins-Dashboard](images/Jenkins-Dashboard.png)
+
+3. Select the tab of `Democloud` and select the `shared-petstore-deployment-job`. Direct to `Build with parameters` and provide all the parameters created early.
+
+   ![Jenkins-BuildwithParameters](images/Jenkins-BuildwithParameters.png)
+
+4. Once all the parameters are filled, press the `build` button located at the bottom of the page. If the pipeline was succeeded you'll be able to see a green check with a specific number within the `Build History`. Select the succeeded pipeline and go to `Console Output`.
+
+   ![Jenkins-PipelineSelect](images/Jenkins-PipelineSelect.png)
+
+   ![Jenkins-PipelineOutput](images/Jenkins-PipelineOutput.png)
+
+5. Look up within the output for a text with this format `Your application is available at http://<url_to_your_application>`. Copy the URL and paste it into your browser to see your Petstore application deployed on AKS.
 ## Github Actions
 
 1. Fork the [JPetstore-Kubernetes](https://github.com/mcmpdemoeng/jpetstore-kubernetes) project to your own Github Account. Then, go to `Github Actions` of the current project and set up the information.
