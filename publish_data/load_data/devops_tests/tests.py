@@ -54,7 +54,7 @@ def post_tests_data(tenant_url, bearer_token):
         )
 
         headers = {
-            "Authorization": "TOKEN " + DEVOPS_TEST_TOKEN,
+            "Authorization": "TOKEN " + DEVOPS_TEST_TOKEN.token,
             "Content-Type": m.content_type,
             "accept": "application/json",
         }

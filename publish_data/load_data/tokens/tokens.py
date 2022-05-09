@@ -10,6 +10,9 @@ def get_token(name, tenant_url, bearer_token, path):
     existing_token = _find_existing_token(tenant_url, bearer_token, path)
 
     if existing_token is not None:
+        devops_token = existing_token
+        with open(f"{name}_TOKEN", "w") as f:
+            f.write(devops_token.token)
         return existing_token
 
     NEW_TOKEN_ENDPOINT = "{0}{1}".format(tenant_url, path)
@@ -30,11 +33,10 @@ def get_token(name, tenant_url, bearer_token, path):
         raise Exception("Error when creating a new devops token. Code = " + str(response.status_code))
 
     devops_token = DevOpsToken(response.json())
-    print(devops_token.__dict__)
     with open(f"{name}_TOKEN", "w") as f:
         f.write(devops_token.token)
 
-    return devops_token.token
+    return devops_token
 
 
 def _find_existing_token(tenant_url, bearer_token, path):

@@ -56,7 +56,7 @@ def post_deployment_data(tenant_url, bearer_token):
         body.serviceoverride = True
 
         headers = {
-            "Authorization": "TOKEN " + DEVOPS_DEPLOYMENTS_TOKEN,
+            "Authorization": "TOKEN " + DEVOPS_DEPLOYMENTS_TOKEN.token,
             "Content-Type": "application/json",
             "accept": "application/json",
         }

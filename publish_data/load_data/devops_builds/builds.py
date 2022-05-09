@@ -54,7 +54,7 @@ def post_build_data(tenant_url, bearer_token):
         body.serviceoverride = True
 
         headers = {
-            "Authorization": "TOKEN " + DEVOPS_BUILD_TOKEN,
+            "Authorization": "TOKEN " + DEVOPS_BUILD_TOKEN.token,
             "Content-Type": "application/json",
             "accept": "application/json",
         }
