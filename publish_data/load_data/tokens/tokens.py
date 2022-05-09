@@ -105,7 +105,7 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
     print(devops_token_encoded)
 
     headers = {
-        "Authorization": "Bearer {0}".format(GITHUB_TOKEN),
+        "Authorization": "TOKEN {0}".format(GITHUB_TOKEN),
         "accept": "application/vnd.github.v3+json",
         "Content-Type": "application/json",
     }
@@ -113,6 +113,7 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
     payload = {"encrypted_value": f"{devops_token_encoded}"}
 
     response = requests.post(url=ENDPOINT, headers=headers, data=payload)
+    print(response.json())
     if response.status_code != 200 and response.status_code != 201 and response.status_code != 204:
         LOGGER.error("Error = " + str(response.text))
 
