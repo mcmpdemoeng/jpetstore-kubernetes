@@ -13,7 +13,7 @@ def get_token(name, tenant_url, bearer_token, path):
         devops_token = existing_token
         with open(f"{name}_TOKEN", "w") as f:
             f.write(devops_token.token)
-        return existing_token
+        return devops_token
 
     NEW_TOKEN_ENDPOINT = "{0}{1}".format(tenant_url, path)
     LOGGER.info(NEW_TOKEN_ENDPOINT)
