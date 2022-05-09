@@ -9,8 +9,10 @@ from common_utils.constants import (
     GITHUB_SERVER_API,
     IS_GITHUB,
 )
+from nacl import encoding, public
 
 import requests, json, base64
+
 
 LOGGER = loggers.create_logger_module("devops-intelligence-publisher")
 
@@ -94,32 +96,44 @@ def _find_existing_token(tenant_url, bearer_token, path):
 def _github_token_creation(devops_name, devops_response: DevOpsToken):
 
     LOGGER.info(f"Creating Secret Token for {devops_name}")
+
     SECRET_NAME = f"{devops_name}_TOKEN"
-    ENDPOINT = GITHUB_API_SECRESTS_ACTIONS_URL.format(GITHUB_SERVER_API, GITHUB_REPO, SECRET_NAME)
-    LOGGER.info(ENDPOINT)
     devops_token = str(devops_response.token)
-    devops_token_encoded = base64.b64encode(devops_token.encode("utf-8")).decode("utf-8")
-    LOGGER.info(devops_token_encoded)
+
+    PUBLIC_KEY_ENDPOINT = GITHUB_API_SECRESTS_ACTIONS_URL.format(GITHUB_SERVER_API, GITHUB_REPO, "public-key")
+    CREATE_SECRET_ENDPOINT = GITHUB_API_SECRESTS_ACTIONS_URL.format(GITHUB_SERVER_API, GITHUB_REPO, SECRET_NAME)
 
     headers = {
-        "authorization": "Bearer {0}".format(GITHUB_TOKEN),
-        "accept": "application/vnd.github.v3+json",
-        "content-type": "application/json",
+        "Authorization": "Bearer {0}".format(GITHUB_TOKEN),
+        "Content-Type": "application/json",
+        "Accept": "application/vnd.github.v3+json",
     }
+
+    public_key = requests.get(url=PUBLIC_KEY_ENDPOINT, headers=headers)
+    LOGGER.info("Status = " + public_key.status_code)
 
     github_repo = GITHUB_REPO.split("/")
     LOGGER.info(github_repo)
 
     payload = {
-        "encrypted_value": f"{devops_token_encoded}",
+        "encrypted_value": _encrypt(public_key["key"], devops_token),
         "owner": github_repo[0],
         "repo": github_repo[1],
         "secret_name": SECRET_NAME,
+        "key_id": public_key["key"],
     }
 
-    response = requests.put(url=ENDPOINT, headers=headers, data=payload)
+    response = requests.put(url=CREATE_SECRET_ENDPOINT, headers=headers, data=payload)
     LOGGER.info(response.json())
     if response.status_code != 200 and response.status_code != 201 and response.status_code != 204:
         LOGGER.error("Error = " + str(response.text))
     else:
         LOGGER.info("Creation succeed")
+
+
+def _encrypt(public_key: str, secret_value: str) -> str:
+    """Encrypt a Unicode string using the public key."""
+    public_key = public.PublicKey(public_key.encode("utf-8"), encoding.Base64Encoder())
+    sealed_box = public.SealedBox(public_key)
+    encrypted = sealed_box.encrypt(secret_value.encode("utf-8"))
+    return base64.b64encode(encrypted).decode("utf-8")

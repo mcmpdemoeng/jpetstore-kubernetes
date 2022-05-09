@@ -32,7 +32,7 @@ env:
   ORDER_NUMBER: ${{secrets.ORDER_NUMBER}}
   BEARER_TOKEN: ${{secrets.BEARER_TOKEN}}
   GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-  # GITHUB_TOKEN: ${{secrets.TOKEN_GITHUB}}
+  # GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
   GITHUB_SERVER: ${{github.server_url}}
   IS_GITHUB: 'true'
   BUILD_TOKEN: ${{secrets.BUILD_TOKEN}}
