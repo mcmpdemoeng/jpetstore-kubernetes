@@ -26,7 +26,9 @@ def post_deployment_data(tenant_url, bearer_token):
 
         TOKEN_API = "dash/api/deployments/v1/config/tokens"
         DEVOPS_DEPLOYMENTS_TOKEN = (
-            DEPLOY_TOKEN if DEPLOY_TOKEN != "" else tokens.get_token("DEPLOY", tenant_url, bearer_token, TOKEN_API)
+            DEPLOY_TOKEN
+            if DEPLOY_TOKEN != ""
+            else tokens.get_token("DEPLOY", tenant_url, bearer_token, TOKEN_API).token
         )
         ENDPOINT = DEPLOYMENT_URL_TEMPLATE.format(tenant_url)
 
@@ -56,7 +58,7 @@ def post_deployment_data(tenant_url, bearer_token):
         body.serviceoverride = True
 
         headers = {
-            "Authorization": "TOKEN " + DEVOPS_DEPLOYMENTS_TOKEN.token,
+            "Authorization": "TOKEN " + DEVOPS_DEPLOYMENTS_TOKEN,
             "Content-Type": "application/json",
             "accept": "application/json",
         }

@@ -26,7 +26,7 @@ def post_tests_data(tenant_url, bearer_token):
 
         TOKEN_API = "dash/api/test/v1/config/tokens"
         DEVOPS_TEST_TOKEN = (
-            TEST_TOKEN if TEST_TOKEN != "" else tokens.get_token("TEST", tenant_url, bearer_token, TOKEN_API)
+            TEST_TOKEN if TEST_TOKEN != "" else tokens.get_token("TEST", tenant_url, bearer_token, TOKEN_API).token
         )
 
         ENDPOINT = TEST_URL_TEMPLATE.format(tenant_url, TEST_TYPE, RUN_ID)
@@ -54,7 +54,7 @@ def post_tests_data(tenant_url, bearer_token):
         )
 
         headers = {
-            "Authorization": "TOKEN " + DEVOPS_TEST_TOKEN.token,
+            "Authorization": "TOKEN " + DEVOPS_TEST_TOKEN,
             "Content-Type": m.content_type,
             "accept": "application/json",
         }
