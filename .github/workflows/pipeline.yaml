@@ -31,7 +31,6 @@ env:
   TENANT_SYSTEM_USER_API_KEY: ${{secrets.TENANT_SYSTEM_USER_API_KEY}}
   ORDER_NUMBER: ${{secrets.ORDER_NUMBER}}
   BEARER_TOKEN: ${{secrets.BEARER_TOKEN}}
-  # GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
   GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
   GITHUB_SERVER: ${{github.server_url}}
   IS_GITHUB: 'true'

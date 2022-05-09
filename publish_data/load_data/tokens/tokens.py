@@ -112,19 +112,16 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
     response = requests.get(url=PUBLIC_KEY_ENDPOINT, headers=headers)
     if response.status_code != 200:
         LOGGER.error("Error Public Key = " + str(response.text))
+        return False
 
     public_key = response.json()
 
-    devops_token_encrypted = str(_encrypt(public_key["key"], devops_token))
+    devops_token_encrypted = _encrypt(public_key["key"], devops_token)
 
     github_repo = GITHUB_REPO.split("/")
-    LOGGER.info(github_repo)
 
     payload = {
         "encrypted_value": devops_token_encrypted,
-        "owner": github_repo[0],
-        "repo": github_repo[1],
-        "secret_name": SECRET_NAME,
         "key_id": public_key["key"],
     }
 
@@ -132,8 +129,10 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
     LOGGER.info(response.json())
     if response.status_code != 200 and response.status_code != 201 and response.status_code != 204:
         LOGGER.error("Error Secret Creation = " + str(response.text))
-    else:
-        LOGGER.info("Creation succeed")
+        return False
+
+    LOGGER.info("Creation succeed")
+    return True
 
 
 def _encrypt(public_key: str, secret_value: str) -> str:
