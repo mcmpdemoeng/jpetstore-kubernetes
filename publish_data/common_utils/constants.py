@@ -79,6 +79,12 @@ PROVIDER = os.getenv("PROVIDER", "")
 
 UTC_FORMAT = "%FT%TZ"
 
+# Tokens if they are already created for publish data to DevOps Intelligence
+
+BUILD_TOKEN = os.getenv("BUILD_TOKEN")
+TEST_TOKEN = os.getenv("TEST_TOKEN")
+DEPLOY_TOKEN = os.getenv("DEPLOY_TOKEN")
+
 """
 {0} tenant url (not api url)
 {1} service name without  any '/' char
@@ -117,3 +123,14 @@ DEPLOY_DURATION_TIME = int(os.getenv("DEPLOY_DURATION_TIME", 1))
 DEPLOYMENT_HOSTNAME = os.getenv("DEPLOYMENT_HOSTNAME", "HOSTNAME")
 DEPLOYMENT_SERVICE_ID = os.getenv("DEPLOYMENT_SERVICE_ID", "SERVICE_ID")
 DEPLOYMENT_HREF = os.getenv("DEPLOYMENT_HREF", "")
+
+
+# Github secrets
+"""
+{0} github url (not api url)
+"""
+GITHUB_SERVER_API = os.getenv("GITHUB_SERVER").replace("github.com", "api.github.com")
+GITHUB_API_SECRESTS_ACTIONS_URL = "{GITHUB_SERVER_API}/repos/{0}/actions/{1}"
+
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_REPO = os.getenv("REPO")

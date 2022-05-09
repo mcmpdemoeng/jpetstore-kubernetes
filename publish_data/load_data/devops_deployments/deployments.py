@@ -12,6 +12,7 @@ from common_utils.constants import (
     SERVICE_NAME,
     RUN_ID,
     PROVIDER,
+    DEPLOY_TOKEN,
 )
 
 import json, requests, traceback
@@ -24,7 +25,11 @@ def post_deployment_data(tenant_url, bearer_token):
     try:
 
         TOKEN_API = "dash/api/deployments/v1/config/tokens"
-        DEVOPS_DEPLOYMENTS_TOKEN = tokens.get_token(tenant_url, bearer_token, TOKEN_API)
+        DEVOPS_DEPLOYMENTS_TOKEN = (
+            DEPLOY_TOKEN
+            if DEPLOY_TOKEN is not None
+            else tokens.get_token("DEPLOY", tenant_url, bearer_token, TOKEN_API)
+        )
         ENDPOINT = DEPLOYMENT_URL_TEMPLATE.format(tenant_url)
 
         body = DeploymentTemplate()

@@ -5,7 +5,7 @@ import requests, json
 LOGGER = loggers.create_logger_module("devops-intelligence-publisher")
 
 
-def get_token(tenant_url, bearer_token, path):
+def get_token(name, tenant_url, bearer_token, path):
 
     existing_token = _find_existing_token(tenant_url, bearer_token, path)
 
@@ -29,7 +29,11 @@ def get_token(tenant_url, bearer_token, path):
         LOGGER.error(response.text)
         raise Exception("Error when creating a new devops token. Code = " + str(response.status_code))
 
-    return DevOpsToken(response.json())
+    devops_token = DevOpsToken(response.json())
+    with open(f"{name}_TOKEN", "w") as f:
+        f.write(devops_token.token)
+
+    return devops_token
 
 
 def _find_existing_token(tenant_url, bearer_token, path):
@@ -64,3 +68,7 @@ def _find_existing_token(tenant_url, bearer_token, path):
         raise Exception("Error during democloud token existence check. Code {0}".format(response.status_code))
 
     return democloud_token
+
+
+def _create_secret_github():
+    pass

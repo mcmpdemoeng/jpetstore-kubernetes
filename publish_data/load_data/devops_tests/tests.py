@@ -12,6 +12,7 @@ from common_utils.constants import (
     SERVICE_NAME,
     RUN_ID,
     TEST_HREF,
+    TEST_TOKEN,
 )
 
 import requests, traceback
@@ -24,7 +25,9 @@ def post_tests_data(tenant_url, bearer_token):
     try:
 
         TOKEN_API = "dash/api/test/v1/config/tokens"
-        DEVOPS_TEST_TOKEN = tokens.get_token(tenant_url, bearer_token, TOKEN_API)
+        DEVOPS_TEST_TOKEN = (
+            TEST_TOKEN if TEST_TOKEN is not None else tokens.get_token("TEST", tenant_url, bearer_token, TOKEN_API)
+        )
 
         ENDPOINT = TEST_URL_TEMPLATE.format(tenant_url, TEST_TYPE, RUN_ID)
 
