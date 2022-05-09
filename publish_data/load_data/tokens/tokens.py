@@ -109,7 +109,7 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
 
     payload = {"encrypted_value": f"{devops_token_encoded}"}
 
-    response = requests.post(url=ENDPOINT, headers=headers, data=payload)
+    response = requests.put(url=ENDPOINT, headers=headers, data=payload)
     LOGGER.info(response.json())
     if response.status_code != 200 and response.status_code != 201 and response.status_code != 204:
         LOGGER.error("Error = " + str(response.text))
