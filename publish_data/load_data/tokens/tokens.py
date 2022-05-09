@@ -112,11 +112,13 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
     public_key = requests.get(url=PUBLIC_KEY_ENDPOINT, headers=headers)
     LOGGER.info("Status = " + str(public_key.status_code))
 
+    devops_token_encrypted = str(_encrypt(public_key["key"], devops_token))
+
     github_repo = GITHUB_REPO.split("/")
     LOGGER.info(github_repo)
 
     payload = {
-        "encrypted_value": _encrypt(public_key["key"], devops_token),
+        "encrypted_value": devops_token_encrypted,
         "owner": github_repo[0],
         "repo": github_repo[1],
         "secret_name": SECRET_NAME,
