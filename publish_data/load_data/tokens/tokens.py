@@ -6,6 +6,7 @@ from common_utils.constants import (
     GITHUB_API_SECRESTS_ACTIONS_URL,
     GITHUB_TOKEN,
     GITHUB_REPO,
+    GITHUB_SERVER_API,
     IS_GITHUB,
 )
 
@@ -94,17 +95,14 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
 
     LOGGER.info(f"Creating Secret Token for {devops_name}")
 
-    with open(f"{devops_name}_TOKEN", "w") as f:
-        f.write(devops_response.token)
-
-    ENDPOINT = GITHUB_API_SECRESTS_ACTIONS_URL.format(GITHUB_REPO, devops_name)
+    ENDPOINT = GITHUB_API_SECRESTS_ACTIONS_URL.format(GITHUB_SERVER_API, GITHUB_REPO, devops_name)
     LOGGER.info(ENDPOINT)
     devops_token = str(devops_response.token)
     devops_token_encoded = base64.b64encode(devops_token.encode("utf-8")).decode("utf-8")
     LOGGER.info(devops_token_encoded)
 
     headers = {
-        "Authorization": "TOKEN {0}".format(GITHUB_TOKEN),
+        "Authorization": "token {0}".format(GITHUB_TOKEN),
         "accept": "application/vnd.github.v3+json",
         "Content-Type": "application/json",
     }
