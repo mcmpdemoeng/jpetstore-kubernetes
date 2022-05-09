@@ -116,5 +116,5 @@ def _github_token_creation(devops_name, devops_response: DevOpsToken):
     print(response.json())
     if response.status_code != 200 and response.status_code != 201 and response.status_code != 204:
         LOGGER.error("Error = " + str(response.text))
-
-    LOGGER.info("Creation succeed")
+    else:
+        LOGGER.info("Creation succeed")
