@@ -177,9 +177,9 @@ jobs:
           chmod +x result.sh
           ./result.sh $app
           echo "DEPLOY_DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
-          echo "DEPLOYMENT_HOSTNAME='http://jpetstore-web.$(cat fqdn)'" >> $GITHUB_ENV
-          echo "DEPLOYMENT_HREF='http://jpetstore-web.$(cat fqdn)'" >> $GITHUB_ENV
-          echo “Your application is available at http://jpetstore-web.$(cat fqdn)”
+          echo "DEPLOYMENT_HOSTNAME=http://jpetstore-web.$(cat fqdn)" >> $GITHUB_ENV
+          echo "DEPLOYMENT_HREF=http://jpetstore-web.$(cat fqdn)" >> $GITHUB_ENV
+          echo Your application is available at http://jpetstore-web.$(cat fqdn)
 
       - name: Print deploy time
         run: |
