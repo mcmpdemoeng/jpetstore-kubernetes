@@ -69,9 +69,11 @@ This setup assumes that you have ordered a Petstore Service Instance.
 
    ![Jenkins-Dashboard](images/Jenkins-Dashboard.png)
 
-3. Select the tab of `Democloud` and select the `shared-petstore-deployment-job`. Direct to `Build with parameters` and provide all the parameters created early.
+3. Select the tab of `Democloud` and select the `template-petstore-deployment-job`. Direct to `Build with parameters` and provide all the parameters created early.
 
-   ![Jenkins-BuildwithParameters](images/Jenkins-BuildwithParameters.png)
+   ![Jenkins-BuildwithParameters1](images/Jenkins-BuildwithParameters1.png)
+
+   ![Jenkins-BuildwithParameters2](images/Jenkins-BuildwithParameters2.png)
 
 4. Once all the parameters are filled, press the `build` button located at the bottom of the page. If the pipeline was succeeded you'll be able to see a green check with a specific number within the `Build History`. Select the succeeded pipeline and go to `Console Output`.
 
