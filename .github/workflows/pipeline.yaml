@@ -13,6 +13,8 @@ on:
   #   tags:
   #     description: 'Test scenario tags'
 
+  repository_dispatch:
+
   # Uncomment these lines if you want your pipeline work with pushes and pull requests automatically
   # Triggers the workflow on push or pull request events but only for the main branch
   # push:
