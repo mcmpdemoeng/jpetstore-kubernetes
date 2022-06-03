@@ -219,7 +219,7 @@ export DEPLOYMENT_HREF="http://jpetstore-web.${petstore_host}"
 
 echo "Reading existing tokens..."
 
-cd .. # root
+#cd .. # root
 
 mkdir -p devops_tokens
 
@@ -242,7 +242,7 @@ fi
 
 cd .. # root
 
-cd jpetstore-kubernetes
+#cd jpetstore-kubernetes
 
 echo "Publishing data into the tenant...."
 
@@ -256,23 +256,23 @@ echo "Storing devops tokens files..."
 
 ls
 
-cd .. # publish_data
+# cd .. # publish_data
 
 cd .. # root
 
 
 if [ -f "./jpetstore-kubernetes/publish_data/DEPLOY_TOKEN" ]; then
-	cp ./jpetstore-kubernetes/publish_data/DEPLOY_TOKEN ./devops_tokens
+	cp ./publish_data/DEPLOY_TOKEN ./devops_tokens
 	echo "Deploy token saved!"
 fi
 
 if [ -f "./jpetstore-kubernetes/publish_data/BUILD_TOKEN" ]; then
-	cp ./jpetstore-kubernetes/publish_data/BUILD_TOKEN ./devops_tokens
+	cp ./publish_data/BUILD_TOKEN ./devops_tokens
 	echo "Build token saved!"
 fi
 
 if [ -f "./jpetstore-kubernetes/publish_data/TEST_TOKEN" ]; then
-	cp ./jpetstore-kubernetes/publish_data/TEST_TOKEN ./devops_tokens
+	cp ./publish_data/TEST_TOKEN ./devops_tokens
 	echo "Test token saved!"
 fi
 
