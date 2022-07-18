@@ -22,9 +22,10 @@ steps:
   - name: openjdk:11
     script: |
       java --version
+      cd jpetstore
       ant runtest
       cp -r /build/reports/TEST-*.xml /workspace/
-    dir: '/jpetstore'
+
 options:
   dynamic_substitutions: true
 substitutions:
