@@ -5,7 +5,7 @@ steps:
       echo $DOCKER_USERNAME && echo $$DOCKER_USERNAME
       docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       echo "PROJECT ID is ${PROJECT_ID}"
-      echo "RANDOM ${RANDOM}"
+      echo "RANDOM ${_DOCKER_USERNAME}"
     env:
       - 'JPETSTOREWEB=DOCKER_USERNAME/jpetstoreweb'
       - 'BUILD=$BUILD_ID'
