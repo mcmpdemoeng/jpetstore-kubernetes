@@ -31,6 +31,7 @@ steps:
       cd ..
       cp -r ./jpetstore/build/reports/TEST-*.xml /workspace/
   - name: 'gcr.io/$PROJECT_ID/helm'
+    id: 'Deploy application'
     # args: ['install', 'stable/keel', '--name', 'keel', '--namespace', 'keel']
     script: |
       helm --version
