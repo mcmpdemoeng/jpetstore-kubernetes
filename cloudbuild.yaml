@@ -5,16 +5,16 @@ steps:
       echo $DOCKER_USERNAME && echo $$DOCKER_USERNAME
       docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       echo "PROJECT ID is ${PROJECT_ID}"
-      echo "RANDOM ${_DOCKER_USERNAME}"
+      echo "RANDOM ${RANDOM}"
     env:
-      - 'JPETSTOREWEB=DOCKER_USERNAME/jpetstoreweb'
+      - 'JPETSTOREWEB=${_DOCKER_USERNAME}/jpetstoreweb'
       - 'BUILD=$BUILD_ID'
       - 'PROJECT_ID=$PROJECT_ID'
       - 'PROJECT_NUMBER=$PROJECT_NUMBER'
       - 'REV=$REVISION_ID'
       - 'SHORT_SHA=$SHORT_SHA'
-      - 'DOCKER_USERNAME=${_DOCKER_USERNAME}'
-    # secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
+      - 'RANDOM=${_DOCKER_USERNAME}'
+    secretEnv: ['_DOCKER_USERNAME', '_DOCKER_PASSWORD']
 options:
   dynamic_substitutions: true
 # substitutions:
