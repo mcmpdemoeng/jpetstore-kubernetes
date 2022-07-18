@@ -2,7 +2,7 @@ steps:
   - name: ubuntu
     # args: ['-c', 'echo $$DOCKER_USERNAME']
     script: |
-      echo $DOCKER_USERNAME
+      echo "Hello this is a ${DOCKER_USERNAME}"
     #   echo "Hello World"
     #   echo "Testing cloud build"
     #   echo $JPETSTOREWEB
