@@ -1,18 +1,18 @@
 steps:
-  - name: gcr.io/cloud-builders/docker
-    script: |
-      #!/bin/bash
-      echo "Hello World"
-      echo "Testing cloud build"
-      echo $JPETSTOREWEB
-      echo $$DOCKER_USERNAME
-      docker login "https://index.docker.io/v1" -u=$$DOCKER_USERNAME -p=$$DOCKER_PASSWORD
-    env:
-      - 'JPETSTOREWEB=$${DOCKER_USERNAME}/jpetstoreweb'
+  - name: bash
+    args: ['-c', 'echo $$DOCKER_USERNAME']
+    # script: |
+    #   echo "Hello World"
+    #   echo "Testing cloud build"
+    #   echo $JPETSTOREWEB
+    #   echo $$DOCKER_USERNAME
+    #   docker login "https://index.docker.io/v1" -u=$$DOCKER_USERNAME -p=$$DOCKER_PASSWORD
+    # env:
+    #   - 'JPETSTOREWEB=$${DOCKER_USERNAME}/jpetstoreweb'
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
 availableSecrets:
   secretManager:
-    - versionName: projects/474656624551/secrets/DOCKER_USERNAME/versions/latest
+    - versionName: 'projects/${PROJECT_ID}/secrets/DOCKER_USERNAME/versions/latest'
       env: 'DOCKER_USERNAME'
-    - versionName: projects/474656624551/secrets/DOCKER_PASSWORD/versions/latest
+    - versionName: 'projects/${PROJECT_ID}/secrets/DOCKER_PASSWORD/versions/latest'
       env: 'DOCKER_PASSWORD'
