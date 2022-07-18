@@ -6,8 +6,8 @@ steps:
       echo "Testing cloud build"
       echo $JPETSTOREWEB
       echo $$DOCKER_USERNAME
-    env:
-      - 'JPETSTOREWEB=$${DOCKER_USERNAME}/jpetstoreweb'
+    # env:
+    #   - 'JPETSTOREWEB=$${DOCKER_USERNAME}/jpetstoreweb'
     # secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
     secretEnv:
       - 'JPETSTOREWEB=$$DOCKER_USERNAME/jpetstoreweb'
