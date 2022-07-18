@@ -4,6 +4,7 @@ steps:
       #!/bin/bash
       echo "Hello World"
       echo "Testing cloud build"
+      echo $JPETSTOREWEB
     env:
       - 'JPETSTOREWEB=$$DOCKER_USERNAME/jpetstoreweb'
 # availableSecrets:
