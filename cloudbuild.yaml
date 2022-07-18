@@ -5,7 +5,7 @@ steps:
       echo "This is the Build Tag ${BUILD_TAG}"
     env:
       - 'BUILD_TAG=${BUILD_ID}-${REPO_NAME}-${SHORT_SHA}'
-      - 'JPETSTOREWEB=${DOCKER_USERNAME}/jpetstoreweb'
+      # - 'JPETSTOREWEB=${DOCKER_USERNAME}/jpetstoreweb'
       - 'BUILD=$BUILD_ID'
       - 'PROJECT_ID=$PROJECT_ID'
       - 'PROJECT_NUMBER=$PROJECT_NUMBER'
