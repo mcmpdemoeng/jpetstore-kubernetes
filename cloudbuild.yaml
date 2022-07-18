@@ -1,9 +1,9 @@
 steps:
   - name: gcr.io/cloud-builders/docker
     script: |
-      echo "Hello this is a ${DOCKER_USERNAME}"
-      echo $DOCKER_USERNAME && echo $$DOCKER_USERNAME
-      docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      echo "Hello this is a ${_DOCKER_USERNAME}"
+      echo $_DOCKER_USERNAME && echo $$_DOCKER_USERNAME
+      docker login -u $_DOCKER_USERNAME -p $_DOCKER_PASSWORD
       echo "PROJECT ID is ${PROJECT_ID}"
       echo "RANDOM ${RANDOM}"
     env:
