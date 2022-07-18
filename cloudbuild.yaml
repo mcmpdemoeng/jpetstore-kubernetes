@@ -19,13 +19,14 @@ steps:
       - 'REV=$REVISION_ID'
       - 'SHORT_SHA=$SHORT_SHA'
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
-  - name: openjdk:11
+  - name: openjdk:19-jdk-alpine3.16
     script: |
       java --version
-      cd jpetstore
+      apk update && apk add apache-ant
+      ls
       ant runtest
       cp -r /build/reports/TEST-*.xml /workspace/
-
+    dir: '/jpetstore'
 options:
   dynamic_substitutions: true
 substitutions:
