@@ -3,6 +3,7 @@ steps:
     # args: ['-c', 'echo $$DOCKER_USERNAME']
     script: |
       echo "Hello this is a ${DOCKER_USERNAME}"
+      echo $DOCKER_USERNAME && echo $$DOCKER_USERNAME
       docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       echo $JPETSTOREWEB
     #   echo "Hello World"
