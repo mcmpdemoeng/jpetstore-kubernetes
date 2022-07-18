@@ -118,10 +118,10 @@ secure(){
 }
 
 cd jpetstore
-(
-    set -ex
-    secure
-)
+#(
+#    set -ex
+#    secure
+#)
 cd ..
 
 docker rmi $JPETSTOREWEB
