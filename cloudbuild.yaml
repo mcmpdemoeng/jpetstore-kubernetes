@@ -10,7 +10,7 @@ steps:
       - 'JPETSTOREWEB=$${DOCKER_USERNAME}/jpetstoreweb'
     # secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
     secretEnv:
-      - 'JPETSTOREWEB=$$DOCKER_USERNAME}/jpetstoreweb'
+      - 'JPETSTOREWEB=$$DOCKER_USERNAME/jpetstoreweb'
       - 'DOCKER_USERNAME'
       - 'DOCKER_PASSWORD'
 availableSecrets:
