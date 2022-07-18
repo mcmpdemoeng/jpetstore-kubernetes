@@ -9,7 +9,6 @@ PAYLOAD="${PAYLOAD/_ORD/"$ORDER_NUMBER"}"
 PAYLOAD="${PAYLOAD/_FUL/"$FULFILLMENT_ID"}"
 PAYLOAD="${PAYLOAD/_BUILD/"$BUILD_URL"}"
 
-
 echo "$PAYLOAD" > payload.json
 cat payload.json
 
@@ -28,30 +27,8 @@ rm -f payload.json
 
 sleep 120
 
-
-
-echo "Cleaning up workspace...."
-
-rm -rf jpetstore-kubernetes
-rm -rf gh_2.5.2_linux_386
-rm -f gh_2.5.2_linux_386.tar.gz
-
-wget -q https://github.com/cli/cli/releases/download/v2.5.2/gh_2.5.2_linux_386.tar.gz
-
-tar -xf gh_2.5.2_linux_386.tar.gz
-
-echo ${GITHUB_ACCESS_TOKEN} > github_token
-
-./gh_2.5.2_linux_386/bin/gh auth login -h GitHub.com --with-token < github_token
-
-git clone "${GITHUB_REPO_URL}"
-
-cd jpetstore-kubernetes
+pip3 install --upgrade pip
 python3 -m pip install -r ./publish_data/requirements.txt 
-
-
-
-#!/bin/sh
 
 
 echo "Building application..."
@@ -104,10 +81,12 @@ echo "Reading order details from marketplace..."
 
 python3 marketplace_order_reader.py
 
-export mysql_url=$(cat db_url | base64)
-export mysql_user=$(cat db_user | base64)
+ls
+
+export mysql_url=$(cat db_url | base64 -w0)
+export mysql_user=$(cat db_user | base64 -w0)
 export petstore_host=$(cat fqdn)
-export mysql_password=$(cat db_password | base64)
+export mysql_password=$(cat db_password | base64 -w0)
 
 echo "Testing application..."
 
@@ -142,14 +121,16 @@ echo "$((enddate - startdate))" >> test_duration_time
 deploy(){
 
   echo "Deploying application..."
+  ls
   
-  NAMESPACE="jppetstore"
-  
+  NAMESPACE="jppetstore"  
+
   docker logout
   docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
   kubectl delete job jpetstoredb --ignore-not-found -n $NAMESPACE --kubeconfig tmp_kube_config
   helm package --destination $JENKINS_HOME/modernpets ./helm/modernpets
-  helm upgrade --install --wait --set image.repository=${DOCKER_USERNAME} --set image.tag=$BUILD_NUMBER --set mysql.url=$mysql_url --set mysql.username=$mysql_user --set mysql.password=$mysql_password --set isDBAAS=True --set isLB=False --set httpHost=$petstore_host --namespace=$NAMESPACE --create-namespace $NAMESPACE $JENKINS_HOME/modernpets/modernpets-0.1.5.tgz --kubeconfig tmp_kube_config
+  
+  helm upgrade --install --wait --set image.repository=$DOCKER_USERNAME --set image.tag=$BUILD_NUMBER --set mysql.url=$mysql_url --set mysql.username=$mysql_user --set mysql.password=$mysql_password --set isDBAAS=True --set isLB=False --set httpHost=$petstore_host --namespace=$NAMESPACE --create-namespace $NAMESPACE --kubeconfig tmp_kube_config $JENKINS_HOME/modernpets/modernpets-0.1.5.tgz
   
   echo "\n\nYour application is available at http://jpetstore-web.${petstore_host}\n\n"
   
@@ -164,7 +145,7 @@ deploy(){
 
 startdate=$(date +%s)
 (
-	set -e
+	set -ex
     deploy
 )
 enddate=$(date +%s)
@@ -179,8 +160,6 @@ else
 fi
 
 echo "$((enddate - startdate))" >> deploy_duration_time
-
-
 
 
 export TENANT_SYSTEM_USER_NAME="${USER_ID}"
@@ -217,34 +196,10 @@ export DEPLOYMENT_HOSTNAME="http://jpetstore-web.${petstore_host}"
 export DEPLOYMENT_SERVICE_ID="petstore_on_aks_jenkins"
 export DEPLOYMENT_HREF="http://jpetstore-web.${petstore_host}"
 
-echo "Reading existing tokens..."
-
-#cd .. # root
-
-mkdir -p devops_tokens
-
-cd devops_tokens
-
-if [ -f "DEPLOY_TOKEN" ]; then
-	echo "Deploy token found!"
-    export DEPLOY_TOKEN=$(cat DEPLOY_TOKEN)
-fi
-
-if [ -f "BUILD_TOKEN" ]; then
-	echo "Build token found!"
-    export BUILD_TOKEN=$(cat BUILD_TOKEN)
-fi
-
-if [ -f "TEST_TOKEN" ]; then
-	echo "Test token found!"
-    export TEST_TOKEN=$(cat TEST_TOKEN)
-fi
-
-cd .. # root
-
-#cd jpetstore-kubernetes
 
 echo "Publishing data into the tenant...."
+
+pwd
 
 cp ./jpetstore/build/reports/TEST-*.xml ./publish_data
 
@@ -252,31 +207,9 @@ cd ./publish_data
 
 python3 publish.py --deploy --build --test
 
-echo "Storing devops tokens files..."
+cd ..
 
-ls
-
-# cd .. # publish_data
-
-cd .. # root
-
-
-if [ -f "./jpetstore-kubernetes/publish_data/DEPLOY_TOKEN" ]; then
-	cp ./publish_data/DEPLOY_TOKEN ./devops_tokens
-	echo "Deploy token saved!"
-fi
-
-if [ -f "./jpetstore-kubernetes/publish_data/BUILD_TOKEN" ]; then
-	cp ./publish_data/BUILD_TOKEN ./devops_tokens
-	echo "Build token saved!"
-fi
-
-if [ -f "./jpetstore-kubernetes/publish_data/TEST_TOKEN" ]; then
-	cp ./publish_data/TEST_TOKEN ./devops_tokens
-	echo "Test token saved!"
-fi
-
-
+echo "Deploy monitoring..."
 
 ns=$(kubectl get ns --kubeconfig tmp_kube_config | grep monitoring | awk '{print $1}')
 
