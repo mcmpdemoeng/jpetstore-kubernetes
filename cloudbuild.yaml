@@ -6,7 +6,7 @@ steps:
       docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       echo $JPETSTOREWEB
     env:
-      - 'JPETSTOREWEB=$DOCKER_USERNAME/jpetstoreweb'
+      - 'JPETSTOREWEB=$_DOCKER_USERNAME/jpetstoreweb'
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
 availableSecrets:
   secretManager:
