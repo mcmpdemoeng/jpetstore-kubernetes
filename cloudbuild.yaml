@@ -5,16 +5,17 @@ steps:
       echo $DOCKER_USERNAME && echo $$DOCKER_USERNAME
       docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       echo "PROJECT ID is ${PROJECT_ID}"
+    env:
+      - 'JPETSTOREWEB=DOCKER_USERNAME/jpetstoreweb'
+      - 'BUILD=$BUILD_ID'
+      - 'PROJECT_ID=$PROJECT_ID'
+      - 'PROJECT_NUMBER=$PROJECT_NUMBER'
+      - 'REV=$REVISION_ID'
+      - 'SHORT_SHA=$SHORT_SHA'
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
 options:
   dynamic_substitutions: true
-  env:
-    - 'JPETSTOREWEB=DOCKER_USERNAME/jpetstoreweb'
-    - 'BUILD=$BUILD_ID'
-    - 'PROJECT_ID=$PROJECT_ID'
-    - 'PROJECT_NUMBER=$PROJECT_NUMBER'
-    - 'REV=$REVISION_ID'
-    - 'SHORT_SHA=$SHORT_SHA'
+
 substitutions:
   _DOCKER_USERNAME: DOCKER_USERNAME
 availableSecrets:
