@@ -1,11 +1,12 @@
 steps:
-  - name: ubuntu
+  - name: gcr.io/cloud-builders/docker
     script: |
       #!/bin/bash
       echo "Hello World"
       echo "Testing cloud build"
       echo $JPETSTOREWEB
       echo $$DOCKER_USERNAME
+      docker login -u $$DOCKER_USERNAME -p $$DOCKER_PASSWORD
     env:
       - 'JPETSTOREWEB=$${DOCKER_USERNAME}/jpetstoreweb'
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
