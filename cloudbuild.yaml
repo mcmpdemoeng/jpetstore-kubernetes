@@ -3,13 +3,14 @@ steps:
     # args: ['-c', 'echo $$DOCKER_USERNAME']
     script: |
       echo "Hello this is a ${DOCKER_USERNAME}"
+      echo $JPETSTOREWEB
     #   echo "Hello World"
     #   echo "Testing cloud build"
     #   echo $JPETSTOREWEB
     #   echo $$DOCKER_USERNAME
     #   docker login "https://index.docker.io/v1" -u=$$DOCKER_USERNAME -p=$$DOCKER_PASSWORD
-    # env:
-    #   - 'JPETSTOREWEB=$${DOCKER_USERNAME}/jpetstoreweb'
+    env:
+      - 'JPETSTOREWEB=${DOCKER_USERNAME}/jpetstoreweb'
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
 availableSecrets:
   secretManager:
