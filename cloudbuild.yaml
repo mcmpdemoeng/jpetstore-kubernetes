@@ -15,7 +15,6 @@ steps:
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
 options:
   dynamic_substitutions: true
-
 substitutions:
   _DOCKER_USERNAME: DOCKER_USERNAME
 availableSecrets:
