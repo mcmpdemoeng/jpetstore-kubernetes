@@ -3,13 +3,13 @@ steps:
     script: |
       export TIMESTAMP=`date -u +%Y%m%d%H%M%S`
       echo "BUILD_TAG ${DOCKER_USERNAME}/jpetstoreweb:${BUILD_TAG}-${TIMESTAMP}"
-      # docker build -t "${DOCKER_USERNAME}/jpetstoreweb:${BUILD_TAG}-${TIMESTAMP}" -t "${DOCKER_USERNAME}/jpetstoreweb:latest" ./jpetstore
-      # docker build -t "${DOCKER_USERNAME}/jpetstoredb:${BUILD_TAG}-${TIMESTAMP}" -t "${DOCKER_USERNAME}/jpetstoredb:latest" .
-      # docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      # docker push "${DOCKER_USERNAME}/jpetstoreweb:${BUILD_TAG}-${TIMESTAMP}"
-      # docker push "${DOCKER_USERNAME}/jpetstoreweb:latest"
-      # docker push "${DOCKER_USERNAME}/jpetstoredb:${BUILD_TAG}-${TIMESTAMP}"
-      # docker push "${DOCKER_USERNAME}/jpetstoredb:latest"
+      docker build -t "${DOCKER_USERNAME}/jpetstoreweb:${BUILD_TAG}-${TIMESTAMP}" -t "${DOCKER_USERNAME}/jpetstoreweb:latest" ./jpetstore
+      docker build -t "${DOCKER_USERNAME}/jpetstoredb:${BUILD_TAG}-${TIMESTAMP}" -t "${DOCKER_USERNAME}/jpetstoredb:latest" .
+      docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      docker push "${DOCKER_USERNAME}/jpetstoreweb:${BUILD_TAG}-${TIMESTAMP}"
+      docker push "${DOCKER_USERNAME}/jpetstoreweb:latest"
+      docker push "${DOCKER_USERNAME}/jpetstoredb:${BUILD_TAG}-${TIMESTAMP}"
+      docker push "${DOCKER_USERNAME}/jpetstoredb:latest"
     env:
       - 'BUILD_TAG=${BUILD_ID}-${BRANCH_NAME}-${SHORT_SHA}'
       - 'JPETSTOREWEB=${_DOCKER_USERNAME}/jpetstoreweb'
