@@ -41,7 +41,7 @@ steps:
   - name: gcr.io/$PROJECT_ID/helm
     id: Deploy application
     script: |
-      helm --version
+      echo "This is a test"
     # args:
     #   - upgrade
     #   - -i
