@@ -27,6 +27,7 @@ rm -f payload.json
 
 sleep 120
 
+pip3 install --upgrade pip
 python3 -m pip install -r ./publish_data/requirements.txt 
 
 
