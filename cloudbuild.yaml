@@ -4,7 +4,7 @@ steps:
       echo "Hello this is a ${DOCKER_USERNAME}"
       echo $DOCKER_USERNAME && echo $$DOCKER_USERNAME
       docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      echo $JPETSTOREWEB
+      echo $SHORT_SHA
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
 options:
   dynamic_substitutions: true
