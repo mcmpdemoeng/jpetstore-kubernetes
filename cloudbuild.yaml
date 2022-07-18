@@ -30,10 +30,13 @@ steps:
       ant runtest
       cd ..
       cp -r ./jpetstore/build/reports/TEST-*.xml /workspace/
-  - name: gcr.io/$PROJECT_ID/helm:latest
-    id: 'Deploying application'
+  - name: 'gcr.io/$PROJECT_ID/helm'
+    # args: ['install', 'stable/keel', '--name', 'keel', '--namespace', 'keel']
     script: |
       helm --version
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-central1-a'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=petstore-gke-cluster'
 options:
   dynamic_substitutions: true
 substitutions:
