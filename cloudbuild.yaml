@@ -35,23 +35,24 @@ steps:
     script: |
       helm --version
     env:
-      - CLOUDSDK_COMPUTE_REGION=$_CUSTOM_REGION
-      - CLOUDSDK_CONTAINER_CLUSTER=$_CUSTOM_CLUSTER
-      - KUBECONFIG=/workspace/.kube/config
-  # - name: gcr.io/$PROJECT_ID/helm
-  #   id: Deploy application
-  #   script: |
-  #     echo "This is a test"
-  #   # args:
-  #   #   - upgrade
-  #   #   - -i
-  #   #   - go-nihao
-  #   #   - ./go-nihao-chart
-  #   #   - -f
-  #   #   - ./go-nihao-chart/values.yaml
-  #   env:
-  #     - KUBECONFIG=/workspace/.kube/config
-  #     - TILLERLESS=true
+      - 'CLOUDSDK_COMPUTE_REGION=$_CUSTOM_REGION'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=$_CUSTOM_CLUSTER'
+      - 'KUBECONFIG=/workspace/.kube/config'
+  - name: gcr.io/${PROJECT_ID}/helm
+    id: Deploy application
+    args: ['version', '--client']
+    # script: |
+    #   echo "This is a test"
+    # args:
+    #   - upgrade
+    #   - -i
+    #   - go-nihao
+    #   - ./go-nihao-chart
+    #   - -f
+    #   - ./go-nihao-chart/values.yaml
+    env:
+      - 'KUBECONFIG=/workspace/.kube/config'
+      - 'TILLERLESS=true'
 options:
   dynamic_substitutions: true
 substitutions:
