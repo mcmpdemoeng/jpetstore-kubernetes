@@ -6,7 +6,7 @@ steps:
       echo "Testing cloud build"
       echo $JPETSTOREWEB
       echo $$DOCKER_USERNAME
-      docker login -u $$DOCKER_USERNAME -p $$DOCKER_PASSWORD
+      docker login -u "$${DOCKER_USERNAME}" -p "$${DOCKER_PASSWORD}"
     env:
       - 'JPETSTOREWEB=$${DOCKER_USERNAME}/jpetstoreweb'
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
