@@ -24,7 +24,7 @@ steps:
       java --version
       ant runtest
       cp -r /build/reports/TEST-*.xml /workspace/
-    dir: ['jpetstore']
+    dir: '/jpetstore'
 options:
   dynamic_substitutions: true
 substitutions:
