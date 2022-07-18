@@ -30,23 +30,18 @@ sleep 120
 pip3 install --upgrade pip
 python3 -m pip install -r ./publish_data/requirements.txt 
 
-
 echo "Building application..."
 
+export JPETSTOREWEB="${DOCKER_USERNAME}/jpetstoreweb:${BUILD_NUMBER}"
+export JPETSTOREDB="${DOCKER_USERNAME}/jpetstoredb:${BUILD_NUMBER}"
 
 build(){
-  
-  JPETSTOREWEB="${DOCKER_USERNAME}/jpetstoreweb:${BUILD_NUMBER}"
-  JPETSTOREDB="${DOCKER_USERNAME}/jpetstoredb:${BUILD_NUMBER}"
-  
   docker build -t $JPETSTOREWEB ./jpetstore
   docker build -t $JPETSTOREDB .
   docker logout
   docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
   docker push $JPETSTOREWEB
   docker push $JPETSTOREDB
-  docker rmi $JPETSTOREWEB
-  docker rmi $JPETSTOREDB
 }
 
 
@@ -69,10 +64,6 @@ fi
 
 
 echo "$((enddate - startdate))" >> build_duration_time
-
-
-
-#!/bin/sh
 
 export TENANT_SYSTEM_USER_NAME="${USER_ID}"
 export TENANT_SYSTEM_USER_API_KEY="${USER_API_KEY}"
@@ -114,9 +105,27 @@ else
 	echo "success" >> test_status	
 fi
 
-
-
 echo "$((enddate - startdate))" >> test_duration_time
+
+echo "Secure application tests..."
+
+secure(){
+    docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_jenkins_shared
+    docker scan --accept-license --version
+    docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
+    docker scan --accept-license  $JPETSTOREWEB
+    docker scan --accept-license  $JPETSTOREDB
+}
+
+(
+    set -ex
+    secure
+)
+
+docker rmi $JPETSTOREWEB
+docker rmi $JPETSTOREDB
+
+echo "Deploying application..."
 
 deploy(){
 
@@ -145,7 +154,7 @@ deploy(){
 
 startdate=$(date +%s)
 (
-	set -ex
+    set -ex
     deploy
 )
 enddate=$(date +%s)
