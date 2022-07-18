@@ -9,7 +9,6 @@ PAYLOAD="${PAYLOAD/_ORD/"$ORDER_NUMBER"}"
 PAYLOAD="${PAYLOAD/_FUL/"$FULFILLMENT_ID"}"
 PAYLOAD="${PAYLOAD/_BUILD/"$BUILD_URL"}"
 
-
 echo "$PAYLOAD" > payload.json
 cat payload.json
 
@@ -28,25 +27,6 @@ rm -f payload.json
 
 sleep 120
 
-
-
-echo "Cleaning up workspace...."
-
-rm -rf jpetstore-kubernetes
-rm -rf gh_2.5.2_linux_386
-rm -f gh_2.5.2_linux_386.tar.gz
-
-wget -q https://github.com/cli/cli/releases/download/v2.5.2/gh_2.5.2_linux_386.tar.gz
-
-tar -xf gh_2.5.2_linux_386.tar.gz
-
-echo ${GITHUB_ACCESS_TOKEN} > github_token
-
-./gh_2.5.2_linux_386/bin/gh auth login -h GitHub.com --with-token < github_token
-
-git clone "${GITHUB_REPO_URL}"
-
-cd jpetstore-kubernetes
 python3 -m pip install -r ./publish_data/requirements.txt 
 
 
