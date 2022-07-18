@@ -23,10 +23,10 @@ steps:
     script: |
       java --version
       apk update && apk add apache-ant
+      cd jpetstore
       ls
       ant runtest
       cp -r /build/reports/TEST-*.xml /workspace/
-    dir: '/jpetstore'
 options:
   dynamic_substitutions: true
 substitutions:
