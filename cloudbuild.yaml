@@ -22,6 +22,9 @@ steps:
   - name: maven:3.8.6-jdk-11
     script: |
       java --version
+      ant runtest
+      cp -r /build/reports/TEST-*.xml /workspace/
+    dir: ['jpetstore']
 options:
   dynamic_substitutions: true
 substitutions:
