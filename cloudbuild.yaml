@@ -1,5 +1,6 @@
 steps:
   - name: gcr.io/cloud-builders/docker
+    id: 'Build Application'
     script: |
       export TIMESTAMP=`date -u +%Y%m%d%H%M%S`
       echo "BUILD_TAG ${DOCKER_USERNAME}/jpetstoreweb:${BUILD_TAG}-${TIMESTAMP}"
@@ -20,6 +21,7 @@ steps:
       - 'SHORT_SHA=$SHORT_SHA'
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
   - name: openjdk:19-jdk-alpine3.16
+    id: 'Test application'
     script: |
       java --version
       apk update && apk add apache-ant
@@ -28,6 +30,10 @@ steps:
       ant runtest
       cd ..
       cp -r ./jpetstore/build/reports/TEST-*.xml /workspace/
+  - name: gcr.io/cloud-builders/gke-deploy
+    id: 'Deploying application'
+    script: |
+      helm --version
 options:
   dynamic_substitutions: true
 substitutions:
