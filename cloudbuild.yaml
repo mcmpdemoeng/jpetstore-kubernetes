@@ -26,6 +26,7 @@ steps:
       cd jpetstore
       ls
       ant runtest
+      cd ..
       cp -r ./jpetstore/build/reports/TEST-*.xml /workspace/
 options:
   dynamic_substitutions: true
