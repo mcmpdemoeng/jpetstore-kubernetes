@@ -1,7 +1,7 @@
 steps:
   - name: ubuntu
-    script:
-      - |
+    script: |
+      #!/bin/bash
       echo "Hello World"
       echo "Testing cloud build"
       echo $$DOCKER_USERNAME
