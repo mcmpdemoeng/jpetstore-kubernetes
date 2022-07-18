@@ -57,6 +57,8 @@ steps:
     env:
       - 'KUBECONFIG=/workspace/.kube/config'
       - 'TILLERLESS=true'
+    secretEnv:
+      ['DOCKER_USERNAME', 'MYSQL_URL', 'MYSQL_USERNAME', 'MYSQL_PASSWORD']
 options:
   dynamic_substitutions: true
 substitutions:
