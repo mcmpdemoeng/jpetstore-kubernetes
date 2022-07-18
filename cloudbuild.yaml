@@ -19,7 +19,7 @@ steps:
       - 'REV=$REVISION_ID'
       - 'SHORT_SHA=$SHORT_SHA'
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
-  - name: java
+  - name: maven:3.8.6-jdk-11
     script: |
       java --version
 options:
