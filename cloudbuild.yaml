@@ -12,6 +12,7 @@ steps:
       - 'PROJECT_NUMBER=$PROJECT_NUMBER'
       - 'REV=$REVISION_ID'
       - 'SHORT_SHA=$SHORT_SHA'
+      - 'RANDOM=$DOCKER_USERNAME'
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
 options:
   dynamic_substitutions: true
