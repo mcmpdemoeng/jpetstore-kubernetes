@@ -3,6 +3,7 @@ steps:
     script: |
       docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       echo "This is the Build Tag ${BUILD_TAG}"
+      echo "URL ${JPETSTOREDB}"
     env:
       - 'BUILD_TAG=${BUILD_ID}-${REPO_NAME}-${SHORT_SHA}'
       - 'JPETSTOREWEB=${_DOCKER_USERNAME}/jpetstoreweb'
