@@ -1,6 +1,6 @@
 steps:
-  - name: 'ubuntu'
-    args:
+  - name: ubuntu
+    script:
       - |
       echo "Hello World"
       echo "Testing cloud build"
