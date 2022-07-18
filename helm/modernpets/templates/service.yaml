@@ -6,9 +6,9 @@ metadata:
     app: jpetstoreweb
   name: jpetstore-nodeport
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
-    - port: 9080
+    - port: 80
       targetPort: 9080
   selector:
     app: jpetstoreweb

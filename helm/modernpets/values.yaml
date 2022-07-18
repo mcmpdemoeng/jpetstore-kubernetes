@@ -7,14 +7,14 @@ replicaCount: 2
 image:
   repository: <REGISTRY>/<NAMESPACE> # Ex: us.icr.io/mynamespace
   pullPolicy: Always
-  pullSecret: ""
+  pullSecret: ''
 
-namespace: ""
+namespace: 'jpetstore'
 
 ingress:
   enabled: true
   hosts:
-    - jpetstore-web.app # Ex: jpetstore.myclustername.us-south.containers.appdomain.cloud 
+    - jpetstore-web.app # Ex: jpetstore.myclustername.us-south.containers.appdomain.cloud
 
 isLB: true
 
