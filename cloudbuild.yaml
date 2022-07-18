@@ -1,5 +1,5 @@
 steps:
-  - name: bash
+  - name: ubuntu
     # args: ['-c', 'echo $$DOCKER_USERNAME']
     script: |
       echo $DOCKER_USERNAME
