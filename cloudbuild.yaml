@@ -11,7 +11,7 @@ steps:
       docker push "${DOCKER_USERNAME}/jpetstoredb:${BUILD_TAG}-${TIMESTAMP}""
       docker push "${DOCKER_USERNAME}/jpetstoredb:latest"
     env:
-      - 'BUILD_TAG=${BUILD_ID}-${REPO_NAME}-${SHORT_SHA}'
+      - 'BUILD_TAG=${BUILD_ID}-${BRANCH_NAME}-${SHORT_SHA}'
       - 'JPETSTOREWEB=${_DOCKER_USERNAME}/jpetstoreweb'
       - 'BUILD=$BUILD_ID'
       - 'PROJECT_ID=$PROJECT_ID'
