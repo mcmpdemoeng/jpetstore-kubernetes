@@ -30,7 +30,7 @@ steps:
       ant runtest
       cd ..
       cp -r ./jpetstore/build/reports/TEST-*.xml /workspace/
-  - name: gcr.io/cloud-builders/gke-deploy
+  - name: gcr.io/$PROJECT_ID/helm:latest
     id: 'Deploying application'
     script: |
       helm --version
