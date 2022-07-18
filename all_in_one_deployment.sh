@@ -117,10 +117,12 @@ secure(){
     docker scan --accept-license  $JPETSTOREDB
 }
 
+cd jpetstore
 (
     set -ex
     secure
 )
+cd ..
 
 docker rmi $JPETSTOREWEB
 docker rmi $JPETSTOREDB
