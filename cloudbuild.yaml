@@ -6,6 +6,8 @@ steps:
       echo "Testing cloud build"
       echo $JPETSTOREWEB
       echo $$DOCKER_USERNAME
+      git rev-parse --abbrev-ref HEAD
+      git rev-parse HEAD
     env:
       - 'JPETSTOREWEB=$$DOCKER_USERNAME/jpetstoreweb'
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
