@@ -1,7 +1,8 @@
 steps:
   - name: bash
     args: ['-c', 'echo $$DOCKER_USERNAME']
-    # script: |
+    script: |
+      -c echo $$DOCKER_USERNAME
     #   echo "Hello World"
     #   echo "Testing cloud build"
     #   echo $JPETSTOREWEB
