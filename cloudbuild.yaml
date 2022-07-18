@@ -12,12 +12,12 @@ steps:
       - 'PROJECT_NUMBER=$PROJECT_NUMBER'
       - 'REV=$REVISION_ID'
       - 'SHORT_SHA=$SHORT_SHA'
-      - 'RANDOM=$DOCKER_USERNAME'
+      - 'RANDOM=$_DOCKER_USERNAME'
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
 options:
   dynamic_substitutions: true
 substitutions:
-  _DOCKER_USERNAME: DOCKER_USERNAME
+  _DOCKER_USERNAME: $DOCKER_USERNAME
 availableSecrets:
   secretManager:
     - versionName: 'projects/${PROJECT_ID}/secrets/DOCKER_USERNAME/versions/latest'
