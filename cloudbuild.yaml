@@ -5,7 +5,7 @@ steps:
       echo "Hello World"
       echo "Testing cloud build"
       echo $JPETSTOREWEB
-      echo $PROJECT_ID
+      echo $GCP_PROJECT_ID
     env:
       - 'JPETSTOREWEB=$$DOCKER_USERNAME/jpetstoreweb'
 #     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
