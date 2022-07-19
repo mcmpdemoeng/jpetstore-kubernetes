@@ -30,6 +30,10 @@ steps:
       ant runtest
       cd ..
       cp -r ./jpetstore/build/reports/TEST-*.xml /workspace/
+  - name: gcr.io/cloud-builders/gcloud
+    id: Testing gcloud
+    script: |
+      gcloud --version
   - name: gcr.io/cloud-builders/kubectl
     id: Configure cluster
     args: ['cluster-info']
