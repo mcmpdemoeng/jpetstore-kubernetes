@@ -34,12 +34,11 @@ steps:
       ant runtest
       cd ..
       cp -r ./jpetstore/build/reports/TEST-*.xml /workspace/
+  # This step is needed for use helm
   - name: gcr.io/cloud-builders/gcloud
-    id: Testing gcloud
+    id: Creating helm image within GCP Container Registry
     script: |
       gcloud --version
-      apt-get update
-      sudo apt-get install git
       git clone https://github.com/GoogleCloudPlatform/cloud-builders-community
       cd cloud-builders-community/helm
       gcloud builds submit --config cloudbuild.yaml .
