@@ -1,3 +1,7 @@
+# This pipeline uses container images to run each stage of the
+# pipeline. You can create your own images or use some existing
+# images that GCP provides and maintain. For mor information check
+# https://cloud.google.com/build/docs/cloud-builders
 steps:
   - name: gcr.io/cloud-builders/docker
     id: Build Application
@@ -35,6 +39,10 @@ steps:
     script: |
       gcloud --version
       apt-get update
+      sudo apt-get install git
+      git clone https://github.com/GoogleCloudPlatform/cloud-builders-community
+      cd cloud-builders-community/helm
+      gcloud builds submit --config cloudbuild.yaml .
   - name: gcr.io/cloud-builders/kubectl
     id: Configure cluster
     args: ['cluster-info']
@@ -42,6 +50,11 @@ steps:
       - 'CLOUDSDK_COMPUTE_REGION=$_CUSTOM_REGION'
       - 'CLOUDSDK_CONTAINER_CLUSTER=$_CUSTOM_CLUSTER'
       - 'KUBECONFIG=/workspace/.kube/config'
+  # First create the helm image in your GCP account and upload it
+  # to the Container Registry with Google CLI. For instance:
+  # $ git clone https://github.com/GoogleCloudPlatform/cloud-builders-community
+  # $ cd cloud-builders-community/helm
+  # $ gcloud builds submit --config cloudbuild.yaml .
   - name: gcr.io/${PROJECT_ID}/helm
     id: Deploy application
     script: |
@@ -59,6 +72,9 @@ substitutions:
   _CUSTOM_REGION: us-central1-a
   _CUSTOM_CLUSTER: petstore-gke-cluster
   _NAMESPACE: jpetstore
+# These secrets are created inside GCP Secret Manager. You can get them and
+# use them in any stage of the pipeline, but cannot be used with other variables
+# or substitution variable to concatenate a new string as an env var, i.e, 'IMAGE_TAG=${MYSECRET}-tag'
 availableSecrets:
   secretManager:
     - versionName: 'projects/${PROJECT_ID}/secrets/DOCKER_USERNAME/versions/latest'
