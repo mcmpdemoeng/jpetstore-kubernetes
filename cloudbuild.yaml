@@ -34,6 +34,7 @@ steps:
     id: Testing gcloud
     script: |
       gcloud --version
+      apt-get update
   - name: gcr.io/cloud-builders/kubectl
     id: Configure cluster
     args: ['cluster-info']
