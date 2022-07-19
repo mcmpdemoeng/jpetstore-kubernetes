@@ -31,10 +31,8 @@ steps:
       cd ..
       cp -r ./jpetstore/build/reports/TEST-*.xml /workspace/
   - name: gcr.io/cloud-builders/kubectl
-    id: Configure kubectl
+    id: Configure cluster
     args: ['cluster-info']
-    # script: |
-    #   helm --version
     env:
       - 'CLOUDSDK_COMPUTE_REGION=$_CUSTOM_REGION'
       - 'CLOUDSDK_CONTAINER_CLUSTER=$_CUSTOM_CLUSTER'
@@ -44,14 +42,6 @@ steps:
     script: |
       helm package --destination ./modernpets ./helm/modernpets
       helm upgrade --install --wait --set image.repository=${DOCKER_USERNAME} --set image.tag=latest --set mysql.url=${MYSQL_URL} --set mysql.username=${MYSQL_USERNAME} --set mysql.password=${MYSQL_PASSWORD} --set isDBAAS=True --set isLB=True --set httpHost=jeptstorehost.gcp --namespace=${NAMESPACE} --create-namespace ${NAMESPACE} ./modernpets/modernpets-0.1.5.tgz
-    # args: ['upgrade', '--client']
-    # args:
-    #   - upgrade
-    #   - -i
-    #   - go-nihao
-    #   - ./go-nihao-chart
-    #   - -f
-    #   - ./go-nihao-chart/values.yaml
     env:
       - 'KUBECONFIG=/workspace/.kube/config'
       - 'TILLERLESS=true'
