@@ -43,7 +43,7 @@ steps:
     id: Deploy application
     script: |
       helm package --destination ./modernpets ./helm/modernpets
-      helm upgrade --install --wait --set image.repository=${DOCKER_USERNAME} --set image.tag=latest --set mysql.url=${MYSQL_URL} --set mysql.username=${MYSQL_USERNAME} --set mysql.password=${MYSQL_PASSWORD} --set isDBAAS=True --set isLB=True --set httpHost=jeptstorehost.gcp --namespace=${_NAMESPACE} --create-namespace ${_NAMESPACE} ./modernpets/modernpets-0.1.5.tgz
+      helm upgrade --install --wait --set image.repository=${DOCKER_USERNAME} --set image.tag=latest --set mysql.url=${MYSQL_URL} --set mysql.username=${MYSQL_USERNAME} --set mysql.password=${MYSQL_PASSWORD} --set isDBAAS=True --set isLB=True --set httpHost=jeptstorehost.gcp --namespace=${NAMESPACE} --create-namespace ${NAMESPACE} ./modernpets/modernpets-0.1.5.tgz
     # args: ['upgrade', '--client']
     # args:
     #   - upgrade
