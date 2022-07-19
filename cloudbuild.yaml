@@ -2,6 +2,8 @@
 # pipeline. You can create your own images or use some existing
 # images that GCP provides and maintain. For mor information check
 # https://cloud.google.com/build/docs/cloud-builders
+# https://github.com/GoogleCloudPlatform/cloud-builders
+# https://github.com/GoogleCloudPlatform/cloud-builders-community
 steps:
   - name: gcr.io/cloud-builders/docker
     id: Build Application
@@ -67,6 +69,9 @@ steps:
       ['DOCKER_USERNAME', 'MYSQL_URL', 'MYSQL_USERNAME', 'MYSQL_PASSWORD']
 options:
   dynamic_substitutions: true
+# These are variables that you can define before the execution of
+# the pipeline. The syntax to declare these variables are found here:
+# https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
 substitutions:
   _CUSTOM_REGION: us-central1-a
   _CUSTOM_CLUSTER: petstore-gke-cluster
