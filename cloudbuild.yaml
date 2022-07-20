@@ -44,6 +44,7 @@ steps:
       git clone https://github.com/GoogleCloudPlatform/cloud-builders-community
       cd cloud-builders-community/helm
       gcloud builds submit --config cloudbuild.yaml .
+      gcloud sql instances list --filter "name:mysql-server-gcp*" | grep -oE "([0-9]{1,3}\.){3}[0-9]{1,3}" | base64 > /workspace/MYSQL_URL
   - name: gcr.io/cloud-builders/kubectl
     id: Configure cluster
     args: ['cluster-info']
@@ -59,6 +60,7 @@ steps:
   - name: gcr.io/${PROJECT_ID}/helm
     id: Deploy application
     script: |
+      export MYSQL_URL=$(cat /workspace/MYSQL_URL)
       helm package --destination ./modernpets ./helm/modernpets
       helm upgrade --install --wait --set image.repository=${DOCKER_USERNAME} --set image.tag=latest --set mysql.url=${MYSQL_URL} --set mysql.username=${MYSQL_USERNAME} --set mysql.password=${MYSQL_PASSWORD} --set isDBAAS=True --set isLB=True --set httpHost=jeptstorehost.gcp --namespace=${NAMESPACE} --create-namespace ${NAMESPACE} ./modernpets/modernpets-0.1.5.tgz
     env:
