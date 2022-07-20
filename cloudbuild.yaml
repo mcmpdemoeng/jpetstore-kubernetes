@@ -67,8 +67,7 @@ steps:
       - 'KUBECONFIG=/workspace/.kube/config'
       - 'TILLERLESS=true'
       - 'NAMESPACE=$_NAMESPACE'
-    secretEnv:
-      ['DOCKER_USERNAME', 'MYSQL_URL', 'MYSQL_USERNAME', 'MYSQL_PASSWORD']
+    secretEnv: ['DOCKER_USERNAME', 'MYSQL_USERNAME', 'MYSQL_PASSWORD']
 options:
   dynamic_substitutions: true
 # These are variables that you can define before the execution of
@@ -87,9 +86,9 @@ availableSecrets:
       env: 'DOCKER_USERNAME'
     - versionName: 'projects/${PROJECT_ID}/secrets/DOCKER_PASSWORD/versions/latest'
       env: 'DOCKER_PASSWORD'
-    - versionName: 'projects/${PROJECT_ID}/secrets/MYSQL_URL/versions/latest'
-      env: 'MYSQL_URL'
     - versionName: 'projects/${PROJECT_ID}/secrets/MYSQL_USERNAME/versions/latest'
       env: 'MYSQL_USERNAME'
     - versionName: 'projects/${PROJECT_ID}/secrets/MYSQL_PASSWORD/versions/latest'
       env: 'MYSQL_PASSWORD'
+    # - versionName: 'projects/${PROJECT_ID}/secrets/MYSQL_URL/versions/latest'
+    #   env: 'MYSQL_URL'
