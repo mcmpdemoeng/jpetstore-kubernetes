@@ -43,7 +43,57 @@ deploy() {
     helm package --destination ./modernpets ./helm/modernpets
     helm upgrade --install --wait --set image.repository=${DOCKER_USERNAME} --set image.tag=latest --set mysql.url=${MYSQL_URL} --set mysql.username=${MYSQL_USERNAME} --set mysql.password=${MYSQL_PASSWORD} --set isDBAAS=True --set isLB=True --set httpHost=${PETSTORE_HOST} --namespace=${NAMESPACE} --create-namespace ${NAMESPACE} --kubeconfig /workspace/.kube/config ./modernpets/modernpets-0.1.5.tgz
     PETSTORE_HOST=$(kubectl get services/jpetstore-nodeport -o jsonpath='{.status.loadBalancer.ingress[0].ip}' -n $NAMESPACE)
+    echo "http://${PETSTORE_HOST}" >> /workspace/fqdn
     echo "\n\nYour application is available at http://${PETSTORE_HOST}\n\n"
+}
+
+devops_intelligence() {
+    export TENANT_URL="${TENANT_URL}"
+    export TENANT_SYSTEM_USER_NAME="${USER_ID}"
+    export TENANT_SYSTEM_USER_API_KEY="${USER_API_KEY}"
+
+    export SERVICE_NAME="petstore_on_gcp"
+
+    export BUILD_DURATION_TIME=$(cat /workspace/build_duration_time)
+    export BUILD_ENGINE="Cloud Build"
+    export BUILD_STATUS=$(cat /workspace/build_status)
+    export BUILD_HREF="https://console.cloud.google.com/cloud-build/builds;region=${LOCATION}/${BUILD_ID}?authuser=3&project=${PROJECT_ID}"
+
+    export BEARER_TOKEN="${TENANT_BEARER_TOKEN}"
+    export RUN_ID="${BUILD_ID}"
+    export BRANCH="${BRANCH_NAME}"
+    export REPO="${REPO_NAME}"
+    export COMMIT="${SHORT_SHA}"
+
+    export TEST_STATUS=$(cat /workspace/test_status)
+    export TEST_DURATION_TIME=$(cat /workspace/test_duration_time)
+    export TEST_TYPE="unit"
+    export TEST_FILE_TYPE="xunit"
+    export TEST_ENGINE="XUNIT"
+    export TEST_ENVIRONMENT="Cloud Build GCP"
+    export TEST_RELEASE="${BUILD_ID}"
+    export TEST_FILE="TEST-org.springframework.samples.jpetstore.domain.CartTest.xml"
+
+    export DEPLOYMENT_STATUS=$(cat /workspace/deploy_status)
+    export DEPLOY_DURATION_TIME=$(cat /workspace/deploy_duration_time)
+    export PROVIDER="Google"
+
+    export petstore_host=$(cat /workspace/fqdn)
+    export DEPLOYMENT_HOSTNAME=$(cat /workspace/fqdn)
+    export DEPLOYMENT_SERVICE_ID="petstore_on_gcp"
+    export DEPLOYMENT_HREF=$(cat /workspace/fqdn)
+
+    echo "Publishing data into the tenant...."
+
+    pwd
+
+    cp /workspace/TEST-*.xml ./publish_data
+
+    cd publish_data
+
+    python publish.py --deploy --build --test
+
+    cd ..
 }
 
 while test $# -gt 0; do
@@ -129,8 +179,9 @@ while test $# -gt 0; do
             fi
             shift
             ;;
-        -pd|--push-devops)
+        --push-devops)
             echo "Push data to DevOps Intelligence"
+            devops_intelligence
             shift
             ;;
         *)

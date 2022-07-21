@@ -87,6 +87,27 @@ steps:
       - 'PETSTORE_HOST=$_PETSTORE_HOST'
     secretEnv:
       ['DOCKER_USERNAME', 'MYSQL_URL', 'MYSQL_USERNAME', 'MYSQL_PASSWORD']
+  - name: python:3.10.5
+    id: Publish data to DevOps Intelligence
+    script: |
+      echo "REVISION ID: ${REV}"
+      echo "REPO NAME: ${REPO_NAME}"
+      pip install --upgrade pip
+      python -m pip install -r ./publish_data/requirements.txt
+      sh gcp_deployment.sh --push-devops
+    env:
+      - 'PROJECT_ID=$PROJECT_ID'
+      - 'PROJECT_NUMBER=$PROJECT_NUMBER'
+      - 'REV=$REVISION_ID'
+      - 'BUILD_ID=$BUILD_ID'
+      - 'SHORT_SHA=$SHORT_SHA'
+      - 'BRANCH_NAME=$BRANCH_NAME'
+      - 'REPO_NAME=$REPO_NAME'
+      - 'COMMIT_SHA=$COMMIT_SHA'
+      - 'TENANT_URL=$_TENANT_URL'
+      - 'USER_ID=$_USER_ID'
+      - 'USER_API_KEY=$_USER_API_KEY'
+      - 'TENANT_BEARER_TOKEN=$_TENANT_BEARER_TOKEN'
 options:
   dynamic_substitutions: true
 # These are variables that you can define before the execution of
