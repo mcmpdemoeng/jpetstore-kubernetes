@@ -90,8 +90,6 @@ steps:
   - name: python:3.10.5
     id: Publish data to DevOps Intelligence
     script: |
-      echo "REVISION ID: ${REV}"
-      echo "REPO NAME: ${REPO_NAME}"
       pip install --upgrade pip
       python -m pip install -r ./publish_data/requirements.txt
       sh gcp_deployment.sh --push-devops
