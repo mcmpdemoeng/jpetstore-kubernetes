@@ -2,10 +2,11 @@
 
 export JPETSTOREWEB="${DOCKER_USERNAME}/jpetstoreweb"
 export JPETSTOREDB="${DOCKER_USERNAME}/jpetstoredb"
-export TIMESTAMP=`date -u +%Y%m%d%H%M%S`
-export BUILD_TAG="${BUILD_ID}-${BRANCH_NAME}-${SHORT_SHA}-${TIMESTAMP}"
 
 build() {
+    export TIMESTAMP=`date -u +%Y%m%d%H%M%S`
+    export BUILD_TAG="${BUILD_ID}-${BRANCH_NAME}-${SHORT_SHA}-${TIMESTAMP}"
+    
     echo "BUILD_TAG=${BUILD_TAG}"
     echo "JPETSTOREWEB_TAG=${JPETSTOREWEB}:${BUILD_TAG}"
     echo "JPETSTOREDB_TAG=${JPETSTOREDB}:${BUILD_TAG}"
@@ -17,6 +18,25 @@ build() {
     docker push "${JPETSTOREDB}:${BUILD_TAG}"
     docker push "${JPETSTOREDB}:latest"
     docker logout
+}
+
+secure() {
+    docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_jenkins_shared
+    docker scan --accept-license --version
+    docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
+    docker scan --accept-license  "${JPETSTOREWEB}:latest"
+    docker scan --accept-license  "${JPETSTOREDB}:latest"
+}
+
+test() {
+    java --version
+    apk update && apk add apache-ant
+    cd jpetstore
+    ls
+    ant runtest
+    cd ..
+    cp -r ./jpetstore/build/reports/TEST-*.xml /workspace/
+    cat /workspace/TEST-org.springframework.samples.jpetstore.domain.CartTest.xml
 }
 
 while test $# -gt 0; do
@@ -42,7 +62,7 @@ while test $# -gt 0; do
             build
             )
             enddate=$(date +%s)
-            echo "BUILD_DURATION_TIME=$((enddate - startdate))"
+            echo "BUILD_DURATION_TIME=$((enddate - startdate)) s"
             echo "$((enddate - startdate))" >> /workspace/build_duration_time
             errorCode=$?
 
@@ -57,15 +77,36 @@ while test $# -gt 0; do
             ;;
         -s|--secure)
             echo "Secure application"
-
+            # secure
             shift
             ;;
         -t|--test)
             echo "Test application in GCP"
+            startdate=$(date +%s)
+            (
+                set -e
+                test
+            )
+            enddate=$(date +%s)
+            echo "TEST_DURATION_TIME=$((enddate - startdate)) s"
+            echo "$((enddate - startdate))" >> /workspace/test_duration_time
+            errorCode=$?
+
+            if [ $errorCode -ne 0 ]; then
+                echo "Application test has failed"
+                echo "failed" >> /workspace/test_status
+            else
+                echo "Application test has succeded"
+                echo "success" >> /workspace/test_status	
+            fi
             shift
             ;;
         -d|--deploy)
             echo "Deploy application in GCP"
+            shift
+            ;;
+        -pd|--push-devops)
+            echo "Push data to DevOps Intelligence"
             shift
             ;;
         *)
