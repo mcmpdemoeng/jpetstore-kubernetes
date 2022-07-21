@@ -7,23 +7,9 @@
 steps:
   - name: gcr.io/cloud-builders/docker
     id: Build Application
-    # script: |
-    #   export TIMESTAMP=`date -u +%Y%m%d%H%M%S`
-    #   echo "BUILD_TAG ${DOCKER_USERNAME}/jpetstoreweb:${BUILD_TAG}-${TIMESTAMP}"
-    #   docker build -t "${DOCKER_USERNAME}/jpetstoreweb:${BUILD_TAG}-${TIMESTAMP}" -t "${DOCKER_USERNAME}/jpetstoreweb:latest" ./jpetstore
-    #   docker build -t "${DOCKER_USERNAME}/jpetstoredb:${BUILD_TAG}-${TIMESTAMP}" -t "${DOCKER_USERNAME}/jpetstoredb:latest" .
-    #   docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-    #   docker push "${DOCKER_USERNAME}/jpetstoreweb:${BUILD_TAG}-${TIMESTAMP}"
-    #   docker push "${DOCKER_USERNAME}/jpetstoreweb:latest"
-    #   docker push "${DOCKER_USERNAME}/jpetstoredb:${BUILD_TAG}-${TIMESTAMP}"
-    #   docker push "${DOCKER_USERNAME}/jpetstoredb:latest"
     script: |
       sh gcp_deployment.sh --build
     env:
-      # - 'BUILD_TAG=${BUILD_ID}-${BRANCH_NAME}-${SHORT_SHA}'
-      # - 'PROJECT_ID=$PROJECT_ID'
-      # - 'PROJECT_NUMBER=$PROJECT_NUMBER'
-      # - 'REV=$REVISION_ID'
       - 'BUILD_ID=$BUILD_ID'
       - 'SHORT_SHA=$SHORT_SHA'
       - 'BRANCH_NAME=$BRANCH_NAME'
@@ -39,14 +25,6 @@ steps:
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
   - name: openjdk:19-jdk-alpine3.16
     id: Test application
-    # script: |
-    #   java --version
-    #   apk update && apk add apache-ant
-    #   cd jpetstore
-    #   ls
-    #   ant runtest
-    #   cd ..
-    #   cp -r ./jpetstore/build/reports/TEST-*.xml /workspace/
     script: |
       java --version
       apk update && apk add apache-ant
@@ -75,9 +53,6 @@ steps:
   # $ gcloud builds submit --config cloudbuild.yaml .
   - name: gcr.io/${PROJECT_ID}/helm
     id: Deploy application
-    # script: |
-    #   helm package --destination ./modernpets ./helm/modernpets
-    #   helm upgrade --install --wait --set image.repository=${DOCKER_USERNAME} --set image.tag=latest --set mysql.url=${MYSQL_URL} --set mysql.username=${MYSQL_USERNAME} --set mysql.password=${MYSQL_PASSWORD} --set isDBAAS=True --set isLB=True --set httpHost=jeptstorehost.gcp --namespace=${NAMESPACE} --create-namespace ${NAMESPACE} ./modernpets/modernpets-0.1.5.tgz
     script: |
       sh gcp_deployment.sh --deploy
     env:
