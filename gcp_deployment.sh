@@ -55,7 +55,7 @@ devops_intelligence() {
     export SERVICE_NAME="petstore_on_gcp"
 
     export BUILD_DURATION_TIME=$(cat /workspace/build_duration_time)
-    export BUILD_ENGINE="Cloud Build"
+    export BUILD_ENGINE="Cloud Build GCP"
     export BUILD_STATUS=$(cat /workspace/build_status)
     export BUILD_HREF="https://console.cloud.google.com/cloud-build/builds;region=${LOCATION}/${BUILD_ID}?authuser=3&project=${PROJECT_ID}"
 
