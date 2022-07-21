@@ -48,7 +48,7 @@ steps:
     #   cd ..
     #   cp -r ./jpetstore/build/reports/TEST-*.xml /workspace/
     script: |
-    sh gcp_deployment.sh --test
+      sh gcp_deployment.sh --test
   # This step is needed for use helm.
   # If you want to get private ip of the sql instace use:
   # gcloud sql instances list --filter "name:<server_name>*" | grep -oE "([0-9]{1,3}\.){3}[0-9]{1,3}" | base64 > /workspace/MYSQL_URL
