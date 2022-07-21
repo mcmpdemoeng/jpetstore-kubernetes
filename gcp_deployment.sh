@@ -60,7 +60,7 @@ devops_intelligence() {
     export BUILD_HREF="https://console.cloud.google.com/cloud-build/builds;region=${LOCATION}/${BUILD_ID}?authuser=3&project=${PROJECT_ID}"
 
     export BEARER_TOKEN="${TENANT_BEARER_TOKEN}"
-    export RUN_ID="${BUILD_ID}"
+    export RUN_ID="$(echo $BUILD_ID | cut -c 1-8)"
     export BRANCH="${BRANCH_NAME}"
     export REPO="${REPO_NAME}"
     export COMMIT="${SHORT_SHA}"
@@ -71,7 +71,7 @@ devops_intelligence() {
     export TEST_FILE_TYPE="xunit"
     export TEST_ENGINE="XUNIT"
     export TEST_ENVIRONMENT="Cloud Build GCP"
-    export TEST_RELEASE="${BUILD_ID}"
+    export TEST_RELEASE="$(echo $BUILD_ID | cut -c 1-8)"
     export TEST_FILE="TEST-org.springframework.samples.jpetstore.domain.CartTest.xml"
 
     export DEPLOYMENT_STATUS=$(cat /workspace/deploy_status)
