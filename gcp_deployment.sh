@@ -29,8 +29,6 @@ secure() {
 }
 
 testing() {
-    java --version
-    apk update && apk add apache-ant
     cd jpetstore
     ls
     ant runtest
