@@ -33,7 +33,7 @@ while test $# -gt 0; do
             exit 0
             ;;
         -b|--build)
-            echo "Build application"
+            echo "Build application in GCP"
             startdate=$(date +%s)
             (
             set -e
@@ -57,11 +57,11 @@ while test $# -gt 0; do
             shift
             ;;
         -t|--test)
-            echo "Test application"
+            echo "Test application in GCP"
             shift
             ;;
         -d|--deploy)
-            echo "Deploy application"
+            echo "Deploy application in GCP"
             shift
             ;;
         *)
