@@ -28,7 +28,7 @@ secure() {
     docker scan --accept-license  "${JPETSTOREDB}:latest"
 }
 
-test() {
+testing() {
     java --version
     apk update && apk add apache-ant
     cd jpetstore
@@ -95,7 +95,7 @@ while test $# -gt 0; do
             startdate=$(date +%s)
             (
                 set -e
-                test
+                testing
             )
             enddate=$(date +%s)
             echo "TEST_DURATION_TIME=$((enddate - startdate)) s"
