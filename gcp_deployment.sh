@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export JPETSTOREWEB="${DOCKER_USERNAME}/jpetstoreweb:${BUILD_NUMBER}"
-export JPETSTOREDB="${DOCKER_USERNAME}/jpetstoredb:${BUILD_NUMBER}"
+export JPETSTOREWEB="${DOCKER_USERNAME}/jpetstoreweb"
+export JPETSTOREDB="${DOCKER_USERNAME}/jpetstoredb"
 export TIMESTAMP=`date -u +%Y%m%d%H%M%S`
 export BUILD_TAG="${BUILD_ID}-${BRANCH_NAME}-${SHORT_SHA}-${TIMESTAMP}"
 
