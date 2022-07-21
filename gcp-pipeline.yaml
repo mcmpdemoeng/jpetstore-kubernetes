@@ -73,13 +73,16 @@ steps:
   # $ gcloud builds submit --config cloudbuild.yaml .
   - name: gcr.io/${PROJECT_ID}/helm
     id: Deploy application
+    # script: |
+    #   helm package --destination ./modernpets ./helm/modernpets
+    #   helm upgrade --install --wait --set image.repository=${DOCKER_USERNAME} --set image.tag=latest --set mysql.url=${MYSQL_URL} --set mysql.username=${MYSQL_USERNAME} --set mysql.password=${MYSQL_PASSWORD} --set isDBAAS=True --set isLB=True --set httpHost=jeptstorehost.gcp --namespace=${NAMESPACE} --create-namespace ${NAMESPACE} ./modernpets/modernpets-0.1.5.tgz
     script: |
-      helm package --destination ./modernpets ./helm/modernpets
-      helm upgrade --install --wait --set image.repository=${DOCKER_USERNAME} --set image.tag=latest --set mysql.url=${MYSQL_URL} --set mysql.username=${MYSQL_USERNAME} --set mysql.password=${MYSQL_PASSWORD} --set isDBAAS=True --set isLB=True --set httpHost=jeptstorehost.gcp --namespace=${NAMESPACE} --create-namespace ${NAMESPACE} ./modernpets/modernpets-0.1.5.tgz
+      sh gcp_deployment.sh --deploy
     env:
       - 'KUBECONFIG=/workspace/.kube/config'
       - 'TILLERLESS=true'
       - 'NAMESPACE=$_NAMESPACE'
+      - 'PETSTORE_HOST=_PETSTORE_HOST'
     secretEnv:
       ['DOCKER_USERNAME', 'MYSQL_URL', 'MYSQL_USERNAME', 'MYSQL_PASSWORD']
 options:
