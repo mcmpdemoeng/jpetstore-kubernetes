@@ -7,24 +7,26 @@
 steps:
   - name: gcr.io/cloud-builders/docker
     id: Build Application
+    # script: |
+    #   export TIMESTAMP=`date -u +%Y%m%d%H%M%S`
+    #   echo "BUILD_TAG ${DOCKER_USERNAME}/jpetstoreweb:${BUILD_TAG}-${TIMESTAMP}"
+    #   docker build -t "${DOCKER_USERNAME}/jpetstoreweb:${BUILD_TAG}-${TIMESTAMP}" -t "${DOCKER_USERNAME}/jpetstoreweb:latest" ./jpetstore
+    #   docker build -t "${DOCKER_USERNAME}/jpetstoredb:${BUILD_TAG}-${TIMESTAMP}" -t "${DOCKER_USERNAME}/jpetstoredb:latest" .
+    #   docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    #   docker push "${DOCKER_USERNAME}/jpetstoreweb:${BUILD_TAG}-${TIMESTAMP}"
+    #   docker push "${DOCKER_USERNAME}/jpetstoreweb:latest"
+    #   docker push "${DOCKER_USERNAME}/jpetstoredb:${BUILD_TAG}-${TIMESTAMP}"
+    #   docker push "${DOCKER_USERNAME}/jpetstoredb:latest"
     script: |
-      export TIMESTAMP=`date -u +%Y%m%d%H%M%S`
-      echo "BUILD_TAG ${DOCKER_USERNAME}/jpetstoreweb:${BUILD_TAG}-${TIMESTAMP}"
-      docker build -t "${DOCKER_USERNAME}/jpetstoreweb:${BUILD_TAG}-${TIMESTAMP}" -t "${DOCKER_USERNAME}/jpetstoreweb:latest" ./jpetstore
-      docker build -t "${DOCKER_USERNAME}/jpetstoredb:${BUILD_TAG}-${TIMESTAMP}" -t "${DOCKER_USERNAME}/jpetstoredb:latest" .
-      docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      docker push "${DOCKER_USERNAME}/jpetstoreweb:${BUILD_TAG}-${TIMESTAMP}"
-      docker push "${DOCKER_USERNAME}/jpetstoreweb:latest"
-      docker push "${DOCKER_USERNAME}/jpetstoredb:${BUILD_TAG}-${TIMESTAMP}"
-      docker push "${DOCKER_USERNAME}/jpetstoredb:latest"
+      sh gcp_deployment.sh --build
     env:
-      - 'BUILD_TAG=${BUILD_ID}-${BRANCH_NAME}-${SHORT_SHA}'
-      - 'JPETSTOREWEB=${_DOCKER_USERNAME}/jpetstoreweb'
+      # - 'BUILD_TAG=${BUILD_ID}-${BRANCH_NAME}-${SHORT_SHA}'
+      # - 'PROJECT_ID=$PROJECT_ID'
+      # - 'PROJECT_NUMBER=$PROJECT_NUMBER'
+      # - 'REV=$REVISION_ID'
       - 'BUILD=$BUILD_ID'
-      - 'PROJECT_ID=$PROJECT_ID'
-      - 'PROJECT_NUMBER=$PROJECT_NUMBER'
-      - 'REV=$REVISION_ID'
       - 'SHORT_SHA=$SHORT_SHA'
+      - 'BRANCH_NAME=$BRANCH_NAME'
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
   - name: openjdk:19-jdk-alpine3.16
     id: Test application
