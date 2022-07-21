@@ -113,6 +113,23 @@ while test $# -gt 0; do
             ;;
         -d|--deploy)
             echo "Deploy application in GCP"
+            startdate=$(date +%s)
+            (
+                set -ex
+                deploy
+            )
+            enddate=$(date +%s)
+            echo "DEPLOY_DURATION_TIME=$((enddate - startdate)) s"
+            echo "$((enddate - startdate))" >> /workspace/deploy_duration_time
+            errorCode=$?
+
+            if [ $errorCode -ne 0 ]; then
+                echo "Application deploy has failed"
+                echo "failed" >> /workspace/deploy_status
+            else
+                echo "Application deploy has succeded"
+                echo "success" >> /workspace/deploy_status	
+            fi
             shift
             ;;
         -pd|--push-devops)
