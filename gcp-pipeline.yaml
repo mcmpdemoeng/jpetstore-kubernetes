@@ -108,6 +108,14 @@ steps:
       - 'USER_ID=$_USER_ID'
       - 'USER_API_KEY=$_USER_API_KEY'
       - 'TENANT_BEARER_TOKEN=$_TENANT_BEARER_TOKEN'
+  - name: gcr.io/cloud-builders/kubectl
+    id: Deploy monitoring
+    script: |
+      sh gcp_deployment.sh --deploy-monitoring
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=$_CUSTOM_REGION'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=$_CUSTOM_CLUSTER'
+      - 'KUBECONFIG=/workspace/.kube/config'
 options:
   dynamic_substitutions: true
 # These are variables that you can define before the execution of

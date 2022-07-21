@@ -96,6 +96,20 @@ devops_intelligence() {
     cd ..
 }
 
+deploy_monitoring() {
+    ns=$(kubectl get ns --kubeconfig /workspace/.kube/config | grep monitoring | awk '{print $1}')
+
+    if [ -z "$ns" ] || [ "$ns" != "monitoring" ]; then
+        kubectl create ns monitoring --kubeconfig /workspace/.kube/config
+        kubectl apply -f ./prometheus -n monitoring --kubeconfig /workspace/.kube/config
+        sleep 1m
+        kubectl apply -f ./alertmanager/AlertManagerConfigmap.yaml -n monitoring --kubeconfig /workspace/.kube/config
+        kubectl apply -f ./alertmanager/AlertTemplateConfigMap.yaml -n monitoring --kubeconfig /workspace/.kube/config
+        kubectl apply -f ./alertmanager/Deployment.yaml -n monitoring --kubeconfig /workspace/.kube/config
+        kubectl apply -f ./alertmanager/Service.yaml -n monitoring --kubeconfig /workspace/.kube/config
+    fi
+}
+
 while test $# -gt 0; do
     case "$1" in
         -h|--help)
@@ -105,10 +119,12 @@ while test $# -gt 0; do
             echo " "
             echo "options:"
             echo "-h, --help                show brief help"
-            echo "-b, --build               build application"
-            echo "-s, --secure              secure application"
-            echo "-t, --test                test application"
-            echo "-d, --deploy              deploy application"
+            echo "-b, --build               build application with docker"
+            echo "-s, --secure              secure application with docker scan and sonarqube"
+            echo "-t, --test                test application in a java environment"
+            echo "-d, --deploy              deploy application into GKE Cluster"
+            echo "--push-devops             push all info to DevOps Intelligence if all the variables are defined"
+            echo "--deploy-monitoring       deploy prometheus monitoring on cluster selected"
             exit 0
             ;;
         -b|--build)
@@ -182,6 +198,11 @@ while test $# -gt 0; do
         --push-devops)
             echo "Push data to DevOps Intelligence"
             devops_intelligence
+            shift
+            ;;
+        --deploy-monitoring)
+            echo "Deploy monitoring on cluster"
+            deploy_monitoring
             shift
             ;;
         *)
