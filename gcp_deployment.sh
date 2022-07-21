@@ -6,7 +6,9 @@ export TIMESTAMP=`date -u +%Y%m%d%H%M%S`
 export BUILD_TAG="${BUILD_ID}-${BRANCH_NAME}-${SHORT_SHA}-${TIMESTAMP}"
 
 build() {
-    echo "BUILD_TAG ${BUILD_TAG}"
+    echo "BUILD_TAG=${BUILD_TAG}"
+    echo "JPETSTOREWEB_TAG=${JPETSTOREWEB}:${BUILD_TAG}"
+    echo "JPETSTOREDB_TAG=${JPETSTOREDB}:${BUILD_TAG}"
     docker build -t "${JPETSTOREWEB}:${BUILD_TAG}" -t "${JPETSTOREWEB}:latest" ./jpetstore
     docker build -t "${JPETSTOREDB}:${BUILD_TAG}" -t "${JPETSTOREDB}:latest" .
     docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
@@ -55,6 +57,7 @@ while test $# -gt 0; do
             ;;
         -s|--secure)
             echo "Secure application"
+
             shift
             ;;
         -t|--test)
