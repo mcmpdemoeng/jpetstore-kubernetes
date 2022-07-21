@@ -40,6 +40,7 @@ while test $# -gt 0; do
             build
             )
             enddate=$(date +%s)
+            echo "BUILD_DURATION_TIME=$((enddate - startdate))"
             echo "$((enddate - startdate))" >> /workspace/build_duration_time
             errorCode=$?
 
