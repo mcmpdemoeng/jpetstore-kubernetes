@@ -29,7 +29,7 @@ steps:
       - 'BRANCH_NAME=$BRANCH_NAME'
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
   - name: gcr.io/cloud-builders/docker
-    id: Build Application
+    id: Secure Application
     script: |
       sh gcp_deployment.sh --secure
     env:
