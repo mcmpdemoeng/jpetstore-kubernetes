@@ -41,7 +41,7 @@ deploy() {
     NAMESPACE="jpetstore"
     kubectl delete job jpetstoredb --ignore-not-found -n $NAMESPACE --kubeconfig /workspace/.kube/config
     helm package --destination ./modernpets ./helm/modernpets
-    helm upgrade --install --wait --set image.repository=${DOCKER_USERNAME} --set image.tag=latest --set mysql.url=${MYSQL_URL} --set mysql.username=${MYSQL_USERNAME} --set mysql.password=${MYSQL_PASSWORD} --set isDBAAS=True --set isLB=False --set httpHost=${PETSTORE_HOST} --namespace=${NAMESPACE} --create-namespace ${NAMESPACE} --kubeconfig /workspace/.kube/config ./modernpets/modernpets-0.1.5.tgz
+    helm upgrade --install --wait --set image.repository=${DOCKER_USERNAME} --set image.tag=latest --set mysql.url=${MYSQL_URL} --set mysql.username=${MYSQL_USERNAME} --set mysql.password=${MYSQL_PASSWORD} --set isDBAAS=True --set isLB=True --set httpHost=${PETSTORE_HOST} --namespace=${NAMESPACE} --create-namespace ${NAMESPACE} --kubeconfig /workspace/.kube/config ./modernpets/modernpets-0.1.5.tgz
 
     echo "\n\nYour application is available at http://jpetstore-web.petstore-web.app"
     echo "\n\nYour application is available at http://${PETSTORE_HOST}\n\n"

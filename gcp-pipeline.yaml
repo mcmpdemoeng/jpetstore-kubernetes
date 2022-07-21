@@ -84,7 +84,7 @@ steps:
       - 'KUBECONFIG=/workspace/.kube/config'
       - 'TILLERLESS=true'
       - 'NAMESPACE=$_NAMESPACE'
-      - 'PETSTORE_HOST=_PETSTORE_HOST'
+      - 'PETSTORE_HOST=$_PETSTORE_HOST'
     secretEnv:
       ['DOCKER_USERNAME', 'MYSQL_URL', 'MYSQL_USERNAME', 'MYSQL_PASSWORD']
 options:
