@@ -21,11 +21,7 @@ curl --request POST $API_URL \
 -H "Content-Type: application/json" \
 -d @payload.json
 
-echo "\nSleeping 2 min..."
-
 rm -f payload.json
-
-sleep 120
 
 pip3 install --upgrade pip
 python3 -m pip install -r ../pipeline-common/publish_data/requirements.txt 
@@ -71,10 +67,10 @@ echo "Reading order details from marketplace..."
 
 python3 ../pipeline-common/marketplace_order_reader.py
 
-export mysql_url=$(cat ../pipeline-common/db_url | base64 -w0)
-export mysql_user=$(cat ../pipeline-common/db_user | base64 -w0)
-export petstore_host=$(cat ../pipeline-common/fqdn)
-export mysql_password=$(cat ../pipeline-common/db_password | base64 -w0)
+export mysql_url=$(cat db_url | base64 -w0)
+export mysql_user=$(cat db_user | base64 -w0)
+export petstore_host=$(cat fqdn)
+export mysql_password=$(cat db_password | base64 -w0)
 
 echo "Testing application..."
 
@@ -134,15 +130,15 @@ deploy(){
 
   docker logout
   docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
-  kubectl delete job jpetstoredb --ignore-not-found -n $NAMESPACE --kubeconfig ../pipeline-common/tmp_kube_config
+  kubectl delete job jpetstoredb --ignore-not-found -n $NAMESPACE --kubeconfig tmp_kube_config
   helm package --destination $JENKINS_HOME/modernpets ../helm/modernpets
   
-  helm upgrade --install --wait --set image.repository=$DOCKER_USERNAME --set image.tag=$BUILD_NUMBER --set mysql.url=$mysql_url --set mysql.username=$mysql_user --set mysql.password=$mysql_password --set isDBAAS=True --set isLB=False --set httpHost=$petstore_host --namespace=$NAMESPACE --create-namespace $NAMESPACE --kubeconfig ../pipeline-common/tmp_kube_config $JENKINS_HOME/modernpets/modernpets-0.1.5.tgz
+  helm upgrade --install --wait --set image.repository=$DOCKER_USERNAME --set image.tag=$BUILD_NUMBER --set mysql.url=$mysql_url --set mysql.username=$mysql_user --set mysql.password=$mysql_password --set isDBAAS=True --set isLB=False --set httpHost=$petstore_host --namespace=$NAMESPACE --create-namespace $NAMESPACE --kubeconfig tmp_kube_config $JENKINS_HOME/modernpets/modernpets-0.1.5.tgz
   
   echo "\n\nYour application is available at http://jpetstore-web.${petstore_host}\n\n"
   
-  app=$(kubectl get  ingress -n $NAMESPACE --kubeconfig ../pipeline-common/tmp_kube_config | base64 | tr -d '\r')
-  app_decoded=$(kubectl get  ingress -n $NAMESPACE --kubeconfig ../pipeline-common/tmp_kube_config | tr -d '\r')
+  app=$(kubectl get  ingress -n $NAMESPACE --kubeconfig tmp_kube_config | base64 | tr -d '\r')
+  app_decoded=$(kubectl get  ingress -n $NAMESPACE --kubeconfig tmp_kube_config | tr -d '\r')
   echo app running at $app_decoded
   chmod +x ../result.sh
   ../result.sh ${app}
@@ -214,18 +210,18 @@ cd ../pipeline-common/publish_data
 
 python3 publish.py --deploy --build --test
 
-cd ../pipeline-jenkins
+cd ../../pipeline-jenkins
 
 echo "Deploy monitoring..."
 
-ns=$(kubectl get ns --kubeconfig ../pipeline-common/tmp_kube_config | grep monitoring | awk '{print $1}')
+ns=$(kubectl get ns --kubeconfig tmp_kube_config | grep monitoring | awk '{print $1}')
 
 if [ -z "$ns" ] || [ "$ns" != "monitoring" ]; then
-	kubectl create ns monitoring --kubeconfig ../pipeline-common/tmp_kube_config
-    kubectl apply -f ../prometheus -n monitoring --kubeconfig ../pipeline-common/tmp_kube_config
+    kubectl create ns monitoring --kubeconfig tmp_kube_config
+    kubectl apply -f ../prometheus -n monitoring --kubeconfig tmp_kube_config
     sleep 1m
-    kubectl apply -f ../alertmanager/AlertManagerConfigmap.yaml -n monitoring --kubeconfig .../pipeline-common/tmp_kube_config
-    kubectl apply -f ../alertmanager/AlertTemplateConfigMap.yaml -n monitoring --kubeconfig ../pipeline-common/tmp_kube_config
-    kubectl apply -f ../alertmanager/Deployment.yaml -n monitoring --kubeconfig ../pipeline-common/tmp_kube_config
-    kubectl apply -f ../alertmanager/Service.yaml -n monitoring --kubeconfig ../pipeline-common/tmp_kube_config
+    kubectl apply -f ../alertmanager/AlertManagerConfigmap.yaml -n monitoring --kubeconfig tmp_kube_config
+    kubectl apply -f ../alertmanager/AlertTemplateConfigMap.yaml -n monitoring --kubeconfig tmp_kube_config
+    kubectl apply -f ../alertmanager/Deployment.yaml -n monitoring --kubeconfig tmp_kube_config
+    kubectl apply -f ../alertmanager/Service.yaml -n monitoring --kubeconfig tmp_kube_config
 fi
