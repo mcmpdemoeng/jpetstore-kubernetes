@@ -11,10 +11,16 @@ steps:
   - name: gcr.io/cloud-builders/gcloud
     id: 'Setup: Create helm image within GCP Container Registry'
     script: |
-      gcloud --version
-      git clone https://github.com/GoogleCloudPlatform/cloud-builders-community
-      cd cloud-builders-community/helm
-      gcloud builds submit --config cloudbuild.yaml .
+      image_exist=$(gcloud container images list-tags gcr.io/${PROJECT_ID}/helm | grep DIGEST | cut -c 9-20)
+      if [ ${#image_exist} = 12 ]; then
+        echo "There is already an helm image in gcr.io"
+      else
+        git clone https://github.com/GoogleCloudPlatform/cloud-builders-community
+        cd cloud-builders-community/helm
+        gcloud builds submit --config cloudbuild.yaml .
+      fi
+    env:
+      - 'PROJECT_ID=$PROJECT_ID'
   - name: gcr.io/cloud-builders/kubectl
     id: 'Setup: Configure cluster credentials'
     args: ['cluster-info']
@@ -66,7 +72,7 @@ steps:
     id: Publish data to DevOps Intelligence
     script: |
       pip install --upgrade pip
-      python -m pip install -r ./publish_data/requirements.txt
+      python -m pip install -r ./pipeline-common/publish_data/requirements.txt
       sh ./pipeline-gcp/gcp_deployment.sh --push-devops
     env:
       - 'PROJECT_ID=$PROJECT_ID'
