@@ -1,0 +1,103 @@
+# Variable 'BUILD_TOKEN' was defined in the Variables tab
+# Variable 'DEPLOY_TOKEN' was defined in the Variables tab
+# Variable 'DOCKER_PASSWORD' was defined in the Variables tab
+# Variable 'DOCKER_USER' was defined in the Variables tab
+# Variable 'ORDER_NUMBER' was defined in the Variables tab
+# Variable 'SNYK_SCAN_TOKEN' was defined in the Variables tab
+# Variable 'SONARQUBE_HOST' was defined in the Variables tab
+# Variable 'SONARQUBE_TOKEN' was defined in the Variables tab
+# Variable 'TENANT_URL' was defined in the Variables tab
+# Variable 'TEST_TOKEN' was defined in the Variables tab
+# Variable 'USER_API_KEY' was defined in the Variables tab
+# Variable 'USER_ID' was defined in the Variables tab
+jobs:
+- job: Job_1
+  displayName: Main Agent
+  pool:
+    name: Default
+  steps:
+  - checkout: self
+  - task: Bash@3
+    name: ''
+    displayName: Build
+    inputs:
+      targetType: inline
+      script: "#!/bin/sh\n\n#echo \"Installing docker trivy...\"\n#sudo apt-get install wget apt-transport-https gnupg lsb-release\n#wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -\n#echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list\n#sudo apt-get update\n# sudo apt-get install trivy\n\necho \"Building application...\"\n\nbuild(){\n\n  JPETSTOREWEB=\"${DOCKER_USERNAME}/azurejpetstoreweb:${BUILD_NUMBER}\"\n  JPETSTOREDB=\"${DOCKER_USERNAME}/azurejpetstoredb:${BUILD_NUMBER}\"\n  \n  docker build -t $JPETSTOREWEB ./jpetstore\n  docker build -t $JPETSTOREDB .\n  \n  docker logout\n  docker login -u \"${DOCKER_USERNAME}\" -p \"${DOCKER_PASSWORD}\"\n  \n  docker push $JPETSTOREWEB\n  docker push $JPETSTOREDB\n  \n  #trivy image --format json -o jpetstore-web-scan.json $JPETSTOREWEB\n  #trivy image --format json -o jpetstore-db-scan.json $JPETSTOREDB\n}\n\nexport startdate=$(date +%s)\n(\n  set -ex\n  build\n)\nexport enddate=$(date +%s)\n\nerrorCode=$?\n\nrm -rf build_status\n\nif [ $errorCode -ne 0 ]; then\n  echo \"Application build has failed\"\n  echo \"failed\" >> build_status\nelse\n  echo \"Application build has succeded\"\n  echo \"success\" >> build_status\nfi\n\nexport SERVICE_NAME=\"petstore_on_aks_azure_devops\"\nexport BUILD_DURATION_TIME=$((enddate - startdate))\nexport BUILD_ENGINE=\"Azure DevOps\"\nexport BUILD_STATUS=$(cat build_status)\nexport BUILD_HREF=\"${SYSTEM_TEAMFOUNDATIONSERVERURI}${SYSTEM_DEFINITIONNAME}/_build/results?buildId=${BUILD_NUMBER}&view=results\"\nexport RUN_ID=$BUILD_NUMBER\nexport BRANCH=$BUILD_SOURCEBRANCHNAME\nexport COMMIT=$(git rev-parse HEAD)\n\npython3 -m pip install -r ./publish_data/requirements.txt \npython3 ./publish_data/publish.py --build\n"
+  - task: Bash@3
+    displayName: Test
+    inputs:
+      targetType: inline
+      script: "#!/bin/sh\n\necho \"Testing application...\"\n\ntest(){\n  \n   cd jpetstore\n\n   ant runtest\n\n   cd ..\n}\n\nstartdate=$(date +%s)\n(\n   set -e\n   test\n)\nenddate=$(date +%s)\n\nerrorCode=$?\n\nif [ $errorCode -ne 0 ]; then\n    echo \"Application test has failed\"\n    echo \"failed\" >> test_status\nelse\n    echo \"Application test has succeded\"\n    echo \"success\" >> test_status\nfi\n\necho \"$((enddate - startdate))\" >> test_duration_time\n\nexport SERVICE_NAME=\"petstore_on_aks_azure_devops\"\nexport TEST_STATUS=$(cat test_status)\nexport TEST_DURATION_TIME=$(cat test_duration_time)\nexport TEST_TYPE=\"unit\"\nexport TEST_FILE_TYPE=\"xunit\"\nexport TEST_ENGINE=\"XUNIT\"\nexport TEST_ENVIRONMENT=\"Azure DevOps\"\nexport TEST_RELEASE=\"${BUILD_NUMBER}\"\nexport TEST_FILE=\"TEST-org.springframework.samples.jpetstore.domain.CartTest.xml\"\nexport RUN_ID=$BUILD_NUMBER\nexport BRANCH=$BUILD_SOURCEBRANCHNAME\nexport COMMIT=$(git rev-parse HEAD)\nexport BUILD_ENGINE=\"Azure DevOps\"\n\ncp ./jpetstore/build/reports/TEST-*.xml ./publish_data\ncd ./publish_data\npython3 publish.py --test"
+  - task: Bash@3
+    displayName: Secure
+    inputs:
+      targetType: inline
+      script: >
+        # Static scan
+
+
+        cd jpetstore
+
+
+        ls
+
+
+        docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=$SYSTEM_DEFINITIONNAME
+
+
+        # Image scan
+
+
+        JPETSTOREWEB="${DOCKER_USERNAME}/azurejpetstoreweb:${BUILD_NUMBER}"
+
+        JPETSTOREDB="${DOCKER_USERNAME}/azurejpetstoredb:${BUILD_NUMBER}"
+
+
+        imagescan(){
+
+           sudo apt-get update
+
+           sudo apt-get install \
+                ca-certificates \
+                curl \
+                gnupg \
+                lsb-release
+
+            sudo mkdir -p /etc/apt/keyrings
+
+            sudo rm -rf /etc/apt/keyrings/docker.gpg
+
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+            echo \
+                 "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+                 $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+            sudo apt-get update
+
+            sudo apt install docker-scan-plugin
+
+            docker images
+
+            docker scan  --accept-license --version
+
+            docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
+
+            docker scan --accept-license  $JPETSTOREWEB
+
+            docker scan --accept-license  $JPETSTOREDB
+
+            docker rmi  $JPETSTOREWEB
+            docker rmi  $JPETSTOREDB
+
+            return 0
+        }
+
+
+        imagescan
+  - task: Bash@3
+    displayName: Deploy & Monitoring
+    inputs:
+      targetType: inline
+      script: "#!/bin/sh\n\nexport TENANT_SYSTEM_USER_NAME=\"${USER_ID}\"\nexport TENANT_SYSTEM_USER_API_KEY=\"${USER_API_KEY}\"\n\necho \"Reading order details from marketplace...\"\n\npython3 marketplace_order_reader.py\n\nexport mysql_url=$(cat db_url | base64)\nexport mysql_user=$(cat db_user | base64)\nexport petstore_host=$(cat fqdn)\nexport mysql_password=$(cat db_password | base64)\n\nmkdir -p chart_zip\n\nJPETSTOREWEB=\"${DOCKER_USERNAME}/azurejpetstoreweb:${BUILD_NUMBER}\"\n\nJPETSTOREDB=\"${DOCKER_USERNAME}/azurejpetstoredb:${BUILD_NUMBER}\"\n\ndeploy(){\n\n  echo \"Deploying application...\"\n  ls\n  \n  NAMESPACE=\"jppetstore\"  \n\n  docker logout\n  docker login -u \"${DOCKER_USERNAME}\" -p \"${DOCKER_PASSWORD}\"\n  kubectl delete job jpetstoredb --ignore-not-found -n $NAMESPACE --kubeconfig tmp_kube_config\n  helm package --destination chart_zip/modernpets ./helm/modernpets\n  \n  helm upgrade --install --wait --set image.repository=$DOCKER_USERNAME --set image.tag=$BUILD_NUMBER --set mysql.url=$mysql_url --set mysql.username=$mysql_user --set mysql.password=$mysql_password --set isDBAAS=True --set isLB=False --set httpHost=$petstore_host --namespace=$NAMESPACE --create-namespace $NAMESPACE --kubeconfig tmp_kube_config chart_zip/modernpets/modernpets-0.1.5.tgz\n  \n  echo \"\\n\\nYour application is available at http://jpetstore-web.${petstore_host}\\n\\n\"\n  \n  app=$(kubectl get  ingress -n $NAMESPACE --kubeconfig tmp_kube_config | base64 | tr -d '\\r')\n  app_decoded=$(kubectl get  ingress -n $NAMESPACE --kubeconfig tmp_kube_config | tr -d '\\r')\n  echo app running at $app_decoded\n  chmod +x result.sh\n  ./result.sh ${app}\n\n}\n\n\nstartdate=$(date +%s)\n(\n    set -ex\n    deploy\n)\nenddate=$(date +%s)\n\nrm -rf deploy_status\n\nif [ $errorCode -ne 0 ]; then\n    echo \"Application deploy has failed\"\n    echo \"failed\" >> deploy_status\nelse\n   echo \"Application deploy has succeded\"\n   echo \"success\" >> deploy_status\nfi\n\nexport DEPLOYMENT_STATUS=$(cat deploy_status)\nexport DEPLOY_DURATION_TIME=$((enddate - startdate))\nexport PROVIDER=\"Azure\"\nexport petstore_host=$(cat fqdn)\nexport DEPLOYMENT_HOSTNAME=\"http://jpetstore-web.${petstore_host}\"\nexport DEPLOYMENT_SERVICE_ID=\"petstore_on_aks_azure_devops\"\nexport DEPLOYMENT_HREF=\"http://jpetstore-web.${petstore_host}\"\nexport SERVICE_NAME=\"petstore_on_aks_azure_devops\"\nexport RUN_ID=$BUILD_NUMBER\n\npython3 ./publish_data/publish.py --deploy\n\nns=$(kubectl get ns --kubeconfig tmp_kube_config | grep monitoring | awk '{print $1}')\n\necho $ns\n\nif [ -z \"$ns\" ] || [ \"$ns\" != \"monitoring\" ]; then\n\n   echo \"Publishing monitoring tools...\"\n    \n    kubectl create ns monitoring --kubeconfig tmp_kube_config\n    kubectl apply -f ./prometheus -n monitoring --kubeconfig tmp_kube_config\n\n    sleep 1m\n\n    kubectl apply -f ./alertmanager/AlertManagerConfigmap.yaml -n monitoring --kubeconfig tmp_kube_config\n    kubectl apply -f ./alertmanager/AlertTemplateConfigMap.yaml -n monitoring --kubeconfig tmp_kube_config\n    kubectl apply -f ./alertmanager/Deployment.yaml -n monitoring --kubeconfig tmp_kube_config\n    kubectl apply -f ./alertmanager/Service.yaml -n monitoring --kubeconfig tmp_kube_config\n\nfi\n\n"
+...
