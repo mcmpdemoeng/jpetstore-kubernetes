@@ -9,7 +9,7 @@ steps:
   # If you want to get private ip of the sql instace use:
   # gcloud sql instances list --filter "name:<server_name>*" | grep -oE "([0-9]{1,3}\.){3}[0-9]{1,3}" | base64 > /workspace/MYSQL_URL
   - name: gcr.io/cloud-builders/gcloud
-    id: 'Setup: Create helm image within GCP Container Registry'
+    id: 'Setup: Create helm image within GCP Container Registry if not exist'
     script: |
       image_exist=$(gcloud container images list-tags gcr.io/${PROJECT_ID}/helm | grep DIGEST | cut -c 9-20)
       if [ ${#image_exist} = 12 ]; then

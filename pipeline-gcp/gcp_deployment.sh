@@ -54,7 +54,7 @@ devops_intelligence() {
 
     export SERVICE_NAME="petstore_on_gcp"
 
-    export BUILD_DURATION_TIME=$(cat /workspace/build_duration_time)
+    export BUILD_DURATION_TIME= $(cat /workspace/build_duration_time)
     export BUILD_ENGINE="Cloud Build GCP"
     export BUILD_STATUS=$(cat /workspace/build_status)
     export BUILD_HREF="https://console.cloud.google.com/cloud-build/builds;region=${LOCATION}/${BUILD_ID}?authuser=3&project=${PROJECT_ID}"
@@ -66,7 +66,7 @@ devops_intelligence() {
     export COMMIT="${SHORT_SHA}"
 
     export TEST_STATUS=$(cat /workspace/test_status)
-    export TEST_DURATION_TIME=$(cat /workspace/test_duration_time)
+    export TEST_DURATION_TIME= $(cat /workspace/test_duration_time)
     export TEST_TYPE="unit"
     export TEST_FILE_TYPE="xunit"
     export TEST_ENGINE="XUNIT"
@@ -75,7 +75,7 @@ devops_intelligence() {
     export TEST_FILE="TEST-org.springframework.samples.jpetstore.domain.CartTest.xml"
 
     export DEPLOYMENT_STATUS=$(cat /workspace/deploy_status)
-    export DEPLOY_DURATION_TIME=$(cat /workspace/deploy_duration_time)
+    export DEPLOY_DURATION_TIME= $(cat /workspace/deploy_duration_time)
     export PROVIDER="Google"
 
     export petstore_host=$(cat /workspace/fqdn)
@@ -135,7 +135,7 @@ while test $# -gt 0; do
             build
             )
             enddate=$(date +%s)
-            echo "BUILD_DURATION_TIME=$((enddate - startdate)) s"
+            echo "BUILD_DURATION_TIME= $((enddate - startdate)) s"
             echo "$((enddate - startdate))" >> /workspace/build_duration_time
             errorCode=$?
 
@@ -161,7 +161,7 @@ while test $# -gt 0; do
                 testing
             )
             enddate=$(date +%s)
-            echo "TEST_DURATION_TIME=$((enddate - startdate)) s"
+            echo "TEST_DURATION_TIME= $((enddate - startdate)) s"
             echo "$((enddate - startdate))" >> /workspace/test_duration_time
             errorCode=$?
 
@@ -182,7 +182,7 @@ while test $# -gt 0; do
                 deploy
             )
             enddate=$(date +%s)
-            echo "DEPLOY_DURATION_TIME=$((enddate - startdate)) s"
+            echo "DEPLOY_DURATION_TIME= $((enddate - startdate)) s"
             echo "$((enddate - startdate))" >> /workspace/deploy_duration_time
             errorCode=$?
 
