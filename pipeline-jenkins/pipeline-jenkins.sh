@@ -28,7 +28,7 @@ rm -f payload.json
 sleep 120
 
 pip3 install --upgrade pip
-python3 -m pip install -r ./publish_data/requirements.txt 
+python3 -m pip install -r ../pipeline-common/publish_data/requirements.txt 
 
 echo "Building application..."
 
@@ -36,8 +36,8 @@ export JPETSTOREWEB="${DOCKER_USERNAME}/jpetstoreweb:${BUILD_NUMBER}"
 export JPETSTOREDB="${DOCKER_USERNAME}/jpetstoredb:${BUILD_NUMBER}"
 
 build(){
-  docker build -t $JPETSTOREWEB ./jpetstore
-  docker build -t $JPETSTOREDB .
+  docker build -t $JPETSTOREWEB ../jpetstore
+  docker build -t $JPETSTOREDB ../
   docker logout
   docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
   docker push $JPETSTOREWEB
@@ -62,7 +62,6 @@ else
 	echo "success" >> build_status	
 fi
 
-
 echo "$((enddate - startdate))" >> build_duration_time
 
 export TENANT_SYSTEM_USER_NAME="${USER_ID}"
@@ -70,28 +69,25 @@ export TENANT_SYSTEM_USER_API_KEY="${USER_API_KEY}"
 
 echo "Reading order details from marketplace..."
 
-python3 marketplace_order_reader.py
+python3 ../pipeline-common/marketplace_order_reader.py
 
-ls
-
-export mysql_url=$(cat db_url | base64 -w0)
-export mysql_user=$(cat db_user | base64 -w0)
-export petstore_host=$(cat fqdn)
-export mysql_password=$(cat db_password | base64 -w0)
+export mysql_url=$(cat ../pipeline-common/db_url | base64 -w0)
+export mysql_user=$(cat ../pipeline-common/db_user | base64 -w0)
+export petstore_host=$(cat ../pipeline-common/fqdn)
+export mysql_password=$(cat ../pipeline-common/db_password | base64 -w0)
 
 echo "Testing application..."
 
-
 test(){
-  cd jpetstore
+  cd ../jpetstore
   ant runtest
-  cd ..
+  cd ../pipeline-jenkins
 }
 
 startdate=$(date +%s)
 (
 	set -e
-    test
+  test
 )
 enddate=$(date +%s)
 
@@ -117,12 +113,12 @@ secure(){
     docker scan --accept-license  $JPETSTOREDB
 }
 
-cd jpetstore
+cd ../jpetstore
 #(
 #    set -ex
 #    secure
 #)
-cd ..
+cd ../pipeline-jenkins
 
 docker rmi $JPETSTOREWEB
 docker rmi $JPETSTOREDB
@@ -138,18 +134,18 @@ deploy(){
 
   docker logout
   docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
-  kubectl delete job jpetstoredb --ignore-not-found -n $NAMESPACE --kubeconfig tmp_kube_config
-  helm package --destination $JENKINS_HOME/modernpets ./helm/modernpets
+  kubectl delete job jpetstoredb --ignore-not-found -n $NAMESPACE --kubeconfig ../pipeline-common/tmp_kube_config
+  helm package --destination $JENKINS_HOME/modernpets ../helm/modernpets
   
-  helm upgrade --install --wait --set image.repository=$DOCKER_USERNAME --set image.tag=$BUILD_NUMBER --set mysql.url=$mysql_url --set mysql.username=$mysql_user --set mysql.password=$mysql_password --set isDBAAS=True --set isLB=False --set httpHost=$petstore_host --namespace=$NAMESPACE --create-namespace $NAMESPACE --kubeconfig tmp_kube_config $JENKINS_HOME/modernpets/modernpets-0.1.5.tgz
+  helm upgrade --install --wait --set image.repository=$DOCKER_USERNAME --set image.tag=$BUILD_NUMBER --set mysql.url=$mysql_url --set mysql.username=$mysql_user --set mysql.password=$mysql_password --set isDBAAS=True --set isLB=False --set httpHost=$petstore_host --namespace=$NAMESPACE --create-namespace $NAMESPACE --kubeconfig ../pipeline-common/tmp_kube_config $JENKINS_HOME/modernpets/modernpets-0.1.5.tgz
   
   echo "\n\nYour application is available at http://jpetstore-web.${petstore_host}\n\n"
   
-  app=$(kubectl get  ingress -n $NAMESPACE --kubeconfig tmp_kube_config | base64 | tr -d '\r')
-  app_decoded=$(kubectl get  ingress -n $NAMESPACE --kubeconfig tmp_kube_config | tr -d '\r')
+  app=$(kubectl get  ingress -n $NAMESPACE --kubeconfig ../pipeline-common/tmp_kube_config | base64 | tr -d '\r')
+  app_decoded=$(kubectl get  ingress -n $NAMESPACE --kubeconfig ../pipeline-common/tmp_kube_config | tr -d '\r')
   echo app running at $app_decoded
-  chmod +x result.sh
-  ./result.sh ${app}
+  chmod +x ../result.sh
+  ../result.sh ${app}
 
 }
 
@@ -212,24 +208,24 @@ echo "Publishing data into the tenant...."
 
 pwd
 
-cp ./jpetstore/build/reports/TEST-*.xml ./publish_data
+cp ../jpetstore/build/reports/TEST-*.xml ../pipeline-common/publish_data
 
-cd ./publish_data
+cd ../pipeline-common/publish_data
 
 python3 publish.py --deploy --build --test
 
-cd ..
+cd ../pipeline-jenkins
 
 echo "Deploy monitoring..."
 
-ns=$(kubectl get ns --kubeconfig tmp_kube_config | grep monitoring | awk '{print $1}')
+ns=$(kubectl get ns --kubeconfig ../pipeline-common/tmp_kube_config | grep monitoring | awk '{print $1}')
 
 if [ -z "$ns" ] || [ "$ns" != "monitoring" ]; then
-	kubectl create ns monitoring --kubeconfig tmp_kube_config
-    kubectl apply -f ./prometheus -n monitoring --kubeconfig tmp_kube_config
+	kubectl create ns monitoring --kubeconfig ../pipeline-common/tmp_kube_config
+    kubectl apply -f ../prometheus -n monitoring --kubeconfig ../pipeline-common/tmp_kube_config
     sleep 1m
-    kubectl apply -f ./alertmanager/AlertManagerConfigmap.yaml -n monitoring --kubeconfig tmp_kube_config
-    kubectl apply -f ./alertmanager/AlertTemplateConfigMap.yaml -n monitoring --kubeconfig tmp_kube_config
-    kubectl apply -f ./alertmanager/Deployment.yaml -n monitoring --kubeconfig tmp_kube_config
-    kubectl apply -f ./alertmanager/Service.yaml -n monitoring --kubeconfig tmp_kube_config
+    kubectl apply -f ../alertmanager/AlertManagerConfigmap.yaml -n monitoring --kubeconfig .../pipeline-common/tmp_kube_config
+    kubectl apply -f ../alertmanager/AlertTemplateConfigMap.yaml -n monitoring --kubeconfig ../pipeline-common/tmp_kube_config
+    kubectl apply -f ../alertmanager/Deployment.yaml -n monitoring --kubeconfig ../pipeline-common/tmp_kube_config
+    kubectl apply -f ../alertmanager/Service.yaml -n monitoring --kubeconfig ../pipeline-common/tmp_kube_config
 fi
