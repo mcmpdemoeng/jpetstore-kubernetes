@@ -5,6 +5,23 @@
 # https://github.com/GoogleCloudPlatform/cloud-builders
 # https://github.com/GoogleCloudPlatform/cloud-builders-community
 steps:
+  # This step is needed for use helm.
+  # If you want to get private ip of the sql instace use:
+  # gcloud sql instances list --filter "name:<server_name>*" | grep -oE "([0-9]{1,3}\.){3}[0-9]{1,3}" | base64 > /workspace/MYSQL_URL
+  - name: gcr.io/cloud-builders/gcloud
+    id: 'Setup: Create helm image within GCP Container Registry'
+    script: |
+      gcloud --version
+      git clone https://github.com/GoogleCloudPlatform/cloud-builders-community
+      cd cloud-builders-community/helm
+      gcloud builds submit --config cloudbuild.yaml .
+  - name: gcr.io/cloud-builders/kubectl
+    id: 'Setup: Configure cluster credentials'
+    args: ['cluster-info']
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=$_CUSTOM_REGION'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=$_CUSTOM_CLUSTER'
+      - 'KUBECONFIG=/workspace/.kube/config'
   - name: gcr.io/cloud-builders/docker
     id: Build Application
     script: |
@@ -29,23 +46,6 @@ steps:
       java --version
       apk update && apk add apache-ant
       sh gcp_deployment.sh --test
-  # This step is needed for use helm.
-  # If you want to get private ip of the sql instace use:
-  # gcloud sql instances list --filter "name:<server_name>*" | grep -oE "([0-9]{1,3}\.){3}[0-9]{1,3}" | base64 > /workspace/MYSQL_URL
-  - name: gcr.io/cloud-builders/gcloud
-    id: Creating helm image within GCP Container Registry
-    script: |
-      gcloud --version
-      git clone https://github.com/GoogleCloudPlatform/cloud-builders-community
-      cd cloud-builders-community/helm
-      gcloud builds submit --config cloudbuild.yaml .
-  - name: gcr.io/cloud-builders/kubectl
-    id: Configure cluster
-    args: ['cluster-info']
-    env:
-      - 'CLOUDSDK_COMPUTE_REGION=$_CUSTOM_REGION'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=$_CUSTOM_CLUSTER'
-      - 'KUBECONFIG=/workspace/.kube/config'
   # First create the helm image in your GCP account and upload it
   # to the Container Registry with Google CLI. For instance:
   # $ git clone https://github.com/GoogleCloudPlatform/cloud-builders-community
