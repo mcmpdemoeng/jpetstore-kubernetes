@@ -25,7 +25,7 @@ steps:
   - name: gcr.io/cloud-builders/docker
     id: Build Application
     script: |
-      sh gcp_deployment.sh --build
+      sh ./pipeline-gcp/gcp_deployment.sh --build
     env:
       - 'BUILD_ID=$BUILD_ID'
       - 'SHORT_SHA=$SHORT_SHA'
@@ -34,7 +34,7 @@ steps:
   - name: gcr.io/cloud-builders/docker
     id: Secure Application
     script: |
-      sh gcp_deployment.sh --secure
+      sh ./pipeline-gcp/gcp_deployment.sh --secure
     env:
       - 'SONARQUBE_HOST=_SONARQUBE_HOST'
       - 'SONARQUBE_TOKEN=_SONARQUBE_TOKEN'
@@ -45,7 +45,7 @@ steps:
     script: |
       java --version
       apk update && apk add apache-ant
-      sh gcp_deployment.sh --test
+      sh ./pipeline-gcp/gcp_deployment.sh --test
   # First create the helm image in your GCP account and upload it
   # to the Container Registry with Google CLI. For instance:
   # $ git clone https://github.com/GoogleCloudPlatform/cloud-builders-community
@@ -54,7 +54,7 @@ steps:
   - name: gcr.io/${PROJECT_ID}/helm
     id: Deploy application
     script: |
-      sh gcp_deployment.sh --deploy
+      sh ./pipeline-gcp/gcp_deployment.sh --deploy
     env:
       - 'KUBECONFIG=/workspace/.kube/config'
       - 'TILLERLESS=true'
@@ -67,7 +67,7 @@ steps:
     script: |
       pip install --upgrade pip
       python -m pip install -r ./publish_data/requirements.txt
-      sh gcp_deployment.sh --push-devops
+      sh ./pipeline-gcp/gcp_deployment.sh --push-devops
     env:
       - 'PROJECT_ID=$PROJECT_ID'
       - 'PROJECT_NUMBER=$PROJECT_NUMBER'
@@ -85,7 +85,7 @@ steps:
   - name: gcr.io/cloud-builders/kubectl
     id: Deploy monitoring
     script: |
-      sh gcp_deployment.sh --deploy-monitoring
+      sh ./pipeline-gcp/gcp_deployment.sh --deploy-monitoring
     env:
       - 'CLOUDSDK_COMPUTE_REGION=$_CUSTOM_REGION'
       - 'CLOUDSDK_CONTAINER_CLUSTER=$_CUSTOM_CLUSTER'

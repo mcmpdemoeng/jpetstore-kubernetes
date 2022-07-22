@@ -87,9 +87,9 @@ devops_intelligence() {
 
     pwd
 
-    cp /workspace/TEST-*.xml ./publish_data
+    cp /workspace/TEST-*.xml ./pipeline-common/publish_data
 
-    cd publish_data
+    cd ./pipeline-common/publish_data
 
     python publish.py --deploy --build --test
 
