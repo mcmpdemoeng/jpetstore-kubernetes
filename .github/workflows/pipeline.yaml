@@ -36,7 +36,7 @@ env:
   GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
   SONARQUBE_HOST: ${{secrets.SONARQUBE_HOST}}
   SONARQUBE_TOKEN: ${{secrets.SONARQUBE_TOKEN}}
-  SNYK_SCAN_TOKEN: ${{SNYK_SCAN_TOKEN}}
+  SNYK_SCAN_TOKEN: ${{secrets.SNYK_SCAN_TOKEN}}
   GITHUB_SERVER: ${{secrets.github.server_url}}
   IS_GITHUB: 'true'
   BUILD_TOKEN: ${{secrets.BUILD_TOKEN}}
@@ -247,7 +247,7 @@ jobs:
 
       - name: Generate Kubeconfig & DB Secrets
         run: |
-          python marketplace_order_reader.py
+          python ./pipeline-common/marketplace_order_reader.py
 
       - name: Deploy into AKS
         id: aks_deployment_status

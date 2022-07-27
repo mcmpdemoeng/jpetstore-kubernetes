@@ -51,7 +51,7 @@ if __name__ == "__main__":
         order_number = os.getenv("ORDER_NUMBER")
         tenant_api_url = os.getenv("TENANT_URL")
 
-        tenant_api_url = tenant_api_url.replace(".multicloud-ibm.com","-api.multicloud-ibm.com")
+        tenant_api_url = tenant_api_url.replace(".multicloud-ibm.com", "-api.multicloud-ibm.com")
 
         error, order_details = get_order_number_details(
             tenant_system_user_name, tenant_system_user_api_key, order_number, tenant_api_url
