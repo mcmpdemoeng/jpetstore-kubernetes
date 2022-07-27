@@ -75,7 +75,7 @@ devops_intelligence() {
     export TEST_FILE="TEST-org.springframework.samples.jpetstore.domain.CartTest.xml"
 
     export DEPLOYMENT_STATUS=$(cat /workspace/deploy_status)
-    export DEPLOY_DURATION_TIME= $(cat /workspace/deploy_duration_time)
+    export DEPLOY_DURATION_TIME=$(cat /workspace/deploy_duration_time)
     export PROVIDER="Google"
 
     export petstore_host=$(cat /workspace/fqdn)
