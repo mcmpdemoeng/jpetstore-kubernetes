@@ -1,3 +1,3 @@
 # Pipeline for Github Actions
 
-Redirect to https://github.com/mcmpdemoeng/jpetstore-kubernetes/tree/master/.github/workflows to see the pipeline yaml file.
+Redirect to [Github Actions Pipeline](https://github.com/mcmpdemoeng/jpetstore-kubernetes/tree/master/.github/workflows). Use the [set up guide](https://github.com/mcmpdemoeng/jpetstore-kubernetes/tree/master/readme_cicd) to configure the pipeline.
