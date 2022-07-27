@@ -66,7 +66,7 @@ devops_intelligence() {
     export COMMIT="${SHORT_SHA}"
 
     export TEST_STATUS=$(cat /workspace/test_status)
-    export TEST_DURATION_TIME= $(cat /workspace/test_duration_time)
+    export TEST_DURATION_TIME=$(cat /workspace/test_duration_time)
     export TEST_TYPE="unit"
     export TEST_FILE_TYPE="xunit"
     export TEST_ENGINE="XUNIT"
