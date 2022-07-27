@@ -31,17 +31,20 @@ phases:
       # - command
   pre_build:
     commands:
-       - apt-get update && apt-get install docker-scan-plugin
+      - wget https://github.com/docker/scan-cli-plugin/releases/download/v0.11.0/docker-scan_linux_amd64
+      - echo $PATH
+      - mv docker-scan_linux_amd64 /usr/local/bin/docker-scan && chmod +x /usr/local/bin/docker-scan
+      - docker-scan scan --accept-license --version
       # - command
   build:
     commands:
     - docker pull $REPOSITORY/jpetstoreweb:default
     - docker pull $REPOSITORY/jpetstoreweb:default
     #- docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_jenkins_shared
-    - docker scan --accept-license --version
-    - docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
-    - docker scan --accept-license  jpetstoreweb:default
-    - docker scan --accept-license  jpetstoredb:default
+    - docker-scan scan --accept-license --version
+    - docker-scan scan --accept-license --login --token $SNYK_SCAN_TOKEN
+    - docker-scan scan --accept-license  jpetstoreweb:default
+    - docker-scan scan --accept-license  jpetstoredb:default
       # - command
       # - command
   #post_build:
