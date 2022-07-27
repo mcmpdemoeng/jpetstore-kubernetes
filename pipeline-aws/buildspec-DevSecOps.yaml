@@ -35,13 +35,13 @@ phases:
       # - command
   build:
     commands:
-    - docker pull $REPOSITORY/jpetstoreweb:latest
-    - docker pull $REPOSITORY/jpetstoreweb:latest
+    - docker pull $REPOSITORY/jpetstoreweb:default
+    - docker pull $REPOSITORY/jpetstoreweb:default
     #- docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_jenkins_shared
     - docker scan --accept-license --version
     - docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
-    - docker scan --accept-license  jpetstoreweb:latest
-    - docker scan --accept-license  jpetstoredb:latest
+    - docker scan --accept-license  jpetstoreweb:default
+    - docker scan --accept-license  jpetstoredb:default
       # - command
       # - command
   #post_build:
