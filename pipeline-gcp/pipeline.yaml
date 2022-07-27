@@ -28,6 +28,12 @@ steps:
       - 'CLOUDSDK_COMPUTE_REGION=$_CUSTOM_REGION'
       - 'CLOUDSDK_CONTAINER_CLUSTER=$_CUSTOM_CLUSTER'
       - 'KUBECONFIG=/workspace/.kube/config'
+  - name: openjdk:19-jdk-alpine3.16
+    id: Test application
+    script: |
+      java --version
+      apk update && apk add apache-ant
+      sh ./pipeline-gcp/gcp_deployment.sh --test
   - name: gcr.io/cloud-builders/docker
     id: Build Application
     script: |
@@ -46,12 +52,6 @@ steps:
       - 'SONARQUBE_TOKEN=_SONARQUBE_TOKEN'
       - 'SNYK_SCAN_TOKEN=_SNYK_SCAN_TOKEN'
     secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
-  - name: openjdk:19-jdk-alpine3.16
-    id: Test application
-    script: |
-      java --version
-      apk update && apk add apache-ant
-      sh ./pipeline-gcp/gcp_deployment.sh --test
   # First create the helm image in your GCP account and upload it
   # to the Container Registry with Google CLI. For instance:
   # $ git clone https://github.com/GoogleCloudPlatform/cloud-builders-community
@@ -87,7 +87,11 @@ steps:
       - 'TENANT_URL=$_TENANT_URL'
       - 'USER_ID=$_USER_ID'
       - 'USER_API_KEY=$_USER_API_KEY'
-      - 'TENANT_BEARER_TOKEN=$_TENANT_BEARER_TOKEN'
+      - 'TEST_TOKEN=$_TEST_TOKEN'
+      - 'BUILD_TOKEN=$_BUILD_TOKEN'
+      - 'SECURE_TOKEN=$_SECURE_TOKEN'
+      - 'DEPLOY_TOKEN=$_DEPLOY_TOKEN'
+      # - 'TENANT_BEARER_TOKEN=$_TENANT_BEARER_TOKEN'
   - name: gcr.io/cloud-builders/kubectl
     id: Deploy monitoring
     script: |

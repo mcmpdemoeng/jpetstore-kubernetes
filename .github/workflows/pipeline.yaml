@@ -34,7 +34,10 @@ env:
   ORDER_NUMBER: ${{secrets.ORDER_NUMBER}}
   BEARER_TOKEN: ${{secrets.BEARER_TOKEN}}
   GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
-  GITHUB_SERVER: ${{github.server_url}}
+  SONARQUBE_HOST: ${{secrets.SONARQUBE_HOST}}
+  SONARQUBE_TOKEN: ${{secrets.SONARQUBE_TOKEN}}
+  SNYK_SCAN_TOKEN: ${{secrets.SNYK_SCAN_TOKEN}}
+  GITHUB_SERVER: ${{secrets.github.server_url}}
   IS_GITHUB: 'true'
   BUILD_TOKEN: ${{secrets.BUILD_TOKEN}}
   TEST_TOKEN: ${{secrets.TEST_TOKEN}}
@@ -60,10 +63,71 @@ env:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel (if there is no dependency)
 jobs:
+  # Job used for publish test info
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    # if: always() # set always
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: JDK 11 set up
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Python set up
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+
+      - name: Install Python dependencies
+        run: |
+          python --version
+          pip install -r ./pipeline-common/publish_data/requirements.txt
+
+      - name: Test jpetstore application
+        id: test_status
+        run: |
+          cd jpetstore
+          ant runtest
+
+      - name: Save unit test into artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: unit-test
+          path: |
+            jpetstore/build/reports/TEST-*.xml
+
+      # - name: Download Unit Test artifact
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: unit-test
+
+      - name: Get artifact name
+        run: |
+          cp -r ./jpetstore/build/reports/TEST-*.xml ${{env.WORKSPACE}}/
+          ls | grep *.xml
+          echo "TEST_FILE=${{env.WORKSPACE}}/$(ls | grep *.xml)" >> $GITHUB_ENV
+
+      - name: Publish test information to IBM DevOps Intelligence
+        env:
+          # TEST_STATUS: ${{needs.deploy.outputs.test_status}}
+          TEST_STATUS: ${{steps.test_status.outcome}}
+        run: |
+          echo "Status of creation of test: ${{env.TEST_STATUS}}"
+          if [[ ${{env.TEST_STATUS}} == "success" ]]; then
+            python ./pipeline-common/publish_data/publish.py --test
+          else
+            echo "The workflow failed. Not able to send the UNIT TEST Results."
+          fi
   # Job used to create docker images, publish them and publish build info
   build:
-    name: Build docker
+    name: Build
     runs-on: ubuntu-latest
+    needs: [test]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -76,7 +140,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python --version
-          pip install -r publish_data/requirements.txt
+          pip install -r ./pipeline-common/publish_data/requirements.txt
 
       - name: Set Github Short SHA & TIMESTAMP
         run: |
@@ -117,16 +181,57 @@ jobs:
         env:
           BUILD_STATUS: ${{steps.docker_build_status.outcome}}
         run: |
-          python ./publish_data/publish.py --build
+          python ./pipeline-common/publish_data/publish.py --build
+
+  # Job used for secure app with SONARQUBE and Docker scan
+  secure:
+    name: Secure
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Python set up
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+      - name: Install Python dependencies
+        run: |
+          python --version
+          pip install -r ./pipeline-common/publish_data/requirements.txt
+      - name: Test docker in ubuntu-latest
+        run: docker --version
+      # - name: Scan Images
+      #   id: docker_scan_status
+      #   run: |
+      #     startdate=$(date +%s)
+      #     docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_jenkins_shared
+      #     docker scan --accept-license --version
+      #     docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
+      #     docker scan --accept-license  "${JPETSTOREWEB}:latest"
+      #     docker scan --accept-license  "${JPETSTOREDB}:latest"
+      #     enddate=$(date +%s)
+      #     echo "SECURE_DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
+      #   env:
+      #     JPETSTOREWEB: '${{env.DOCKER_USERNAME}}/jpetstoreweb'
+      #     JPETSTOREDB: '${{env.DOCKER_USERNAME}}/jpetstoredb'
+      # - name: Printing secure time
+      #   run: |
+      #     echo "The secure time process took ${{env.BUILD_DURATION_TIME}} s"
+      # - name: Publishing data to DevOps Intelligence Secure
+      #   if: always()
+      #   env:
+      #     SECURE_STATUS: ${{steps.docker_scan_status.outcome}}
+      #   run: |
+      #     python ./pipeline-common/publish_data/publish.py --build
 
   # Job used for deploy app to AKS and publish deploy info
   deploy:
-    name: AKS Deployment & IBM DevOps Intelligence Publish Deploy
+    name: Deploy
     runs-on: ubuntu-latest
-    needs: [Build]
+    needs: [test, build, secure]
     outputs:
       test_status: ${{ steps.test_status.outcome }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -139,30 +244,11 @@ jobs:
       - name: Install Python dependencies
         run: |
           python --version
-          pip install -r publish_data/requirements.txt
+          pip install -r ./pipeline-common/publish_data/requirements.txt
 
       - name: Generate Kubeconfig & DB Secrets
         run: |
-          python marketplace_order_reader.py
-
-      - name: JDK 11 set up
-        uses: actions/setup-java@v2
-        with:
-          java-version: '11'
-          distribution: 'adopt'
-
-      - name: Test jpetstore application
-        id: test_status
-        run: |
-          cd jpetstore
-          ant runtest
-
-      - name: Save unit test into artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: unit-test
-          path: |
-            jpetstore/build/reports/TEST-*.xml
+          python ./pipeline-common/marketplace_order_reader.py
 
       - name: Deploy into AKS
         id: aks_deployment_status
@@ -205,45 +291,4 @@ jobs:
         env:
           DEPLOYMENT_STATUS: ${{steps.aks_deployment_status.outcome}}
         run: |
-          python ./publish_data/publish.py --deploy
-
-  # Job used for publish test info
-  test:
-    name: IBM DevOps Intelligence Publish Tests
-    runs-on: ubuntu-latest
-    needs: [build, deploy]
-    if: always() # set always
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Python set up
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.10'
-
-      - name: Install Python dependencies
-        run: |
-          python --version
-          pip install -r publish_data/requirements.txt
-
-      - name: Download Unit Test artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: unit-test
-
-      - name: Get artifact name
-        run: |
-          ls | grep *.xml
-          echo "TEST_FILE=${{env.WORKSPACE}}/$(ls | grep *.xml)" >> $GITHUB_ENV
-
-      - name: Publish test information to IBM DevOps Intelligence
-        env:
-          TEST_STATUS: ${{needs.deploy.outputs.test_status}}
-        run: |
-          echo "Status of creation of test: ${{env.TEST_STATUS}}"
-          if [[ ${{env.TEST_STATUS}} == "success" ]]; then
-            python ./publish_data/publish.py --test
-          else
-            echo "The workflow failed. Not able to send the UNIT TEST Results."
-          fi
+          python ./pipeline-common/publish_data/publish.py --deploy
