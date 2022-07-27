@@ -114,7 +114,8 @@ jobs:
 
       - name: Publish test information to IBM DevOps Intelligence
         env:
-          TEST_STATUS: ${{needs.deploy.outputs.test_status}}
+          # TEST_STATUS: ${{needs.deploy.outputs.test_status}}
+          TEST_STATUS: ${{steps.test_status.outcome}}
         run: |
           echo "Status of creation of test: ${{env.TEST_STATUS}}"
           if [[ ${{env.TEST_STATUS}} == "success" ]]; then
