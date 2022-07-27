@@ -1,0 +1,71 @@
+version: 0.2
+
+#env:
+  #variables:
+     # key: "value"
+     # key: "value"
+  #parameter-store:
+     # key: "value"
+     # key: "value"
+  #secrets-manager:
+     # key: secret-id:json-key:version-stage:version-id
+     # key: secret-id:json-key:version-stage:version-id
+  #exported-variables:
+     # - variable
+     # - variable
+  #git-credential-helper: yes
+#batch:
+  #fast-fail: true
+  #build-list:
+  #build-matrix:
+  #build-graph:
+phases:
+  #install:
+    #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
+    #If you specify runtime-versions and use an image other than Ubuntu standard image 2.0, the build fails.
+    #runtime-versions:
+      # name: version
+      # name: version
+    #commands:
+      # - command
+      # - command
+  pre_build:
+    commands:
+      - wget https://github.com/docker/scan-cli-plugin/releases/download/v0.11.0/docker-scan_linux_amd64
+      - echo $PATH
+      - mv docker-scan_linux_amd64 /usr/local/bin/docker-scan && chmod +x /usr/local/bin/docker-scan
+      - docker-scan scan --accept-license --version
+      # - command
+  build:
+    commands:
+    - docker pull $REPOSITORY/jpetstoreweb:default
+    - docker pull $REPOSITORY/jpetstoredb:default
+    #- docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_jenkins_shared
+    - docker-scan scan --accept-license --version
+    - docker-scan scan --accept-license --login --token $SNYK_SCAN_TOKEN
+    - docker-scan scan --accept-license  $REPOSITORY/jpetstoreweb:default
+    - docker-scan scan --accept-license  $REPOSITORY/jpetstoredb:default
+      # - command
+      # - command
+  #post_build:
+    #commands:
+      # - command
+      # - command
+#reports:
+  #report-name-or-arn:
+    #files:
+      # - location
+      # - location
+    #base-directory: location
+    #discard-paths: yes
+    #file-format: JunitXml | CucumberJson
+#artifacts:
+  #files:
+    # - location
+    # - location
+  #name: $(date +%Y-%m-%d)
+  #discard-paths: yes
+  #base-directory: location
+#cache:
+  #paths:
+    # - paths

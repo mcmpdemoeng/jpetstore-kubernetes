@@ -1,0 +1,325 @@
+# Variable 'BUILD_TOKEN' was defined in the Variables tab
+# Variable 'DEPLOY_TOKEN' was defined in the Variables tab
+# Variable 'DOCKER_PASSWORD' was defined in the Variables tab
+# Variable 'DOCKER_USER' was defined in the Variables tab
+# Variable 'ORDER_NUMBER' was defined in the Variables tab
+# Variable 'SNYK_SCAN_TOKEN' was defined in the Variables tab
+# Variable 'SONARQUBE_HOST' was defined in the Variables tab
+# Variable 'SONARQUBE_TOKEN' was defined in the Variables tab
+# Variable 'TENANT_URL' was defined in the Variables tab
+# Variable 'TEST_TOKEN' was defined in the Variables tab
+# Variable 'USER_API_KEY' was defined in the Variables tab
+# Variable 'USER_ID' was defined in the Variables tab
+jobs:
+- job: Job_1
+  displayName: Main Agent
+  pool:
+    name: Default
+  steps:
+  - checkout: self
+  - task: Bash@3
+    name: ''
+    displayName: Build
+    env:
+      DOCKER_USERNAME: $(DOCKER_USER)
+      DOCKER_PASSWORD: $(DOCKER_PASSWORD)
+      BUILD_NUMBER: $(Build.BuildNumber)
+      TENANT_URL: $(TENANT_URL)
+      BUILD_TOKEN: $(BUILD_TOKEN)
+    inputs:
+      targetType: inline
+      script: >
+          echo "Building application..."
+
+          build(){
+
+            JPETSTOREWEB="${DOCKER_USERNAME}/azurejpetstoreweb:${BUILD_BUILDID}"
+            JPETSTOREDB="${DOCKER_USERNAME}/azurejpetstoredb:${BUILD_BUILDID}"
+
+            docker build -t $JPETSTOREWEB ./jpetstore
+            docker build -t $JPETSTOREDB .
+
+            docker logout
+            docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
+
+            docker push $JPETSTOREWEB
+            docker push $JPETSTOREDB
+            
+          }
+
+          startdate=$(date +%s)
+          
+          (
+            set -ex
+            build
+          )
+          
+          enddate=$(date +%s)
+
+          errorCode=$?
+          
+          rm -rf build_status
+
+          if [ $errorCode -ne 0 ]; then
+            echo "Application build has failed"
+            echo "failed" >> build_status
+          else
+            echo "Application build has succeded"
+            echo "success" >> build_status
+          fi
+
+          export SERVICE_NAME="petstore_on_aks_azure_devops"
+          export BUILD_DURATION_TIME=$((enddate - startdate))
+          export BUILD_ENGINE="Azure DevOps"
+          export BUILD_STATUS=$(cat build_status)
+          export BUILD_HREF="${SYSTEM_TEAMFOUNDATIONSERVERURI}${SYSTEM_DEFINITIONNAME}/_build/results?buildId=${BUILD_NUMBER}&view=results"
+          export RUN_ID=$BUILD_NUMBER
+          export BRANCH=$BUILD_SOURCEBRANCHNAME
+          export COMMIT=$(git rev-parse HEAD)
+  
+          python3 -m pip install -r ./pipeline-common/publish_data/requirements.txt 
+          
+          python3 ./pipeline-common/publish_data/publish.py --build
+        
+  - task: Bash@3
+    displayName: Test
+    env:
+      BUILD_NUMBER: $(Build.BuildNumber)
+      TEST_TOKEN: $(TEST_TOKEN)
+    inputs:
+      targetType: inline
+      script: >
+      
+          echo "Testing application..."
+
+          test(){
+
+             cd jpetstore
+
+             ant runtest
+
+             cd ..
+          }
+          
+          startdate=$(date +%s)
+          
+          (
+             set -e
+             test
+          )
+          
+          enddate=$(date +%s)
+
+          errorCode=$?
+
+          if [ $errorCode -ne 0 ]; then
+              echo "Application test has failed"
+              echo "failed" >> test_status
+          else
+              echo "Application test has succeded"
+              echo "success" >> test_status
+          fi
+
+          export SERVICE_NAME="petstore_on_aks_azure_devops"
+          export TEST_STATUS=$(cat test_status)
+          export TEST_DURATION_TIME=$((enddate - startdate))
+          export TEST_TYPE="unit"
+          export TEST_FILE_TYPE="xunit"
+          export TEST_ENGINE="XUNIT"
+          export TEST_ENVIRONMENT="Azure DevOps"
+          export TEST_RELEASE="${BUILD_NUMBER}"
+          export TEST_FILE="TEST-org.springframework.samples.jpetstore.domain.CartTest.xml"
+          export RUN_ID=$BUILD_NUMBER
+          export BRANCH=$BUILD_SOURCEBRANCHNAME
+          export COMMIT=$(git rev-parse HEAD)
+          export BUILD_ENGINE="Azure DevOps"
+
+          cp ./jpetstore/build/reports/TEST-*.xml ./pipeline-common/publish_data/
+          
+          cd ./pipeline-common/publish_data/
+          
+          python3 publish.py --test
+          
+          cd ..
+          
+          cd ..
+      
+  - task: Bash@3
+    displayName: Secure
+    env:
+      DOCKER_USERNAME: $(DOCKER_USER)
+      DOCKER_PASSWORD: $(DOCKER_PASSWORD)
+      BUILD_NUMBER: $(Build.BuildNumber)
+    inputs:
+      targetType: inline
+      script: >
+        # Static scan
+
+
+        cd jpetstore
+
+
+        ls
+
+
+        docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=$SYSTEM_DEFINITIONNAME
+
+
+        # Image scan
+
+
+        JPETSTOREWEB="${DOCKER_USERNAME}/azurejpetstoreweb:${BUILD_BUILDID}"
+
+        JPETSTOREDB="${DOCKER_USERNAME}/azurejpetstoredb:${BUILD_BUILDID}"
+
+
+        imagescan(){
+
+           sudo apt-get update
+
+           sudo apt-get install \
+                ca-certificates \
+                curl \
+                gnupg \
+                lsb-release
+
+            sudo mkdir -p /etc/apt/keyrings
+
+            sudo rm -rf /etc/apt/keyrings/docker.gpg
+
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+            echo \
+                 "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+                 $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+            sudo apt-get update
+
+            sudo apt install docker-scan-plugin
+
+            docker images
+
+            docker scan  --accept-license --version
+
+            docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
+
+            docker scan --accept-license  $JPETSTOREWEB
+
+            docker scan --accept-license  $JPETSTOREDB
+            
+            docker rmi  $JPETSTOREWEB
+            docker rmi  $JPETSTOREDB
+
+            return 0
+        }
+
+
+        imagescan
+  - task: Bash@3
+    displayName: Deploy & Monitoring
+    env:
+      DOCKER_USERNAME: $(DOCKER_USER)
+      DOCKER_PASSWORD: $(DOCKER_PASSWORD)
+      BUILD_NUMBER: $(Build.BuildNumber)
+      DEPLOY_TOKEN: $(DEPLOY_TOKEN)
+      USER_ID: $(USER_ID)
+      USER_API_KEY: $(USER_API_KEY)
+      TENANT_URL: $(TENANT_URL)
+    inputs:
+      targetType: inline
+      script: >
+      
+        export TENANT_SYSTEM_USER_NAME="${USER_ID}"
+
+        export TENANT_SYSTEM_USER_API_KEY="${USER_API_KEY}"
+
+        echo "Reading order details from marketplace..."
+
+        python3 ./pipeline-common/marketplace_order_reader.py
+
+        export mysql_url=$(cat db_url | base64)
+        export mysql_user=$(cat db_user | base64)
+        export petstore_host=$(cat fqdn)
+        export mysql_password=$(cat db_password | base64)
+
+        mkdir -p chart_zip
+
+        JPETSTOREWEB="${DOCKER_USERNAME}/azurejpetstoreweb:${BUILD_BUILDID}"
+
+        JPETSTOREDB="${DOCKER_USERNAME}/azurejpetstoredb:${BUILD_BUILDID}"
+
+        deploy(){
+
+          echo "Deploying application..."
+          ls
+
+          NAMESPACE="jppetstore"  
+
+          docker logout
+          docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
+          kubectl delete job jpetstoredb --ignore-not-found -n $NAMESPACE --kubeconfig tmp_kube_config
+          helm package --destination chart_zip/modernpets ./helm/modernpets
+
+          helm upgrade --install --wait --set image.repository=$DOCKER_USERNAME --set image.tag=$BUILD_BUILDID --set mysql.url=$mysql_url --set mysql.username=$mysql_user --set mysql.password=$mysql_password --set isDBAAS=True --set isLB=False --set httpHost=$petstore_host --namespace=$NAMESPACE --create-namespace $NAMESPACE --kubeconfig tmp_kube_config chart_zip/modernpets/modernpets-0.1.5.tgz
+
+          echo "\n\nYour application is available at http://jpetstore-web.${petstore_host}\n\n"
+
+          app=$(kubectl get  ingress -n $NAMESPACE --kubeconfig tmp_kube_config | base64 | tr -d '\r')
+          app_decoded=$(kubectl get  ingress -n $NAMESPACE --kubeconfig tmp_kube_config | tr -d '\r')
+          echo app running at $app_decoded
+          chmod +x result.sh
+          ./result.sh ${app}
+
+        }
+
+
+        startdate=$(date +%s)
+        
+        (
+            set -ex
+            deploy
+        )
+        
+        enddate=$(date +%s)
+
+        rm -rf deploy_status
+
+        if [ $errorCode -ne 0 ]; then
+            echo "Application deploy has failed"
+            echo "failed" >> deploy_status
+        else
+           echo "Application deploy has succeded"
+           echo "success" >> deploy_status
+        fi
+
+        export DEPLOYMENT_STATUS=$(cat deploy_status)
+        export DEPLOY_DURATION_TIME=$((enddate - startdate))
+        export PROVIDER="Azure"
+        export petstore_host=$(cat fqdn)
+        export DEPLOYMENT_HOSTNAME="http://jpetstore-web.${petstore_host}"
+        export DEPLOYMENT_SERVICE_ID="petstore_on_aks_azure_devops"
+        export DEPLOYMENT_HREF="http://jpetstore-web.${petstore_host}"
+        export SERVICE_NAME="petstore_on_aks_azure_devops"
+        export RUN_ID=$BUILD_NUMBER
+
+        python3 ./pipeline-common/publish_data/publish.py --deploy
+
+        ns=$(kubectl get ns --kubeconfig tmp_kube_config | grep monitoring | awk '{print $1}')
+
+        echo $ns
+
+        if [ -z "$ns" ] || [ "$ns" != "monitoring" ]; then
+
+           echo "Publishing monitoring tools..."
+
+            kubectl create ns monitoring --kubeconfig tmp_kube_config
+            kubectl apply -f ./prometheus -n monitoring --kubeconfig tmp_kube_config
+
+            sleep 1m
+
+            kubectl apply -f ./alertmanager/AlertManagerConfigmap.yaml -n monitoring --kubeconfig tmp_kube_config
+            kubectl apply -f ./alertmanager/AlertTemplateConfigMap.yaml -n monitoring --kubeconfig tmp_kube_config
+            kubectl apply -f ./alertmanager/Deployment.yaml -n monitoring --kubeconfig tmp_kube_config
+            kubectl apply -f ./alertmanager/Service.yaml -n monitoring --kubeconfig tmp_kube_config
+
+        fi

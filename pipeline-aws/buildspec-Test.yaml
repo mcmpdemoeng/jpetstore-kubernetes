@@ -1,0 +1,79 @@
+version: 0.2
+
+#env:
+  #variables:
+     # key: "value"
+     # key: "value"
+  #parameter-store:
+     # key: "value"
+     # key: "value"
+  #secrets-manager:
+     # key: secret-id:json-key:version-stage:version-id
+     # key: secret-id:json-key:version-stage:version-id
+  #exported-variables:
+     # - variable
+     # - variable
+  #git-credential-helper: yes
+#batch:
+  #fast-fail: true
+  #build-list:
+  #build-matrix:
+  #build-graph:
+phases:
+  #install:
+    #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
+    #If you specify runtime-versions and use an image other than Ubuntu standard image 2.0, the build fails.
+    #runtime-versions:
+      # name: version
+      # name: version
+    #commands:
+      # - command
+      # - command
+  pre_build:
+    commands:
+    
+       - export TEST_FILE="TEST-org.springframework.samples.jpetstore.domain.CartTest.xml"
+       - git clone https://github.com/mcmpdemoeng/jpetstore-kubernetes.git
+       - cd jpetstore-kubernetes/
+       - pip install -r publish_data/requirements.txt
+       - cd jpetstore/
+       - ant runtest
+       - cd ..
+       - cp ./jpetstore/build/reports/TEST-*.xml ./publish_data
+       - export TEST_STATUS=pass
+       - export TEST_DURATION_TIME=5000
+       - export TEST_TYPE="unit"
+       - export TEST_FILE_TYPE="xunit"
+       - export TEST_ENGINE="XUNIT"
+       - export TEST_ENVIRONMENT="Jenkins"
+       - export TEST_RELEASE="latest"
+       - export RUN_ID=$(date | base64 | sed 's/=/H/g')
+
+  build:
+    commands:
+       - echo "TESTING PETSTORE APP"
+       - ls publish_data/
+       - cd publish_data && python3 publish.py --test
+
+  #post_build:
+    #commands:
+      # - command
+      # - command
+#reports:
+  #report-name-or-arn:
+    #files:
+      # - location
+      # - location
+    #base-directory: location
+    #discard-paths: yes
+    #file-format: JunitXml | CucumberJson
+#artifacts:
+  #files:
+    # - location
+    # - location
+  #name: $(date +%Y-%m-%d)
+  #discard-paths: yes
+  #base-directory: location
+#cache:
+  #paths:
+    # - paths
