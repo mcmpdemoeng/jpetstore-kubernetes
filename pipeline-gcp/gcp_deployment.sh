@@ -49,8 +49,8 @@ deploy() {
 
 devops_intelligence() {
     export TENANT_URL="${TENANT_URL}"
-    export TENANT_SYSTEM_USER_NAME="${USER_ID}"
-    export TENANT_SYSTEM_USER_API_KEY="${USER_API_KEY}"
+    export TENANT_SYSTEM_USER_NAME="${SYSTEM_USER_ID}"
+    export TENANT_SYSTEM_USER_API_KEY="${SYSTEM_USER_API_KEY}"
 
     export SERVICE_NAME="petstore_on_gcp"
 

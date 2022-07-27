@@ -85,8 +85,8 @@ steps:
       - 'COMMIT_SHA=$COMMIT_SHA'
       - 'SHORT_SHA=$SHORT_SHA'
       - 'TENANT_URL=$_TENANT_URL'
-      - 'USER_ID=$_SYSTEM_USER_ID'
-      - 'USER_API_KEY=$_SYSTEM_USER_API_KEY'
+      - 'SYSTEM_USER_ID=$_SYSTEM_USER_ID'
+      - 'SYSTEM_USER_API_KEY=$_SYSTEM_USER_API_KEY'
       - 'TENANT_BEARER_TOKEN=$_TENANT_BEARER_TOKEN'
   - name: gcr.io/cloud-builders/kubectl
     id: Deploy monitoring
