@@ -39,6 +39,7 @@ phases:
        - export BUILD_TAG=$CODEBUILD_BUILD_NUMBER
        - export IMAGE_TAG=$CODEBUILD_BUILD_NUMBER
        - export BUILD_HREF=$CODEBUILD_PUBLIC_BUILD_URL
+       - echo Public link for this build ':' $BUILD_HREF
 
   build:
     commands:
