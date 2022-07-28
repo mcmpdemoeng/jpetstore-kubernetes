@@ -14,7 +14,7 @@ LOGGER = loggers.create_logger_module("devops-intelligence-publisher")
 
 TOKEN_API = "dash/api/dev_secops/v1/config/tokens"
 SCANNED_BY = "snyk"
-LIMIT_PER_REQUEST = 20
+LIMIT_PER_REQUEST = 100
 
 def __chunks(lst, n):
     for i in range(0, len(lst), n):
@@ -115,5 +115,3 @@ def post_vulnerabilities_scans( tenant_url, bearer_token ):
         traceback.print_exc()
         LOGGER.error(str(e))
         return False, str(e)
-
-    return True, None
