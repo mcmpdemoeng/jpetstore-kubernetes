@@ -104,7 +104,7 @@ TEST_TOKEN = os.getenv("TEST_TOKEN", "")
 DEPLOY_TOKEN = os.getenv("DEPLOY_TOKEN", "")
 SECURE_TOKEN = os.getenv("SECURE_TOKEN","")
 
-VULNERABILITIES_URL_TEMPLATE = "{0}/dash/api/dev_secops/v1/services/{1}/image-scan?scannedBy={2}&scannedTime={3}"
+VULNERABILITIES_URL_TEMPLATE = "{0}dash/api/dev_secops/v1/services/{1}/image-scan?scannedBy={2}&scannedTime={3}"
 
 """
 {0} tenant url (not api url)
