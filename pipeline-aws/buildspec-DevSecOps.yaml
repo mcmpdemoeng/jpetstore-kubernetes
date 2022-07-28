@@ -38,29 +38,13 @@ phases:
       # - command
   build:
     commands:
-      - docker pull hello-world
-      - docker login -u mcmpdemo -p mcmprocks123
-      - docker-scan scan --accept-license hello-world
-      - docker-scan scan --accept-license hello-world
-      - docker-scan scan --accept-license hello-world
-      - docker-scan scan --accept-license hello-world
-      - docker-scan scan --accept-license hello-world
-      - docker-scan scan --accept-license hello-world
-      - docker-scan scan --accept-license hello-world
-      - docker-scan scan --accept-license hello-world
-      - docker-scan scan --accept-license hello-world
-      - docker-scan scan --accept-license hello-world
-      - docker-scan scan --accept-license hello-world
-      - docker-scan scan --accept-license hello-world
-      - docker-scan scan --accept-license hello-world
-
-    # - docker pull $REPOSITORY/jpetstoreweb:default
-    # - docker pull $REPOSITORY/jpetstoredb:default
-    # #- docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_jenkins_shared
-    # - docker-scan scan --accept-license --version
-    # - docker-scan scan --accept-license --login --token $SNYK_SCAN_TOKEN
-    # - docker-scan scan --accept-license  $REPOSITORY/jpetstoreweb:default || echo 0
-    # - docker-scan scan --accept-license  $REPOSITORY/jpetstoredb:default || echo 0 
+    - docker pull $REPOSITORY/jpetstoreweb:default
+    - docker pull $REPOSITORY/jpetstoredb:default
+    #- docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_jenkins_shared
+    - docker-scan scan --accept-license --version
+    - docker-scan scan --accept-license --login --token $SNYK_SCAN_TOKEN
+    - docker-scan scan --accept-license  $REPOSITORY/jpetstoreweb:default || echo 0
+    - docker-scan scan --accept-license  $REPOSITORY/jpetstoredb:default || echo 0 
       # - command
       # - command
   #post_build:
