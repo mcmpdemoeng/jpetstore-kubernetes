@@ -33,11 +33,11 @@ phases:
     commands:
     
        - docker login -u "$DOCKERUSERNAME" -p "$DOCKERPASSWORD"
-       - git clone https://github.com/mcmpdemoeng/jpetstore-kubernetes.git
-       - cd jpetstore-kubernetes/
-       - pip install -r publish_data/requirements.txt
+       - pip install -r pipeline-common/publish_data/requirements.txt
        - export RUN_ID=$CODEBUILD_BUILD_NUMBER
        - export BUILD_ENGINE="AWSCodeBuild"
+       - export BUILD_TAG=$CODEBUILD_BUILD_NUMBER
+       - export BUILD_HREF=$CODEBUILD_PUBLIC_BUILD_URL
 
   build:
     commands:
@@ -47,7 +47,10 @@ phases:
        - docker push $DOCKERUSERNAME/jpetstoredb:$IMAGE_TAG
   post_build:
     commands:
-       - python3 publish_data/publish.py --build
+       - if [[ "$CODEBUILD_BUILD_SUCCEEDING"==1 ]] then \ 
+       export BUILD_STATUS=passed \
+       fi \
+       && python3 pipeline-common/publish_data/publish.py --build 
       # - command
 #reports:
   #report-name-or-arn:
