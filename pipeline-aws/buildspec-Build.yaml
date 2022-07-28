@@ -50,8 +50,7 @@ phases:
     commands:
        - if [[ "$CODEBUILD_BUILD_SUCCEEDING"==1 ]] then \ 
        export BUILD_STATUS=passed \
-       fi \
-       && python3 pipeline-common/publish_data/publish.py --build 
+       fi; && python3 pipeline-common/publish_data/publish.py --build 
       # - command
 #reports:
   #report-name-or-arn:
