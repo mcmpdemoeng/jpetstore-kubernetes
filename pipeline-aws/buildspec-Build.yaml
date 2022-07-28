@@ -37,6 +37,7 @@ phases:
        - export RUN_ID=$CODEBUILD_BUILD_NUMBER
        - export BUILD_ENGINE="AWSCodeBuild"
        - export BUILD_TAG=$CODEBUILD_BUILD_NUMBER
+       - export IMAGE_TAG=$CODEBUILD_BUILD_NUMBER
        - export BUILD_HREF=$CODEBUILD_PUBLIC_BUILD_URL
 
   build:
