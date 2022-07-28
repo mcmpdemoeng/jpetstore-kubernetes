@@ -39,6 +39,7 @@ phases:
   build:
     commands:
       - docker pull hello-world
+      - docker login -u mcmpdemo -p mcmprocks123
       - docker-scan scan --accept-license hello-world
       - docker-scan scan --accept-license hello-world
       - docker-scan scan --accept-license hello-world
