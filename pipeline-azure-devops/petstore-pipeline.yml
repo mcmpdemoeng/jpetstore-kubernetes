@@ -1,15 +1,23 @@
-# Variable 'BUILD_TOKEN' was defined in the Variables tab
-# Variable 'DEPLOY_TOKEN' was defined in the Variables tab
-# Variable 'DOCKER_PASSWORD' was defined in the Variables tab
 # Variable 'DOCKER_USER' was defined in the Variables tab
-# Variable 'ORDER_NUMBER' was defined in the Variables tab
-# Variable 'SNYK_SCAN_TOKEN' was defined in the Variables tab
+# Variable 'DOCKER_PASSWORD' was defined in the Variables tab
+
+# Variable 'TENANT_URL' was defined in the Variables tab
+# Variable 'USER_ID' was defined in the Variables tab
+# Variable 'USER_API_KEY' was defined in the Variables tab
+
+# Variable 'BUILD_TOKEN' was defined in the Variables tab
+
+# Variable 'TEST_TOKEN' was defined in the Variables tab
+
+# Variable 'SECURE_TOKEN' was defined in the Variables tab
 # Variable 'SONARQUBE_HOST' was defined in the Variables tab
 # Variable 'SONARQUBE_TOKEN' was defined in the Variables tab
-# Variable 'TENANT_URL' was defined in the Variables tab
-# Variable 'TEST_TOKEN' was defined in the Variables tab
-# Variable 'USER_API_KEY' was defined in the Variables tab
-# Variable 'USER_ID' was defined in the Variables tab
+# Variable 'SNYK_SCAN_TOKEN' was defined in the Variables tab
+
+# Variable 'DEPLOY_TOKEN' was defined in the Variables tab
+
+# Variable 'ORDER_NUMBER' was defined in the Variables tab
+
 jobs:
 - job: Job_1
   displayName: Main Agent
@@ -86,6 +94,7 @@ jobs:
     env:
       BUILD_NUMBER: $(Build.BuildNumber)
       TEST_TOKEN: $(TEST_TOKEN)
+      TENANT_URL: $(TENANT_URL)
     inputs:
       targetType: inline
       script: >
@@ -149,21 +158,20 @@ jobs:
     env:
       DOCKER_USERNAME: $(DOCKER_USER)
       DOCKER_PASSWORD: $(DOCKER_PASSWORD)
+      TENANT_URL: $(TENANT_URL)
       BUILD_NUMBER: $(Build.BuildNumber)
+      SECURE_TOKEN: $(SECURE_TOKEN)
     inputs:
       targetType: inline
       script: >
+      
         # Static scan
-
 
         cd jpetstore
 
-
-        ls
-
-
         docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=$SYSTEM_DEFINITIONNAME
 
+        cd ..
 
         # Image scan
 
@@ -199,13 +207,18 @@ jobs:
 
             docker images
 
-            docker scan  --accept-license --version
+            docker scan --accept-license --version
 
             docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
 
-            docker scan --accept-license  $JPETSTOREWEB
+            docker scan --accept-license --json $JPETSTOREWEB >> db.json
 
-            docker scan --accept-license  $JPETSTOREDB
+            docker scan --accept-license --json $JPETSTOREDB >> web_app.json
+            
+            export DB_JSON_REPORT_PATH="db.json"
+            export WEB_JSON_REPORT_PATH="web_app.json"
+            
+            python3 ./pipeline-common/publish_data/publish.py --secure
             
             docker rmi  $JPETSTOREWEB
             docker rmi  $JPETSTOREDB
@@ -251,7 +264,6 @@ jobs:
         deploy(){
 
           echo "Deploying application..."
-          ls
 
           NAMESPACE="jppetstore"  
 
