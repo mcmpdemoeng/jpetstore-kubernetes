@@ -36,10 +36,6 @@ phases:
        - git clone https://github.com/mcmpdemoeng/jpetstore-kubernetes.git
        - cd jpetstore-kubernetes/
        - pip install -r publish_data/requirements.txt
-       - cd jpetstore/
-       - ant runtest
-       - cd ..
-       - cp ./jpetstore/build/reports/TEST-*.xml ./publish_data
        - export TEST_STATUS=pass
        - export TEST_DURATION_TIME=5000
        - export TEST_TYPE="unit"
@@ -53,11 +49,11 @@ phases:
   build:
     commands:
        - echo "TESTING PETSTORE APP"
-       - ls publish_data/
-       - cd publish_data && python3 publish.py --test
+       - cd jpetstore/ && ant runtest && cd .. && cp ./jpetstore/build/reports/TEST-*.xml ./pipeline-common/publish_data
 
-  #post_build:
-    #commands:
+  post_build:
+    commands:
+     - cd pipeline-common/publish_data && python3 publish.py --test
       # - command
       # - command
 #reports:
