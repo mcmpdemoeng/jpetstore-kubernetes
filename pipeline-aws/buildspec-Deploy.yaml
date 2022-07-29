@@ -35,6 +35,7 @@ phases:
   
   pre_build:
     commands:
+
        - git clone https://github.com/mcmpdemoeng/jpetstore-kubernetes.git
        - cd jpetstore-kubernetes/
        - aws configure set aws_access_key_id $SECRETKEYID
@@ -45,20 +46,24 @@ phases:
        - export DEPLOYMENT_SERVICE_ID=$(date | base64 | sed 's/=/H/g')
        - export PROVIDER="AWSCodeBuild"
        - export RUN_ID=$DEPLOYMENT_SERVICE_ID
+       - export DEPLOYMENT_HREF="somehostname"
+       - export START_TIME=$( date +%s )
+       - export PROVIDER="AWS"
+
   build:
     commands:
+
        - echo "kubernetes Deployment"
        - kubectl create namespace $NAMESPACE || echo "The namespace $NAMESPACE already exists"
        - helm package --destination ./modernpets ./helm/modernpets
-       - pwd
-       - ls
        - helm upgrade --install --set image.repository=$REPOSITORY --set image.tag=$IMAGE_TAG --set mysql.url=$MYSQL_URL --set mysql.username=$MYSQL_USER --set mysql.password=$MYSQL_PASSWORD --set isDBAAS=False --set isLB=True --set httpHost=$PETSTORE_HOST petstore3 modernpets/modernpets-0.1.5.tgz  --namespace $NAMESPACE
-       - kubectl get nodes 
-       - kubectl get pods --namespace $NAMESPACE 
+       - kubectl get nodes
+       - kubectl get pods --namespace $NAMESPACE
 
   post_build:
     commands:
-      - python3 publish_data/publish.py --deploy
+       - if [ "$CODEBUILD_BUILD_SUCCEEDING"==1 ]; then export DEPLOYMENT_STATUS=success; fi  && export ENDTIME=$(date +%s) && export DEPLOY_DURATION_TIME=$((ENDTIME - START_TIME)) && python3 pipeline-common/publish_data/publish.py --build
+
 
 #reports:
   #report-name-or-arn:
