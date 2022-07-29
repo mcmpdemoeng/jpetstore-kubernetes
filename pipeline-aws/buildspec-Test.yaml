@@ -48,6 +48,7 @@ phases:
        - export TEST_ENVIRONMENT="Jenkins"
        - export TEST_RELEASE="latest"
        - export RUN_ID=$(date | base64 | sed 's/=/H/g')
+       - export TEST_HREF=$CODEBUILD_PUBLIC_BUILD_URL
 
   build:
     commands:
