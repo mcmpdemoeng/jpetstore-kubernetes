@@ -21,4 +21,13 @@ Flags that can be used:
 - `--build`
 - `--test`
 - `--deploy`
+- `--secure`
+  Please consider:
 
+  Instead of displaying the docker scans results on the logs, you will need to output the scans as a json file as follows:
+  docker scan $IMAGE_NAME --json >> sample_output.json
+  export the following env vars:
+
+  SECURE_TOKEN: secure token generated from DI
+  DB_JSON_REPORT_PATH: path to the json file that resulted from the docker scan of the db image
+  WEB_JSON_REPORT_PATH: path to the json file that resulted from the docker scan of the web app image
