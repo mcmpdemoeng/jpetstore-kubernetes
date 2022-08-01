@@ -35,16 +35,20 @@ phases:
       - echo $PATH
       - mv docker-scan_linux_amd64 /usr/local/bin/docker-scan && chmod +x /usr/local/bin/docker-scan
       - docker-scan scan --accept-license --version
+      - pip install -r pipeline-common/publish_data/requirements.txt
+      - export DB_JSON_REPORT_PATH="scan_jpetstoreweb.json"
+      - export WEB_JSON_REPORT_PATH="scan_jpetstoredb.json"
       # - command
   build:
     commands:
     - docker pull $REPOSITORY/jpetstoreweb:default
     - docker pull $REPOSITORY/jpetstoredb:default
-    #- docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_jenkins_shared
+    - docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_jenkins_shared
     - docker-scan scan --accept-license --version
     - docker-scan scan --accept-license --login --token $SNYK_SCAN_TOKEN
-    - docker-scan scan --accept-license  $REPOSITORY/jpetstoreweb:default || echo 0
-    - docker-scan scan --accept-license  $REPOSITORY/jpetstoredb:default || echo 0 
+    - docker-scan scan --accept-license  $REPOSITORY/jpetstoreweb:default --json >> scan_jpetstoreweb.json || echo 0
+    - docker-scan scan --accept-license  $REPOSITORY/jpetstoredb:default --json >> scan_jpetstoredb.json || echo 0
+    - python3 pipeline-common/publish_data/publish.py --secure
       # - command
       # - command
   #post_build:
