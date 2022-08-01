@@ -222,8 +222,8 @@ jobs:
           cd ..
           docker scan --accept-license --version
           docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
-          docker scan --accept-license "${JPETSTOREWEB}:latest" >> db.json
-          docker scan --accept-license "${JPETSTOREDB}:latest" >> web.json
+          # docker scan --accept-license "${JPETSTOREWEB}:latest" >> db.json
+          # docker scan --accept-license "${JPETSTOREDB}:latest" >> web.json
           enddate=$(date +%s)
           echo "SECURE_DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
           echo "DB_JSON_REPORT_PATH=db.json" >> $GITHUB_ENV
