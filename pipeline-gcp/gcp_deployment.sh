@@ -156,7 +156,7 @@ while test $# -gt 0; do
             ;;
         -s|--secure)
             echo "Secure application"
-            # secure
+            secure
             shift
             ;;
         -t|--test)
