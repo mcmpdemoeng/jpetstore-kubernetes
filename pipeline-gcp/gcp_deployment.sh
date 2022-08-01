@@ -21,6 +21,9 @@ build() {
 }
 
 secure() {
+    echo "JPETSTOREWEB_TAG=${JPETSTOREWEB}:latest"
+    echo "JPETSTOREDB_TAG=${JPETSTOREDB}:latest"
+    
     cd jpetstore
     docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=$SYSTEM_DEFINITIONNAME
     cd ..
