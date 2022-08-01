@@ -1,9 +1,11 @@
 # Variable 'DOCKER_USER' was defined in the Variables tab
 # Variable 'DOCKER_PASSWORD' was defined in the Variables tab
 
+# Variable 'MYSQL_USER' was defined in the Variables tab
+# Variable 'MYSQL_PASSWORD' was defined in the Variables tab
+# Variable 'MYSQL_URL' was defined in the Variables tab
+
 # Variable 'TENANT_URL' was defined in the Variables tab
-# Variable 'USER_ID' was defined in the Variables tab
-# Variable 'USER_API_KEY' was defined in the Variables tab
 
 # Variable 'BUILD_TOKEN' was defined in the Variables tab
 
@@ -15,8 +17,6 @@
 # Variable 'SNYK_SCAN_TOKEN' was defined in the Variables tab
 
 # Variable 'DEPLOY_TOKEN' was defined in the Variables tab
-
-# Variable 'ORDER_NUMBER' was defined in the Variables tab
 
 jobs:
 - job: Job_1
@@ -41,8 +41,8 @@ jobs:
 
           build(){
 
-            JPETSTOREWEB="${DOCKER_USERNAME}/azurejpetstoreweb:${BUILD_BUILDID}"
-            JPETSTOREDB="${DOCKER_USERNAME}/azurejpetstoredb:${BUILD_BUILDID}"
+            JPETSTOREWEB="${DOCKER_USERNAME}/jpetstoreweb:${BUILD_BUILDID}"
+            JPETSTOREDB="${DOCKER_USERNAME}/jpetstoredb:${BUILD_BUILDID}"
 
             docker build -t $JPETSTOREWEB ./jpetstore
             docker build -t $JPETSTOREDB .
@@ -161,6 +161,7 @@ jobs:
       TENANT_URL: $(TENANT_URL)
       BUILD_NUMBER: $(Build.BuildNumber)
       SECURE_TOKEN: $(SECURE_TOKEN)
+      SNYK_SCAN_TOKEN: $(SNYK_SCAN_TOKEN)
     inputs:
       targetType: inline
       script: >
@@ -175,11 +176,9 @@ jobs:
 
         # Image scan
 
-
-        JPETSTOREWEB="${DOCKER_USERNAME}/azurejpetstoreweb:${BUILD_BUILDID}"
-
-        JPETSTOREDB="${DOCKER_USERNAME}/azurejpetstoredb:${BUILD_BUILDID}"
-
+        JPETSTOREWEB="${DOCKER_USERNAME}/jpetstoreweb:${BUILD_BUILDID}"
+        
+        JPETSTOREDB="${DOCKER_USERNAME}/jpetstoredb:${BUILD_BUILDID}"
 
         imagescan(){
 
@@ -226,40 +225,39 @@ jobs:
             return 0
         }
 
-
         imagescan
+  
+  - task: AzureCLI@2
+    displayName: Deploy - Cluster Connection
+    env:
+      RESOURCE_GROUP_NAME: ''
+      CLUSTER_NAME: ''
+    inputs:
+      azureSubscription: ''
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az aks get-credentials --resource-group $RESOURCE_GROUP_NAME --name $CLUSTER_NAME --file kubeconfig
+        az aks show --resource-group $RESOURCE_GROUP_NAME --name $CLUSTER_NAME | jq '.addonProfiles.httpApplicationRouting.config.HTTPApplicationRoutingZoneName' -r >> fqdn
+  
   - task: Bash@3
-    displayName: Deploy & Monitoring
+    displayName: Deploy - Apply & Monitoring
     env:
       DOCKER_USERNAME: $(DOCKER_USER)
       DOCKER_PASSWORD: $(DOCKER_PASSWORD)
       BUILD_NUMBER: $(Build.BuildNumber)
       DEPLOY_TOKEN: $(DEPLOY_TOKEN)
-      USER_ID: $(USER_ID)
-      USER_API_KEY: $(USER_API_KEY)
       TENANT_URL: $(TENANT_URL)
+      MYSQL_USER: $(MYSQL_USER)
+      MYSQL_PASSWORD: $(MYSQL_PASSWORD)
+      MYSQL_URL: $(MYSQL_URL)
     inputs:
       targetType: inline
       script: >
-      
-        export TENANT_SYSTEM_USER_NAME="${USER_ID}"
-
-        export TENANT_SYSTEM_USER_API_KEY="${USER_API_KEY}"
-
-        echo "Reading order details from marketplace..."
-
-        python3 ./pipeline-common/marketplace_order_reader.py
-
-        export mysql_url=$(cat db_url | base64)
-        export mysql_user=$(cat db_user | base64)
-        export petstore_host=$(cat fqdn)
-        export mysql_password=$(cat db_password | base64)
+        
+        export PESTORE_HOST=$(cat fqdn)
 
         mkdir -p chart_zip
-
-        JPETSTOREWEB="${DOCKER_USERNAME}/azurejpetstoreweb:${BUILD_BUILDID}"
-
-        JPETSTOREDB="${DOCKER_USERNAME}/azurejpetstoredb:${BUILD_BUILDID}"
 
         deploy(){
 
@@ -269,15 +267,15 @@ jobs:
 
           docker logout
           docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
-          kubectl delete job jpetstoredb --ignore-not-found -n $NAMESPACE --kubeconfig tmp_kube_config
+          kubectl delete job jpetstoredb --ignore-not-found -n $NAMESPACE --kubeconfig kubeconfig
           helm package --destination chart_zip/modernpets ./helm/modernpets
 
-          helm upgrade --install --wait --set image.repository=$DOCKER_USERNAME --set image.tag=$BUILD_BUILDID --set mysql.url=$mysql_url --set mysql.username=$mysql_user --set mysql.password=$mysql_password --set isDBAAS=True --set isLB=False --set httpHost=$petstore_host --namespace=$NAMESPACE --create-namespace $NAMESPACE --kubeconfig tmp_kube_config chart_zip/modernpets/modernpets-0.1.5.tgz
+          helm upgrade --install --wait --set image.repository=$DOCKER_USERNAME --set image.tag=$BUILD_BUILDID --set mysql.url=$MYSQL_URL --set mysql.username=$MYSQL_USER --set mysql.password=$MYSQL_PASSWORD --set isDBAAS=True --set isLB=False --set httpHost=$PESTORE_HOST --namespace=$NAMESPACE --create-namespace $NAMESPACE --kubeconfig kubeconfig chart_zip/modernpets/modernpets-0.1.5.tgz
 
-          echo "\n\nYour application is available at http://jpetstore-web.${petstore_host}\n\n"
+          echo "\n\nYour application is available at http://jpetstore-web.${PESTORE_HOST}\n\n"
 
-          app=$(kubectl get  ingress -n $NAMESPACE --kubeconfig tmp_kube_config | base64 | tr -d '\r')
-          app_decoded=$(kubectl get  ingress -n $NAMESPACE --kubeconfig tmp_kube_config | tr -d '\r')
+          app=$(kubectl get  ingress -n $NAMESPACE --kubeconfig kubeconfig | base64 | tr -d '\r')
+          app_decoded=$(kubectl get  ingress -n $NAMESPACE --kubeconfig kubeconfig | tr -d '\r')
           echo app running at $app_decoded
           chmod +x result.sh
           ./result.sh ${app}
@@ -316,7 +314,7 @@ jobs:
 
         python3 ./pipeline-common/publish_data/publish.py --deploy
 
-        ns=$(kubectl get ns --kubeconfig tmp_kube_config | grep monitoring | awk '{print $1}')
+        ns=$(kubectl get ns --kubeconfig kubeconfig | grep monitoring | awk '{print $1}')
 
         echo $ns
 
@@ -324,14 +322,14 @@ jobs:
 
            echo "Publishing monitoring tools..."
 
-            kubectl create ns monitoring --kubeconfig tmp_kube_config
-            kubectl apply -f ./prometheus -n monitoring --kubeconfig tmp_kube_config
+            kubectl create ns monitoring --kubeconfig kubeconfig
+            kubectl apply -f ./prometheus -n monitoring --kubeconfig kubeconfig
 
             sleep 1m
 
-            kubectl apply -f ./alertmanager/AlertManagerConfigmap.yaml -n monitoring --kubeconfig tmp_kube_config
-            kubectl apply -f ./alertmanager/AlertTemplateConfigMap.yaml -n monitoring --kubeconfig tmp_kube_config
-            kubectl apply -f ./alertmanager/Deployment.yaml -n monitoring --kubeconfig tmp_kube_config
-            kubectl apply -f ./alertmanager/Service.yaml -n monitoring --kubeconfig tmp_kube_config
+            kubectl apply -f ./alertmanager/AlertManagerConfigmap.yaml -n monitoring --kubeconfig kubeconfig
+            kubectl apply -f ./alertmanager/AlertTemplateConfigMap.yaml -n monitoring --kubeconfig kubeconfig
+            kubectl apply -f ./alertmanager/Deployment.yaml -n monitoring --kubeconfig kubeconfig
+            kubectl apply -f ./alertmanager/Service.yaml -n monitoring --kubeconfig kubeconfig
 
         fi
