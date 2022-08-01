@@ -201,29 +201,31 @@ jobs:
           pip install -r ./pipeline-common/publish_data/requirements.txt
       - name: Test docker in ubuntu-latest
         run: docker --version
-      # - name: Scan Images
-      #   id: docker_scan_status
-      #   run: |
-      #     startdate=$(date +%s)
-      #     docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_jenkins_shared
-      #     docker scan --accept-license --version
-      #     docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
-      #     docker scan --accept-license  "${JPETSTOREWEB}:latest"
-      #     docker scan --accept-license  "${JPETSTOREDB}:latest"
-      #     enddate=$(date +%s)
-      #     echo "SECURE_DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
-      #   env:
-      #     JPETSTOREWEB: '${{env.DOCKER_USERNAME}}/jpetstoreweb'
-      #     JPETSTOREDB: '${{env.DOCKER_USERNAME}}/jpetstoredb'
-      # - name: Printing secure time
-      #   run: |
-      #     echo "The secure time process took ${{env.BUILD_DURATION_TIME}} s"
-      # - name: Publishing data to DevOps Intelligence Secure
-      #   if: always()
-      #   env:
-      #     SECURE_STATUS: ${{steps.docker_scan_status.outcome}}
-      #   run: |
-      #     python ./pipeline-common/publish_data/publish.py --build
+      - name: Scan Images
+        id: docker_scan_status
+        run: |
+          startdate=$(date +%s)
+          docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_github_actions
+          docker scan --accept-license --version
+          docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
+          docker scan --accept-license  "${JPETSTOREWEB}:latest" >> db.json
+          docker scan --accept-license  "${JPETSTOREDB}:latest" >> web.json
+          enddate=$(date +%s)
+          echo "SECURE_DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
+          echo "DB_JSON_REPORT_PATH=db.json" >> $GITHUB_ENV
+          echo "WEB_JSON_REPORT_PATH=web.json" >> $GITHUB_ENV
+        env:
+          JPETSTOREWEB: '${{env.DOCKER_USERNAME}}/jpetstoreweb'
+          JPETSTOREDB: '${{env.DOCKER_USERNAME}}/jpetstoredb'
+      - name: Printing secure time
+        run: |
+          echo "The secure time process took ${{env.BUILD_DURATION_TIME}} s"
+      - name: Publishing data to DevOps Intelligence Secure
+        if: always()
+        env:
+          SECURE_STATUS: ${{steps.docker_scan_status.outcome}}
+        run: |
+          python ./pipeline-common/publish_data/publish.py --secure
 
   # Job used for deploy app to AKS and publish deploy info
   deploy:
