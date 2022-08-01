@@ -42,11 +42,11 @@ phases:
        - aws configure set aws_secret_access_key $SECRETKEY
        - aws eks --region us-west-1 update-kubeconfig --name PetstoreEKSCluster
        - export KUBECONFIG=/root/.kube/config
-       - pip install -r publish_data/requirements.txt
+       - pip install -r pipeline-common/publish_data/requirements.txt
        - export DEPLOYMENT_SERVICE_ID=$(date | base64 | sed 's/=/H/g')
        - export PROVIDER="AWSCodeBuild"
        - export RUN_ID=$DEPLOYMENT_SERVICE_ID
-       - export DEPLOYMENT_HREF="somehostname"
+       - export DEPLOYMENT_HREF=$CODEBUILD_PUBLIC_BUILD_URL
        - export START_TIME=$( date +%s )
        - export PROVIDER="AWS"
 
