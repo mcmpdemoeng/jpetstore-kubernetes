@@ -218,13 +218,14 @@ jobs:
         id: docker_scan_status
         run: |
           echo "JPETSTOREWEB=${JPETSTOREWEB}:latest"
+          echo "JPETSTOREDB=${JPETSTOREDB}:latest"
           startdate=$(date +%s)
           cd jpetstore
           docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_github_actions
           cd ..
           docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
-          docker scan --accept-license "${JPETSTOREWEB}:latest" >> db.json
-          docker scan --accept-license "${JPETSTOREDB}:latest" >> web.json
+          docker scan --accept-license "${JPETSTOREWEB}:latest" >> web.json
+          docker scan --accept-license "${JPETSTOREDB}:latest" >> db.json
           enddate=$(date +%s)
           echo "SECURE_DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
         env:
