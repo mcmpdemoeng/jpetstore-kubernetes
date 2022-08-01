@@ -42,6 +42,7 @@ env:
   BUILD_TOKEN: ${{secrets.BUILD_TOKEN}}
   TEST_TOKEN: ${{secrets.TEST_TOKEN}}
   DEPLOY_TOKEN: ${{secrets.DEPLOY_TOKEN}}
+  SECURE_TOKEN: ${{secrets.SECURE_TOKEN}}
   WORKSPACE: ${{ github.workspace }}
   RUN_ID: ${{ github.run_id }}
   BRANCH: ${{github.ref_name}}
@@ -216,6 +217,7 @@ jobs:
       - name: Scan Images
         id: docker_scan_status
         run: |
+          echo "JPETSTOREWEB=${JPETSTOREWEB}:latest"
           startdate=$(date +%s)
           cd jpetstore
           docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_github_actions
