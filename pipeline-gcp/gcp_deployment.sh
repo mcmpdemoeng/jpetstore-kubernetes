@@ -21,11 +21,14 @@ build() {
 }
 
 secure() {
-    docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_jenkins_shared
+    cd jpetstore
+    docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=$SYSTEM_DEFINITIONNAME
+    cd ..
+    
     docker scan --accept-license --version
     docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
-    docker scan --accept-license  "${JPETSTOREWEB}:latest"
-    docker scan --accept-license  "${JPETSTOREDB}:latest"
+    docker scan --accept-license --json "${JPETSTOREWEB}:latest" >> /workspace/db.json
+    docker scan --accept-license --json "${JPETSTOREDB}:latest" >> /workspace/web_app.json
 }
 
 testing() {
@@ -38,6 +41,9 @@ testing() {
 }
 
 deploy() {
+    MYSQL_USERNAME=$(echo $MYSQL_USERNAME | base64)
+    MYSQL_PASSWORD=$(echo $MYSQL_PASSWORD | base64)
+    MYSQL_URL=$(echo $MYSQL_URL | base64)
     NAMESPACE="jpetstore"
     kubectl delete job jpetstoredb --ignore-not-found -n $NAMESPACE --kubeconfig /workspace/.kube/config
     helm package --destination ./modernpets ./helm/modernpets
@@ -91,7 +97,7 @@ devops_intelligence() {
 
     cd ./pipeline-common/publish_data
 
-    python publish.py --deploy --build --test
+    python publish.py --test --build --secure --deploy
 
     cd ..
 }
