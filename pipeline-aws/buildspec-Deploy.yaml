@@ -47,6 +47,7 @@ phases:
        - export PROVIDER="AWSCodeBuild"
        - export RUN_ID=$DEPLOYMENT_SERVICE_ID
        - export DEPLOYMENT_HREF=$CODEBUILD_PUBLIC_BUILD_URL
+       - export BUILD_ENGINE="AWSCodeBuild"
        - export START_TIME=$( date +%s )
        - export PROVIDER="AWS"
 
@@ -62,7 +63,7 @@ phases:
 
   post_build:
     commands:
-       - if [ "$CODEBUILD_BUILD_SUCCEEDING"==1 ]; then export DEPLOYMENT_STATUS=success; fi  && export ENDTIME=$(date +%s) && export DEPLOY_DURATION_TIME=$((ENDTIME - START_TIME)) && python3 pipeline-common/publish_data/publish.py --build
+       - if [ "$CODEBUILD_BUILD_SUCCEEDING"==1 ]; then export DEPLOYMENT_STATUS=success; fi  && export ENDTIME=$(date +%s) && export DEPLOY_DURATION_TIME=$((ENDTIME - START_TIME)) && python3 pipeline-common/publish_data/publish.py --deploy
 
 
 #reports:
