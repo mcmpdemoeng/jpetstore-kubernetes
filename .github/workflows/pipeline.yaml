@@ -199,15 +199,20 @@ jobs:
         run: |
           python --version
           pip install -r ./pipeline-common/publish_data/requirements.txt
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
       - name: Install Docker Scan Plugin
         run: |
           mkdir -p ~/.docker/cli-plugins && \
           curl https://github.com/docker/scan-cli-plugin/releases/latest/download/docker-scan_linux_amd64 -L -s -S -o ~/.docker/cli-plugins/docker-scan &&\
           chmod +x ~/.docker/cli-plugins/docker-scan
-          sudo apt-get update
-          sudo apt install docker-scan-plugin
       - name: Test docker in ubuntu-latest
-        run: docker --version
+        run: |
+          docker scan
+          docker --version
       - name: Scan Images
         id: docker_scan_status
         run: |
