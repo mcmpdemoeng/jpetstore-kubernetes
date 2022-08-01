@@ -35,11 +35,7 @@ phases:
        - export TEST_FILE="TEST-org.springframework.samples.jpetstore.domain.CartTest.xml"
        - git clone https://github.com/mcmpdemoeng/jpetstore-kubernetes.git
        - cd jpetstore-kubernetes/
-       - pip install -r publish_data/requirements.txt
-       - cd jpetstore/
-       - ant runtest
-       - cd ..
-       - cp ./jpetstore/build/reports/TEST-*.xml ./publish_data
+       - pip install -r pipeline-common/publish_data/requirements.txt
        - export TEST_STATUS=pass
        - export TEST_DURATION_TIME=5000
        - export TEST_TYPE="unit"
@@ -48,15 +44,16 @@ phases:
        - export TEST_ENVIRONMENT="Jenkins"
        - export TEST_RELEASE="latest"
        - export RUN_ID=$(date | base64 | sed 's/=/H/g')
+       - export TEST_HREF=$CODEBUILD_PUBLIC_BUILD_URL
 
   build:
     commands:
        - echo "TESTING PETSTORE APP"
-       - ls publish_data/
-       - cd publish_data && python3 publish.py --test
+       - cd jpetstore/ && ant runtest && cd .. && cp ./jpetstore/build/reports/TEST-*.xml ./pipeline-common/publish_data
 
-  #post_build:
-    #commands:
+  post_build:
+    commands:
+     - cd pipeline-common/publish_data && python3 publish.py --test
       # - command
       # - command
 #reports:
