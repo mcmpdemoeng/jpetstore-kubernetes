@@ -65,6 +65,24 @@ class DeploymentTemplate:
         self.serviceoverride = True
         self.status = None
 
+class ImageScanTemplate:
+    def __init__(self):
+        self.vulnerable_image_scan = []
+        self.serviceoverride = None
+        self.servicename = None
+
+class VulnerabilityTemplate:
+    def __init__(self,cvss,description,image_digest,pack_name,pack_path,pack_version,severity,url,id):
+        self.cvss_score = cvss
+        self.description = description
+        self.image_digest = image_digest
+        self.package_name = pack_name
+        self.package_path = pack_path
+        self.package_version = pack_version
+        self.severity = severity
+        self.url_datasource = url
+        self.vulnerability_id = id
+
 
 TOKEN_NAME = os.getenv("TOKEN_NAME", "tokenapp")
 BROKER = "mcmp:devops-intelligence:service"
@@ -84,6 +102,9 @@ UTC_FORMAT = "%FT%TZ"
 BUILD_TOKEN = os.getenv("BUILD_TOKEN", "")
 TEST_TOKEN = os.getenv("TEST_TOKEN", "")
 DEPLOY_TOKEN = os.getenv("DEPLOY_TOKEN", "")
+SECURE_TOKEN = os.getenv("SECURE_TOKEN","")
+
+VULNERABILITIES_URL_TEMPLATE = "{0}dash/api/dev_secops/v1/services/{1}/image-scan?scannedBy={2}&scannedTime={3}"
 
 """
 {0} tenant url (not api url)

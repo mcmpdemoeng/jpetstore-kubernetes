@@ -57,7 +57,7 @@ if __name__ == "__main__":
             tenant_system_user_name, tenant_system_user_api_key, order_number, tenant_api_url
         )
         if not error:
-            print("Error = " + order_details)
+            print("Error [Order] = " + order_details)
             exit()
 
         service_instance_id = order_details["service_instance_id"]
@@ -67,7 +67,7 @@ if __name__ == "__main__":
         )
 
         if not error:
-            print("Error = " + service_details)
+            print("Error [Service] = " + service_details)
             exit()
 
         fqdn = None

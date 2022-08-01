@@ -1,6 +1,7 @@
 from load_data.devops_builds.builds import post_build_data
 from load_data.devops_tests.tests import post_tests_data
 from load_data.devops_deployments.deployments import post_deployment_data
+from load_data.devops_secure.secure import post_vulnerabilities_scans
 from common_utils import args_utils, loggers
 
 import os, sys
@@ -36,6 +37,13 @@ def main():
         result, err = post_deployment_data(TENANT_URL, BEARER_TOKEN)
         if not result:
             LOGGER.error("Error = Data couldn't be published.")
+            return
+        LOGGER.info("The data was published successfully.")
+    if ARGS.secure:
+        LOGGER.info(INFO_MESSAGE.format("Secure"))
+        result, err = post_vulnerabilities_scans(TENANT_URL, BEARER_TOKEN)
+        if not result:
+            LOGGER.error(f"Error = Data couldn't be published")
             return
         LOGGER.info("The data was published successfully.")
     # if check_flags > 1:
