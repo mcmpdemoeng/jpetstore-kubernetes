@@ -55,7 +55,7 @@ steps:
       - 'SNYK_SCAN_TOKEN=_SNYK_SCAN_TOKEN'
       - 'DOCKER_USERNAME=$_DOCKER_USERNAME'
       - 'DOCKER_PASSWORD=$_DOCKER_PASSWORD'
-      - 'SYSTEM_DEFINITIONNAME:$_SYSTEM_DEFINITIONNAME'
+      - 'SYSTEM_DEFINITIONNAME=$_SYSTEM_DEFINITIONNAME'
     # secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
   # First create the helm image in your GCP account and upload it
   # to the Container Registry with Google CLI. For instance:
