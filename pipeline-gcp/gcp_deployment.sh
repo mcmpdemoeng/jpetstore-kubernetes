@@ -21,6 +21,9 @@ build() {
 }
 
 secure() {
+    echo "JPETSTOREWEB_TAG=${JPETSTOREWEB}:latest"
+    echo "JPETSTOREDB_TAG=${JPETSTOREDB}:latest"
+
     cd jpetstore
     docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=$SYSTEM_DEFINITIONNAME
     cd ..
@@ -79,6 +82,10 @@ devops_intelligence() {
     export TEST_ENVIRONMENT="Cloud Build GCP"
     export TEST_RELEASE="$(echo $BUILD_ID | cut -c 1-8)"
     export TEST_FILE="TEST-org.springframework.samples.jpetstore.domain.CartTest.xml"
+
+    export DB_JSON_REPORT_PATH="/workspace/db.json"
+    export WEB_JSON_REPORT_PATH="/workspace/web_app.json"
+
 
     export DEPLOYMENT_STATUS=$(cat /workspace/deploy_status)
     export DEPLOY_DURATION_TIME=$(cat /workspace/deploy_duration_time)
@@ -155,8 +162,24 @@ while test $# -gt 0; do
             shift
             ;;
         -s|--secure)
-            echo "Secure application"
+            echo "Secure application in GCP"
+            startdate=$(date +%s)
+            (
+            set -e
             secure
+            )
+            enddate=$(date +%s)
+            echo "SECURE_DURATION_TIME= $((enddate - startdate)) s"
+            echo "$((enddate - startdate))" >> /workspace/secure_duration_time
+            errorCode=$?
+
+            if [ $errorCode -ne 0 ]; then
+                echo "Application secure has failed"
+                echo "failed" >> /workspace/build_status
+            else
+                echo "Application secure has succeded"
+                echo "success" >> /workspace/build_status
+            fi
             shift
             ;;
         -t|--test)

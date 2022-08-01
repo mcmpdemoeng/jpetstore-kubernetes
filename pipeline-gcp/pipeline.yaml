@@ -50,12 +50,12 @@ steps:
     script: |
       sh ./pipeline-gcp/gcp_deployment.sh --secure
     env:
-      - 'SONARQUBE_HOST=_SONARQUBE_HOST'
-      - 'SONARQUBE_TOKEN=_SONARQUBE_TOKEN'
-      - 'SNYK_SCAN_TOKEN=_SNYK_SCAN_TOKEN'
+      - 'SONARQUBE_HOST=$_SONARQUBE_HOST'
+      - 'SONARQUBE_TOKEN=$_SONARQUBE_TOKEN'
+      - 'SNYK_SCAN_TOKEN=$_SNYK_SCAN_TOKEN'
       - 'DOCKER_USERNAME=$_DOCKER_USERNAME'
       - 'DOCKER_PASSWORD=$_DOCKER_PASSWORD'
-      - 'SYSTEM_DEFINITIONNAME:$_SYSTEM_DEFINITIONNAME'
+      - 'SYSTEM_DEFINITIONNAME=$_SYSTEM_DEFINITIONNAME'
     # secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
   # First create the helm image in your GCP account and upload it
   # to the Container Registry with Google CLI. For instance:
@@ -115,11 +115,11 @@ options:
 # the pipeline. The syntax to declare these variables are found here:
 # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
 substitutions:
-  # _CUSTOM_REGION: us-central1-a
-  # _CUSTOM_CLUSTER: petstore-gke-cluster
   _NAMESPACE: jpetstore
   _SYSTEM_DEFINITIONNAME: petstore_gcp
   _PETSTORE_HOST: petstore.app
+  # _CUSTOM_REGION: us-central1-a
+  # _CUSTOM_CLUSTER: petstore-gke-cluster
 # These secrets are created inside GCP Secret Manager. You can get them and
 # use them in any stage of the pipeline, but cannot be used with other variables
 # or substitution variable to concatenate a new string as an env var, i.e, 'IMAGE_TAG=${MYSECRET}-tag'
