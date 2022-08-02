@@ -214,8 +214,8 @@ jobs:
         run: |
           docker scan --version
           docker --version
-      - name: Scan Images
-        id: docker_scan_status
+      - name: Static Scan
+        id: static_scan_status
         env:
           JPETSTOREWEB: '${{env.DOCKER_USERNAME}}/jpetstoreweb'
           JPETSTOREDB: '${{env.DOCKER_USERNAME}}/jpetstoredb'
@@ -224,19 +224,31 @@ jobs:
           echo "JPETSTOREDB=${JPETSTOREDB}:latest"
           cd jpetstore
           docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_github_actions
-          cd ..
+      - name: Scan Image WEB
+        id: docker_scan_status_web
+        env:
+          JPETSTOREWEB: '${{env.DOCKER_USERNAME}}/jpetstoreweb'
+        run: |
           docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
-          docker scan --accept-license --json "${JPETSTOREWEB}:latest" >> ./web_app.json
-          docker scan --accept-license --json "${JPETSTOREDB}:latest" >> ./db.json
+          docker scan --accept-license --json "${JPETSTOREWEB}:latest" >> ${{env.WORKSPACE}}/web_app.json
+      - name: Scan Image DB
+        id: docker_scan_status_db
+        env:
+          JPETSTOREDB: '${{env.DOCKER_USERNAME}}/jpetstoredb'
+        run: |
+          docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
+          docker scan --accept-license --json "${JPETSTOREDB}:latest" >> ${{env.WORKSPACE}}/db.json
       # - name: Printing secure time
       #   run: |
       #     echo "The secure time process took ${{env.BUILD_DURATION_TIME}} s"
       - name: Publishing data to DevOps Intelligence Secure
         if: always()
         env:
-          SECURE_STATUS: ${{steps.docker_scan_status.outcome}}
-          DB_JSON_REPORT_PATH: 'db.json'
-          WEB_JSON_REPORT_PATH: 'web_app.json'
+          SECURE_STATUS_WEB: ${{steps.docker_scan_status_web.outcome}}
+          SECURE_STATUS_DB: ${{steps.docker_scan_status_db.outcome}}
+          STATIC_STATUS: ${{steps.static_scan_status.outcome}}
+          DB_JSON_REPORT_PATH: '${{env.WORKSPACE}}/db.json'
+          WEB_JSON_REPORT_PATH: '${{env.WORKSPACE}}/web_app.json'
         run: |
           echo "DB_JSON_REPORT_PATH=db.json" >> $GITHUB_ENV
           echo "WEB_JSON_REPORT_PATH=web_app.json" >> $GITHUB_ENV
