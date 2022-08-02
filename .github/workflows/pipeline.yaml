@@ -225,7 +225,7 @@ jobs:
           cd ..
           imagescan() {
             docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
-            docker scan --accept-license --json "${JPETSTOREWEB}:latest" >> ./web_app.json
+            
             docker scan --accept-license --json "${JPETSTOREDB}:latest" >> ./db.json
             return 0
           }
