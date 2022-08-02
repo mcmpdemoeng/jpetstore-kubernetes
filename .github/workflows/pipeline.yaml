@@ -219,25 +219,18 @@ jobs:
         run: |
           echo "JPETSTOREWEB=${JPETSTOREWEB}:latest"
           echo "JPETSTOREDB=${JPETSTOREDB}:latest"
-          startdate=$(date +%s)
           cd jpetstore
           docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_github_actions
           cd ..
-          imagescan() {
-            docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
-            
-            docker scan --accept-license --json "${JPETSTOREDB}:latest" >> ./db.json
-            return 0
-          }
-          imagescan
-          enddate=$(date +%s)
-          echo "SECURE_DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
+          docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
+          docker scan --accept-license --json "${JPETSTOREWEB}:latest" >> ./web_app.json
+          docker scan --accept-license --json "${JPETSTOREDB}:latest" >> ./db.json
         env:
           JPETSTOREWEB: '${{env.DOCKER_USERNAME}}/jpetstoreweb'
           JPETSTOREDB: '${{env.DOCKER_USERNAME}}/jpetstoredb'
-      - name: Printing secure time
-        run: |
-          echo "The secure time process took ${{env.BUILD_DURATION_TIME}} s"
+      # - name: Printing secure time
+      #   run: |
+      #     echo "The secure time process took ${{env.BUILD_DURATION_TIME}} s"
       - name: Publishing data to DevOps Intelligence Secure
         if: always()
         env:
