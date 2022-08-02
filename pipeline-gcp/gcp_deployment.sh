@@ -30,8 +30,8 @@ secure() {
     
     docker scan --accept-license --version
     docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
-    docker scan --accept-license --json "${JPETSTOREWEB}:latest" >> /workspace/db.json
-    docker scan --accept-license --json "${JPETSTOREDB}:latest" >> /workspace/web_app.json
+    docker scan --accept-license --json "${JPETSTOREWEB}:latest" >> /workspace/web_app.json
+    docker scan --accept-license --json "${JPETSTOREDB}:latest" >> /workspace/db.json
 }
 
 testing() {
