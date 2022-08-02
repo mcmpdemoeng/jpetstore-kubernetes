@@ -241,9 +241,6 @@ jobs:
           DB_JSON_REPORT_PATH: 'db.json'
           WEB_JSON_REPORT_PATH: 'web.json'
         run: |
-          echo "DB_JSON_REPORT_PATH=db.json" >> $GITHUB_ENV
-          echo "WEB_JSON_REPORT_PATH=web.json" >> $GITHUB_ENV
-          ls
           python ./pipeline-common/publish_data/publish.py --secure
 
   # Job used for deploy app to AKS and publish deploy info
