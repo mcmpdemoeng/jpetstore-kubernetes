@@ -216,6 +216,9 @@ jobs:
           docker --version
       - name: Scan Images
         id: docker_scan_status
+        env:
+          JPETSTOREWEB: '${{env.DOCKER_USERNAME}}/jpetstoreweb'
+          JPETSTOREDB: '${{env.DOCKER_USERNAME}}/jpetstoredb'
         run: |
           echo "JPETSTOREWEB=${JPETSTOREWEB}:latest"
           echo "JPETSTOREDB=${JPETSTOREDB}:latest"
@@ -225,9 +228,6 @@ jobs:
           docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
           docker scan --accept-license --json "${JPETSTOREWEB}:latest" >> ./web_app.json
           docker scan --accept-license --json "${JPETSTOREDB}:latest" >> ./db.json
-        env:
-          JPETSTOREWEB: '${{env.DOCKER_USERNAME}}/jpetstoreweb'
-          JPETSTOREDB: '${{env.DOCKER_USERNAME}}/jpetstoredb'
       # - name: Printing secure time
       #   run: |
       #     echo "The secure time process took ${{env.BUILD_DURATION_TIME}} s"
