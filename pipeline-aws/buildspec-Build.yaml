@@ -1,5 +1,8 @@
 version: 0.2
-
+env:
+    secrets-manager:
+      DOCKERPASSWORD: dockercreds:password
+      DOCKERUSERNAME: dockercreds:user
 #env:
   #variables:
      # key: "value"
