@@ -2,7 +2,7 @@ version: 0.2
 env:
     secrets-manager:
       DOCKERPASSWORD: dockercreds:password
-      DOCKERUSERNAME: dockercreds:user
+      DOCKERUSERNAME: dockercreds:username
       DOCKER_REPO: dockercreds:repo
 
 #env:
