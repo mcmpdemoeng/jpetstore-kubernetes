@@ -3,7 +3,6 @@ env:
     secrets-manager:
       MYSQL_USER: mysqlpetstore:user
       MYSQL_PASSWORD: mysqlpetstore:password
-      MYSQL_PASSWORD: mysqlpetstore:password
       SECRETKEYID: awscreds:api_id
       SECRETKEY: awscreds:api_key
 #env:

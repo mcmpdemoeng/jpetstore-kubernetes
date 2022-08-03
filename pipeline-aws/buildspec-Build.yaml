@@ -3,6 +3,8 @@ env:
     secrets-manager:
       DOCKERPASSWORD: dockercreds:password
       DOCKERUSERNAME: dockercreds:user
+      DOCKER_REPO: dockercreds:repo
+
 #env:
   #variables:
      # key: "value"
@@ -23,6 +25,7 @@ env:
   #build-matrix:
   #build-graph:
 phases:
+
   #install:
     #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
     #If you specify runtime-versions and use an image other than Ubuntu standard image 2.0, the build fails.
@@ -34,7 +37,7 @@ phases:
       # - command
   pre_build:
     commands:
-    
+      
        - docker login -u "$DOCKERUSERNAME" -p "$DOCKERPASSWORD"
        - pip install -r pipeline-common/publish_data/requirements.txt
        - export RUN_ID=$CODEBUILD_BUILD_NUMBER
