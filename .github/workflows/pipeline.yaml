@@ -214,8 +214,8 @@ jobs:
         run: |
           docker scan --version
           docker --version
-      - name: Static Scan
-        id: static_scan_status
+      - name: Static and vulnerabilities scan
+        id: scan_status
         env:
           JPETSTOREWEB: '${{env.DOCKER_USERNAME}}/jpetstoreweb'
           JPETSTOREDB: '${{env.DOCKER_USERNAME}}/jpetstoredb'
@@ -236,30 +236,15 @@ jobs:
       - name: Printing secure time
         run: |
           echo "The secure time process took ${{env.SECURE_DURATION_TIME}} s"
-      # - name: Scan Image WEB
-      #   id: docker_scan_status_web
-      #   env:
-      #     JPETSTOREWEB: '${{env.DOCKER_USERNAME}}/jpetstoreweb'
-      #   run: |
-      #     docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
-      #     docker scan --accept-license --json "${JPETSTOREWEB}:latest" >> ${{env.WORKSPACE}}/web_app.json || echo 0
-      # - name: Scan Image DB
-      #   id: docker_scan_status_db
-      #   env:
-      #     JPETSTOREDB: '${{env.DOCKER_USERNAME}}/jpetstoredb'
-      #   run: |
-      #     docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
-      #     docker scan --accept-license --json "${JPETSTOREDB}:latest" >> ${{env.WORKSPACE}}/db.json || echo 0
       - name: Publishing data to DevOps Intelligence Secure
         if: always()
         env:
           # SECURE_STATUS_WEB: ${{steps.docker_scan_status_web.outcome}}
           # SECURE_STATUS_DB: ${{steps.docker_scan_status_db.outcome}}
-          # STATIC_STATUS: ${{steps.static_scan_status.outcome}}
+          # SECURE_STATUS: ${{steps.scan_status.outcome}}
           DB_JSON_REPORT_PATH: '${{env.WORKSPACE}}/db.json'
           WEB_JSON_REPORT_PATH: '${{env.WORKSPACE}}/web_app.json'
         run: |
-          ls
           python ./pipeline-common/publish_data/publish.py --secure
 
   # Job used for deploy app to AKS and publish deploy info
