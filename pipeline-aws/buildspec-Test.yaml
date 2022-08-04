@@ -44,7 +44,7 @@ phases:
        - export TEST_ENGINE="XUNIT"
        - export TEST_ENVIRONMENT="Jenkins"
        - export TEST_RELEASE="latest"
-       - export RUN_ID=$(date | base64 | sed 's/=/H/g')
+       - export RUN_ID=$CODEBUILD_RESOLVED_SOURCE_VERSION
        - export TEST_HREF=$CODEBUILD_PUBLIC_BUILD_URL
 
   build:

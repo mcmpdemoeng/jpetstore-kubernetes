@@ -42,10 +42,10 @@ phases:
       
        - docker login -u "$DOCKERUSERNAME" -p "$DOCKERPASSWORD"
        - pip install -r pipeline-common/publish_data/requirements.txt
-       - export RUN_ID=$CODEBUILD_BUILD_NUMBER
+       - export RUN_ID=$CODEBUILD_RESOLVED_SOURCE_VERSION
        - export BUILD_ENGINE="AWSCodeBuild"
-       - export BUILD_TAG=$CODEBUILD_BUILD_NUMBER
-       - export IMAGE_TAG=$CODEBUILD_BUILD_NUMBER
+       - export BUILD_TAG=$CODEBUILD_RESOLVED_SOURCE_VERSION
+       - export IMAGE_TAG=$CODEBUILD_RESOLVED_SOURCE_VERSION
        - export BUILD_HREF=$CODEBUILD_PUBLIC_BUILD_URL
        - echo Public link for this build ':' $BUILD_HREF
        - export START_TIME=$(date +%s)
