@@ -5,7 +5,7 @@ env:
       DOCKERUSERNAME: dockercreds:username
       SNYK_SCAN_TOKEN: dockercreds:token
       REPOSITORY: dockercreds:repo
-      BUILD_TOKEN: devopsTokens:build
+      BUILD_TOKEN: devopsTokens:secure
       TENANT_URL: petstoreTenant:url
       #SONARQUBE_TOKEN: sonarq:token
       #SONARQUBE_HOST: sonarq:host
