@@ -4,6 +4,7 @@ env:
       DOCKERPASSWORD: dockercreds:password
       DOCKERUSERNAME: dockercreds:username
       DOCKER_REPO: dockercreds:repo
+      BUILD_TOKEN: devopsTokens:build
 
 #env:
   #variables:

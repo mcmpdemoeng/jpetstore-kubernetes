@@ -1,5 +1,8 @@
 version: 0.2
-
+env:
+    secrets-manager:
+      TENANT_URL: petstoreTenant:url
+      TEST_TOKEN: devopsTokens:test
 #env:
   #variables:
      # key: "value"
@@ -33,8 +36,6 @@ phases:
     commands:
     
        - export TEST_FILE="TEST-org.springframework.samples.jpetstore.domain.CartTest.xml"
-       - git clone https://github.com/mcmpdemoeng/jpetstore-kubernetes.git
-       - cd jpetstore-kubernetes/
        - pip install -r pipeline-common/publish_data/requirements.txt
        - export TEST_STATUS=pass
        - export TEST_DURATION_TIME=5000
