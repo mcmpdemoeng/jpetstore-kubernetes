@@ -1,5 +1,14 @@
 version: 0.2
-
+env:
+    secrets-manager:
+      MYSQL_USER: mysqlpetstore:user
+      MYSQL_PASSWORD: mysqlpetstore:password
+      MYSQL_URL: mysqlpetstore:url
+      SECRETKEYID: awscreds:api_id
+      SECRETKEY: awscreds:api_key
+      TENANT_URL: petstoreTenant:url
+      DEPLOY_TOKEN: devopsTokens:deploy
+      REPOSITORY: dockercreds:repo
 #env:
   #variables:
      # key: "value"
@@ -27,22 +36,21 @@ phases:
       # name: version
       # name: version
     commands:
-    
+
        - curl https://get.helm.sh/helm-v3.9.1-linux-amd64.tar.gz -o helm.tar.gz 
        - tar -zxvf helm.tar.gz 
        - mv ./linux-amd64/helm /usr/local/bin/helm
        - chmod +x /usr/local/bin/helm
-  
+
   pre_build:
     commands:
 
-       - git clone https://github.com/mcmpdemoeng/jpetstore-kubernetes.git
-       - cd jpetstore-kubernetes/
        - aws configure set aws_access_key_id $SECRETKEYID
        - aws configure set aws_secret_access_key $SECRETKEY
-       - aws eks --region us-west-1 update-kubeconfig --name PetstoreEKSCluster
+       - aws eks --region us-west-1 update-kubeconfig --name $CLUSTER_NAME
        - export KUBECONFIG=/root/.kube/config
        - pip install -r pipeline-common/publish_data/requirements.txt
+       - export IMAGE_TAG=$CODEBUILD_RESOLVED_SOURCE_VERSION
        - export DEPLOYMENT_SERVICE_ID=$(date | base64 | sed 's/=/H/g')
        - export PROVIDER="AWSCodeBuild"
        - export RUN_ID=$DEPLOYMENT_SERVICE_ID
@@ -50,6 +58,7 @@ phases:
        - export BUILD_ENGINE="AWSCodeBuild"
        - export START_TIME=$( date +%s )
        - export PROVIDER="AWS"
+       - export PETSTORE_HOST="3.101.118.209"
 
   build:
     commands:
