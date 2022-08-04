@@ -21,11 +21,17 @@ build() {
 }
 
 secure() {
-    docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_jenkins_shared
+    echo "JPETSTOREWEB_TAG=${JPETSTOREWEB}:latest"
+    echo "JPETSTOREDB_TAG=${JPETSTOREDB}:latest"
+
+    cd jpetstore
+    docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=$SYSTEM_DEFINITIONNAME
+    cd ..
+    
     docker scan --accept-license --version
     docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
-    docker scan --accept-license  "${JPETSTOREWEB}:latest"
-    docker scan --accept-license  "${JPETSTOREDB}:latest"
+    docker scan --accept-license --json "${JPETSTOREWEB}:latest" >> /workspace/web_app.json
+    docker scan --accept-license --json "${JPETSTOREDB}:latest" >> /workspace/db.json
 }
 
 testing() {
@@ -38,6 +44,9 @@ testing() {
 }
 
 deploy() {
+    MYSQL_USERNAME=$(echo $MYSQL_USERNAME | base64)
+    MYSQL_PASSWORD=$(echo $MYSQL_PASSWORD | base64)
+    MYSQL_URL=$(echo $MYSQL_URL | base64)
     NAMESPACE="jpetstore"
     kubectl delete job jpetstoredb --ignore-not-found -n $NAMESPACE --kubeconfig /workspace/.kube/config
     helm package --destination ./modernpets ./helm/modernpets
@@ -74,6 +83,10 @@ devops_intelligence() {
     export TEST_RELEASE="$(echo $BUILD_ID | cut -c 1-8)"
     export TEST_FILE="TEST-org.springframework.samples.jpetstore.domain.CartTest.xml"
 
+    export DB_JSON_REPORT_PATH="/workspace/db.json"
+    export WEB_JSON_REPORT_PATH="/workspace/web_app.json"
+
+
     export DEPLOYMENT_STATUS=$(cat /workspace/deploy_status)
     export DEPLOY_DURATION_TIME=$(cat /workspace/deploy_duration_time)
     export PROVIDER="Google"
@@ -91,7 +104,7 @@ devops_intelligence() {
 
     cd ./pipeline-common/publish_data
 
-    python publish.py --deploy --build --test
+    python publish.py --test --build --secure --deploy
 
     cd ..
 }
@@ -149,8 +162,24 @@ while test $# -gt 0; do
             shift
             ;;
         -s|--secure)
-            echo "Secure application"
-            # secure
+            echo "Secure application in GCP"
+            startdate=$(date +%s)
+            (
+            set -e
+            secure
+            )
+            enddate=$(date +%s)
+            echo "SECURE_DURATION_TIME= $((enddate - startdate)) s"
+            echo "$((enddate - startdate))" >> /workspace/secure_duration_time
+            errorCode=$?
+
+            if [ $errorCode -ne 0 ]; then
+                echo "Application secure has failed"
+                echo "failed" >> /workspace/build_status
+            else
+                echo "Application secure has succeded"
+                echo "success" >> /workspace/build_status
+            fi
             shift
             ;;
         -t|--test)

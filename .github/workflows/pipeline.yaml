@@ -42,6 +42,7 @@ env:
   BUILD_TOKEN: ${{secrets.BUILD_TOKEN}}
   TEST_TOKEN: ${{secrets.TEST_TOKEN}}
   DEPLOY_TOKEN: ${{secrets.DEPLOY_TOKEN}}
+  SECURE_TOKEN: ${{secrets.SECURE_TOKEN}}
   WORKSPACE: ${{ github.workspace }}
   RUN_ID: ${{ github.run_id }}
   BRANCH: ${{github.ref_name}}
@@ -199,31 +200,52 @@ jobs:
         run: |
           python --version
           pip install -r ./pipeline-common/publish_data/requirements.txt
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
+      - name: Install Docker Scan Plugin
+        run: |
+          mkdir -p ~/.docker/cli-plugins && \
+          curl https://github.com/docker/scan-cli-plugin/releases/latest/download/docker-scan_linux_amd64 -L -s -S -o ~/.docker/cli-plugins/docker-scan &&\
+          chmod +x ~/.docker/cli-plugins/docker-scan
       - name: Test docker in ubuntu-latest
-        run: docker --version
-      # - name: Scan Images
-      #   id: docker_scan_status
-      #   run: |
-      #     startdate=$(date +%s)
-      #     docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_jenkins_shared
-      #     docker scan --accept-license --version
-      #     docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
-      #     docker scan --accept-license  "${JPETSTOREWEB}:latest"
-      #     docker scan --accept-license  "${JPETSTOREDB}:latest"
-      #     enddate=$(date +%s)
-      #     echo "SECURE_DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
-      #   env:
-      #     JPETSTOREWEB: '${{env.DOCKER_USERNAME}}/jpetstoreweb'
-      #     JPETSTOREDB: '${{env.DOCKER_USERNAME}}/jpetstoredb'
-      # - name: Printing secure time
-      #   run: |
-      #     echo "The secure time process took ${{env.BUILD_DURATION_TIME}} s"
-      # - name: Publishing data to DevOps Intelligence Secure
-      #   if: always()
-      #   env:
-      #     SECURE_STATUS: ${{steps.docker_scan_status.outcome}}
-      #   run: |
-      #     python ./pipeline-common/publish_data/publish.py --build
+        run: |
+          docker scan --version
+          docker --version
+      - name: Static and vulnerabilities scan
+        id: scan_status
+        env:
+          JPETSTOREWEB: '${{env.DOCKER_USERNAME}}/jpetstoreweb'
+          JPETSTOREDB: '${{env.DOCKER_USERNAME}}/jpetstoredb'
+        run: |
+          echo "JPETSTOREWEB=${JPETSTOREWEB}:latest"
+          echo "JPETSTOREDB=${JPETSTOREDB}:latest"
+          startdate=$(date +%s)
+          cd jpetstore
+          docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_github_actions
+          cd ..
+          docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
+          docker scan --accept-license --json "${JPETSTOREWEB}:latest" >> ${{env.WORKSPACE}}/web_app.json || echo 0
+          docker scan --accept-license --json "${JPETSTOREDB}:latest" >> ${{env.WORKSPACE}}/db.json || echo 0
+          enddate=$(date +%s)
+          echo "SECURE_DURATION_TIME=$((enddate - startdate))" >> $GITHUB_ENV
+          echo "DB_JSON_REPORT_PATH=db.json" >> $GITHUB_ENV
+          echo "WEB_JSON_REPORT_PATH=web_app.json" >> $GITHUB_ENV
+      - name: Printing secure time
+        run: |
+          echo "The secure time process took ${{env.SECURE_DURATION_TIME}} s"
+      - name: Publishing data to DevOps Intelligence Secure
+        if: always()
+        env:
+          # SECURE_STATUS_WEB: ${{steps.docker_scan_status_web.outcome}}
+          # SECURE_STATUS_DB: ${{steps.docker_scan_status_db.outcome}}
+          # SECURE_STATUS: ${{steps.scan_status.outcome}}
+          DB_JSON_REPORT_PATH: '${{env.WORKSPACE}}/db.json'
+          WEB_JSON_REPORT_PATH: '${{env.WORKSPACE}}/web_app.json'
+        run: |
+          python ./pipeline-common/publish_data/publish.py --secure
 
   # Job used for deploy app to AKS and publish deploy info
   deploy:
