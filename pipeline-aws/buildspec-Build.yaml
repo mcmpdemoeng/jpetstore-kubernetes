@@ -5,6 +5,7 @@ env:
       DOCKERUSERNAME: dockercreds:username
       DOCKER_REPO: dockercreds:repo
       BUILD_TOKEN: devopsTokens:build
+      TENANT_URL: petstoreTenant:url
 
 #env:
   #variables:
