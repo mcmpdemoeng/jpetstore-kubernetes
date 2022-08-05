@@ -105,15 +105,18 @@ secure(){
     docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_jenkins_shared
     docker scan --accept-license --version
     docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
-    docker scan --accept-license  $JPETSTOREWEB
-    docker scan --accept-license  $JPETSTOREDB
+    docker scan --accept-license --json $JPETSTOREWEB >> db.json
+    docker scan --accept-license --json $JPETSTOREDB >> web_app.json
+    export DB_JSON_REPORT_PATH="db.json"
+    export WEB_JSON_REPORT_PATH="web_app.json"
+    python3 ./pipeline-common/publish_data/publish.py --secure
 }
 
 cd ../jpetstore
-#(
-#    set -ex
-#    secure
-#)
+(
+    set -ex
+    secure
+)
 cd ../pipeline-jenkins
 
 docker rmi $JPETSTOREWEB
