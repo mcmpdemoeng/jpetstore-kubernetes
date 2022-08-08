@@ -106,8 +106,8 @@ secure(){
     cd ../pipeline-jenkins
     docker scan --accept-license --version
     docker scan --accept-license --login --token $SNYK_SCAN_TOKEN
-    docker scan --accept-license --json $JPETSTOREDB >> web_app.json
-    docker scan --accept-license --json $JPETSTOREWEB >> db.json
+    docker scan --accept-license --json $JPETSTOREDB >> db.json
+    docker scan --accept-license --json $JPETSTOREWEB >> web_app.json
     export DB_JSON_REPORT_PATH="db.json"
     export WEB_JSON_REPORT_PATH="web_app.json"
     python3 ../pipeline-common/publish_data/publish.py --secure
