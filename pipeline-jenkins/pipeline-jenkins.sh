@@ -114,10 +114,10 @@ secure(){
     return 0
 }
 
-(
+#(
     # set -ex
     # secure
-)
+#)
 
 docker rmi $JPETSTOREWEB
 docker rmi $JPETSTOREDB
