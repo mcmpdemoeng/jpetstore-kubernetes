@@ -116,7 +116,7 @@ secure(){
 
 (
     # set -ex
-    secure
+    # secure
 )
 
 docker rmi $JPETSTOREWEB
