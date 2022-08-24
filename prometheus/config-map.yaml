@@ -10,19 +10,41 @@ data:
     groups:
     - name: devopscube demo alert
       rules:
+      - alert: High CPU Usage
+        expr: (sum(rate(container_cpu_usage_secord_total[3m])) BY (instance,namespace,pod) * 100) > 30
+        for: 5s
+        labels:
+          severity: critical
+          namespace: "{{ $labels.namespace }}"
+          pod: "{{ $labels.pod }}"
+        annotations: 
+          summary: High CPU Usage
+          description: "pod is using more cpu"
       - alert: High Pod Memory
-        expr: sum(container_memory_usage_bytes) > 50
-        for: 1m
+        expr: sum(container_memory_usage_bytes) > 25
+        for: 5s
+        labels:
+          severity: critical
+          namespace: "{{ $labels.namespace }}"
+          pod: "{{ $labels.pod }}"
         annotations:
           summary: High Memory Usage
       - alert: High CPU load
-        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 20
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 10
         for: 0m
+        labels:
+          severity: critical
+          namespace: "{{ $labels.namespace }}"
+          pod: "{{ $labels.pod }}"
         annotations:
           summary: "CPU load is > 20%\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
       - alert: High incoming request on network
-        expr: sum by (instance) (rate(node_network_receive_bytes_total[2m])) / 1024 > 100
+        expr: sum by (instance) (rate(node_network_receive_bytes_total[2m])) / 1024 > 1
         for: 0m
+        labels:
+          severity: critical
+          namespace: "{{ $labels.namespace }}"
+          pod: "{{ $labels.pod }}"
         annotations:
           summary: "Host network interfaces are probably receiving too much data"
 
