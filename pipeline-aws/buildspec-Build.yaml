@@ -1,0 +1,80 @@
+version: 0.2
+env:
+    secrets-manager:
+      DOCKERPASSWORD: dockercreds:password
+      DOCKERUSERNAME: dockercreds:username
+      DOCKER_REPO: dockercreds:repo
+      BUILD_TOKEN: devopsTokens:build
+      TENANT_URL: petstoreTenant:url
+
+#env:
+  #variables:
+     # key: "value"
+     # key: "value"
+  #parameter-store:
+     # key: "value"
+     # key: "value"
+  #secrets-manager:
+     # key: secret-id:json-key:version-stage:version-id
+     # key: secret-id:json-key:version-stage:version-id
+  #exported-variables:
+     # - variable
+     # - variable
+  #git-credential-helper: yes
+#batch:
+  #fast-fail: true
+  #build-list:
+  #build-matrix:
+  #build-graph:
+phases:
+
+  #install:
+    #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
+    #If you specify runtime-versions and use an image other than Ubuntu standard image 2.0, the build fails.
+    #runtime-versions:
+      # name: version
+      # name: version
+    #commands:
+      # - command
+      # - command
+  pre_build:
+    commands:
+      
+       - docker login -u "$DOCKERUSERNAME" -p "$DOCKERPASSWORD"
+       - pip install -r pipeline-common/publish_data/requirements.txt
+       - export RUN_ID=$CODEBUILD_RESOLVED_SOURCE_VERSION
+       - export BUILD_ENGINE="AWSCodeBuild"
+       - export BUILD_TAG=$CODEBUILD_RESOLVED_SOURCE_VERSION
+       - export IMAGE_TAG=$CODEBUILD_RESOLVED_SOURCE_VERSION
+       - export BUILD_HREF=$CODEBUILD_PUBLIC_BUILD_URL
+       - echo Public link for this build ':' $BUILD_HREF
+       - export START_TIME=$(date +%s)
+
+  build:
+    commands:
+       - docker build -t $DOCKERUSERNAME/jpetstoreweb:$IMAGE_TAG ./jpetstore
+       - docker build -t $DOCKERUSERNAME/jpetstoredb:$IMAGE_TAG .
+       - docker push $DOCKERUSERNAME/jpetstoreweb:$IMAGE_TAG
+       - docker push $DOCKERUSERNAME/jpetstoredb:$IMAGE_TAG
+  post_build:
+    commands:
+       - if [ "$CODEBUILD_BUILD_SUCCEEDING"==1 ]; then export BUILD_STATUS=success; fi  && export ENDTIME=$(date +%s) && export BUILD_DURATION_TIME=$((ENDTIME - START_TIME)) && python3 pipeline-common/publish_data/publish.py --build 
+      # - command
+#reports:
+  #report-name-or-arn:
+    #files:
+      # - location
+      # - location
+    #base-directory: location
+    #discard-paths: yes
+    #file-format: JunitXml | CucumberJson
+#artifacts:
+  #files:
+    # - location
+    # - location
+  #name: $(date +%Y-%m-%d)
+  #discard-paths: yes
+  #base-directory: location
+#cache:
+  #paths:
+    # - paths

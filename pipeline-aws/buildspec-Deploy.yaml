@@ -1,0 +1,95 @@
+version: 0.2
+env:
+    secrets-manager:
+      MYSQL_USER: mysqlpetstore:user
+      MYSQL_PASSWORD: mysqlpetstore:password
+      MYSQL_URL: mysqlpetstore:url
+      SECRETKEYID: awscreds:api_id
+      SECRETKEY: awscreds:api_key
+      TENANT_URL: petstoreTenant:url
+      DEPLOY_TOKEN: devopsTokens:deploy
+      REPOSITORY: dockercreds:repo
+#env:
+  #variables:
+     # key: "value"
+     # key: "value"
+  #parameter-store:
+     # key: "value"
+     # key: "value"
+  #secrets-manager:
+     # key: secret-id:json-key:version-stage:version-id
+     # key: secret-id:json-key:version-stage:version-id
+  #exported-variables:
+     # - variable
+     # - variable
+  #git-credential-helper: yes
+#batch:
+  #fast-fail: true
+  #build-list:
+  #build-matrix:
+  #build-graph:
+phases:
+  install:
+    #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
+    #If you specify runtime-versions and use an image other than Ubuntu standard image 2.0, the build fails.
+    #runtime-versions:
+      # name: version
+      # name: version
+    commands:
+
+       - curl https://get.helm.sh/helm-v3.9.1-linux-amd64.tar.gz -o helm.tar.gz 
+       - tar -zxvf helm.tar.gz 
+       - mv ./linux-amd64/helm /usr/local/bin/helm
+       - chmod +x /usr/local/bin/helm
+
+  pre_build:
+    commands:
+
+       - aws configure set aws_access_key_id $SECRETKEYID
+       - aws configure set aws_secret_access_key $SECRETKEY
+       - aws eks --region us-west-1 update-kubeconfig --name $CLUSTER_NAME
+       - export KUBECONFIG=/root/.kube/config
+       - pip install -r pipeline-common/publish_data/requirements.txt
+       - export IMAGE_TAG=$CODEBUILD_RESOLVED_SOURCE_VERSION
+       - export DEPLOYMENT_SERVICE_ID=$(date | base64 | sed 's/=/H/g')
+       - export PROVIDER="AWSCodeBuild"
+       - export RUN_ID=$DEPLOYMENT_SERVICE_ID
+       - export DEPLOYMENT_HREF=$CODEBUILD_PUBLIC_BUILD_URL
+       - export BUILD_ENGINE="AWSCodeBuild"
+       - export START_TIME=$( date +%s )
+       - export PROVIDER="AWS"
+       - export PETSTORE_HOST="3.101.118.209"
+
+  build:
+    commands:
+
+       - echo "kubernetes Deployment"
+       - kubectl create namespace $NAMESPACE || echo "The namespace $NAMESPACE already exists"
+       - helm package --destination ./modernpets ./helm/modernpets
+       - helm upgrade --install --set image.repository=$REPOSITORY --set image.tag=$IMAGE_TAG --set mysql.url=$MYSQL_URL --set mysql.username=$MYSQL_USER --set mysql.password=$MYSQL_PASSWORD --set isDBAAS=False --set isLB=True --set httpHost=$PETSTORE_HOST petstore3 modernpets/modernpets-0.1.5.tgz  --namespace $NAMESPACE
+       - kubectl get nodes
+       - kubectl get pods --namespace $NAMESPACE
+
+  post_build:
+    commands:
+       - if [ "$CODEBUILD_BUILD_SUCCEEDING"==1 ]; then export DEPLOYMENT_STATUS=success; fi  && export ENDTIME=$(date +%s) && export DEPLOY_DURATION_TIME=$((ENDTIME - START_TIME)) && python3 pipeline-common/publish_data/publish.py --deploy
+
+
+#reports:
+  #report-name-or-arn:
+    #files:
+      # - location
+      # - location
+    #base-directory: location
+    #discard-paths: yes
+    #file-format: JunitXml | CucumberJson
+#artifacts:
+  #files:
+    # - location
+    # - location
+  #name: $(date +%Y-%m-%d)
+  #discard-paths: yes
+  #base-directory: location
+#cache:
+  #paths:
+    # - paths

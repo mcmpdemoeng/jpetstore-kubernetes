@@ -1,0 +1,87 @@
+version: 0.2
+
+env:
+
+    secrets-manager:
+
+      DOCKERPASSWORD: dockercreds:password
+      DOCKERUSERNAME: dockercreds:username
+      SNYK_SCAN_TOKEN: dockercreds:token
+      REPOSITORY: dockercreds:repo
+      BUILD_TOKEN: devopsTokens:secure
+      TENANT_URL: petstoreTenant:url
+      #SONARQUBE_TOKEN: sonarq:token
+      #SONARQUBE_HOST: sonarq:host
+
+#env:
+  #variables:
+     # key: "value"
+     # key: "value"
+  #parameter-store:
+     # key: "value"
+     # key: "value"
+  #secrets-manager:
+     # key: secret-id:json-key:version-stage:version-id
+     # key: secret-id:json-key:version-stage:version-id
+  #exported-variables:
+     # - variable
+     # - variable
+  #git-credential-helper: yes
+#batch:
+  #fast-fail: true
+  #build-list:
+  #build-matrix:
+  #build-graph:
+phases:
+  #install:
+    #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
+    #If you specify runtime-versions and use an image other than Ubuntu standard image 2.0, the build fails.
+    #runtime-versions:
+      # name: version
+      # name: version
+    #commands:
+      # - command
+      # - command
+  pre_build:
+    commands:
+      - wget https://github.com/docker/scan-cli-plugin/releases/download/v0.11.0/docker-scan_linux_amd64
+      - mv docker-scan_linux_amd64 /usr/local/bin/docker-scan && chmod +x /usr/local/bin/docker-scan
+      - docker-scan scan --accept-license --version
+      - pip install -r pipeline-common/publish_data/requirements.txt
+      - export DB_JSON_REPORT_PATH="scan_jpetstoreweb.json"
+      - export WEB_JSON_REPORT_PATH="scan_jpetstoredb.json"
+      # - command
+  build:
+    commands:
+    - docker pull $REPOSITORY/jpetstoreweb:$CODEBUILD_RESOLVED_SOURCE_VERSION
+    - docker pull $REPOSITORY/jpetstoredb:$CODEBUILD_RESOLVED_SOURCE_VERSION
+    # - docker run --rm --network=host -e SONAR_HOST_URL="${SONARQUBE_HOST}" -e SONAR_LOGIN="${SONARQUBE_TOKEN}" -v "$(pwd)":/usr/src  sonarsource/sonar-scanner-cli -Dsonar.projectKey=petstore_jenkins_shared
+    - docker-scan scan --accept-license --version
+    - docker-scan scan --accept-license --login --token $SNYK_SCAN_TOKEN
+    - docker-scan scan --accept-license  $REPOSITORY/jpetstoreweb:$CODEBUILD_RESOLVED_SOURCE_VERSION --json >> scan_jpetstoreweb.json || echo 0
+    - docker-scan scan --accept-license  $REPOSITORY/jpetstoredb:$CODEBUILD_RESOLVED_SOURCE_VERSION --json >> scan_jpetstoredb.json || echo 0
+    - python3 pipeline-common/publish_data/publish.py --secure
+      # - command
+      # - command
+  #post_build:
+    #commands:
+      # - command
+      # - command
+#reports:
+  #report-name-or-arn:
+    #files:
+      # - location
+      # - location
+    #base-directory: location
+    #discard-paths: yes
+    #file-format: JunitXml | CucumberJson
+#artifacts:
+  #files:
+    # - location
+    # - location
+  #name: $(date +%Y-%m-%d)
+  #discard-paths: yes
+  #base-directory: location
+#cache:
+  #paths:
+    # - paths

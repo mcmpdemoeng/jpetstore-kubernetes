@@ -1,0 +1,137 @@
+# This pipeline uses container images to run each stage of the
+# pipeline. You can create your own images or use some existing
+# images that GCP provides and maintain. For mor information check
+# https://cloud.google.com/build/docs/cloud-builders
+# https://github.com/GoogleCloudPlatform/cloud-builders
+# https://github.com/GoogleCloudPlatform/cloud-builders-community
+steps:
+  # This step is needed for use helm.
+  # If you want to get private ip of the sql instace use:
+  # gcloud sql instances list --filter "name:<server_name>*" | grep -oE "([0-9]{1,3}\.){3}[0-9]{1,3}" | base64 > /workspace/MYSQL_URL
+  - name: gcr.io/cloud-builders/gcloud
+    id: 'Setup: Create helm image within GCP Container Registry if not exist'
+    script: |
+      image_exist=$(gcloud container images list-tags gcr.io/${PROJECT_ID}/helm | grep DIGEST | cut -c 9-20)
+      if [ ${#image_exist} = 12 ]; then
+        echo "There is already an helm image in gcr.io"
+      else
+        git clone https://github.com/GoogleCloudPlatform/cloud-builders-community
+        cd cloud-builders-community/helm
+        gcloud builds submit --config cloudbuild.yaml .
+      fi
+    env:
+      - 'PROJECT_ID=$PROJECT_ID'
+  - name: gcr.io/cloud-builders/kubectl
+    id: 'Setup: Configure cluster credentials'
+    args: ['cluster-info']
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=$_CUSTOM_CLUSTER_LOCATION'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=$_CUSTOM_CLUSTER_NAME'
+      - 'KUBECONFIG=/workspace/.kube/config'
+  - name: openjdk:19-jdk-alpine3.16
+    id: Test application
+    script: |
+      java --version
+      apk update && apk add apache-ant
+      sh ./pipeline-gcp/gcp_deployment.sh --test
+  - name: gcr.io/cloud-builders/docker
+    id: Build Application
+    script: |
+      sh ./pipeline-gcp/gcp_deployment.sh --build
+    env:
+      - 'BUILD_ID=$BUILD_ID'
+      - 'SHORT_SHA=$SHORT_SHA'
+      - 'BRANCH_NAME=$BRANCH_NAME'
+      - 'DOCKER_USERNAME=$_DOCKER_USERNAME'
+      - 'DOCKER_PASSWORD=$_DOCKER_PASSWORD'
+    # secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
+  - name: gcr.io/cloud-builders/docker
+    id: Secure Application
+    script: |
+      sh ./pipeline-gcp/gcp_deployment.sh --secure
+    env:
+      - 'SONARQUBE_HOST=$_SONARQUBE_HOST'
+      - 'SONARQUBE_TOKEN=$_SONARQUBE_TOKEN'
+      - 'SNYK_SCAN_TOKEN=$_SNYK_SCAN_TOKEN'
+      - 'DOCKER_USERNAME=$_DOCKER_USERNAME'
+      - 'DOCKER_PASSWORD=$_DOCKER_PASSWORD'
+      - 'SYSTEM_DEFINITIONNAME=$_SYSTEM_DEFINITIONNAME'
+    # secretEnv: ['DOCKER_USERNAME', 'DOCKER_PASSWORD']
+  # First create the helm image in your GCP account and upload it
+  # to the Container Registry with Google CLI. For instance:
+  # $ git clone https://github.com/GoogleCloudPlatform/cloud-builders-community
+  # $ cd cloud-builders-community/helm
+  # $ gcloud builds submit --config cloudbuild.yaml .
+  - name: gcr.io/${PROJECT_ID}/helm
+    id: Deploy application
+    script: |
+      sh ./pipeline-gcp/gcp_deployment.sh --deploy
+    env:
+      - 'KUBECONFIG=/workspace/.kube/config'
+      - 'TILLERLESS=true'
+      - 'NAMESPACE=$_NAMESPACE'
+      - 'PETSTORE_HOST=$_PETSTORE_HOST'
+      - 'DOCKER_USERNAME=$_DOCKER_USERNAME'
+      - 'MYSQL_USERNAME=$_MYSQL_USERNAME'
+      - 'MYSQL_PASSWORD=$_MYSQL_PASSWORD'
+      - 'MYSQL_URL=$_MYSQL_URL'
+    # secretEnv:
+    #   ['DOCKER_USERNAME', 'MYSQL_URL', 'MYSQL_USERNAME', 'MYSQL_PASSWORD']
+  - name: python:3.10.5
+    id: Publish data to DevOps Intelligence
+    script: |
+      pip install --upgrade pip
+      python -m pip install -r ./pipeline-common/publish_data/requirements.txt
+      sh ./pipeline-gcp/gcp_deployment.sh --push-devops
+    env:
+      - 'PROJECT_ID=$PROJECT_ID'
+      - 'PROJECT_NUMBER=$PROJECT_NUMBER'
+      - 'LOCATION=$LOCATION'
+      - 'REV=$REVISION_ID'
+      - 'BUILD_ID=$BUILD_ID'
+      - 'REPO_NAME=$REPO_NAME'
+      - 'BRANCH_NAME=$BRANCH_NAME'
+      - 'COMMIT_SHA=$COMMIT_SHA'
+      - 'SHORT_SHA=$SHORT_SHA'
+      - 'TENANT_URL=$_TENANT_URL'
+      - 'TEST_TOKEN=$_TENANT_TEST_TOKEN'
+      - 'BUILD_TOKEN=$_TENANT_BUILD_TOKEN'
+      - 'SECURE_TOKEN=$_TENANT_SECURE_TOKEN'
+      - 'DEPLOY_TOKEN=$_TENANT_DEPLOY_TOKEN'
+      # - 'USER_ID=$_USER_ID'
+      # - 'USER_API_KEY=$_USER_API_KEY'
+      # - 'TENANT_BEARER_TOKEN=$_TENANT_BEARER_TOKEN'
+  - name: gcr.io/cloud-builders/kubectl
+    id: Deploy monitoring
+    script: |
+      sh ./pipeline-gcp/gcp_deployment.sh --deploy-monitoring
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=$_CUSTOM_CLUSTER_LOCATION'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=$_CUSTOM_CLUSTER'
+      - 'KUBECONFIG=/workspace/.kube/config'
+options:
+  dynamic_substitutions: true
+# These are variables that you can define before the execution of
+# the pipeline. The syntax to declare these variables are found here:
+# https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
+substitutions:
+  _NAMESPACE: jpetstore
+  _SYSTEM_DEFINITIONNAME: petstore_gcp
+  _PETSTORE_HOST: petstore.app
+  # _CUSTOM_REGION: us-central1-a
+  # _CUSTOM_CLUSTER: petstore-gke-cluster
+# These secrets are created inside GCP Secret Manager. You can get them and
+# use them in any stage of the pipeline, but cannot be used with other variables
+# or substitution variable to concatenate a new string as an env var, i.e, 'IMAGE_TAG=${MYSECRET}-tag'
+# availableSecrets:
+#   secretManager:
+#     - versionName: 'projects/${PROJECT_ID}/secrets/DOCKER_USERNAME/versions/latest'
+#       env: 'DOCKER_USERNAME'
+#     - versionName: 'projects/${PROJECT_ID}/secrets/DOCKER_PASSWORD/versions/latest'
+#       env: 'DOCKER_PASSWORD'
+#     - versionName: 'projects/${PROJECT_ID}/secrets/MYSQL_USERNAME/versions/latest'
+#       env: 'MYSQL_USERNAME'
+#     - versionName: 'projects/${PROJECT_ID}/secrets/MYSQL_PASSWORD/versions/latest'
+#       env: 'MYSQL_PASSWORD'
+#     - versionName: 'projects/${PROJECT_ID}/secrets/MYSQL_URL/versions/latest'
+#       env: 'MYSQL_URL'
