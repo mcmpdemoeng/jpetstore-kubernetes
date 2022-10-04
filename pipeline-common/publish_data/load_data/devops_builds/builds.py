@@ -13,9 +13,11 @@ from common_utils.constants import (
     SERVICE_NAME,
     BUILD_HREF,
     BUILD_TOKEN,
+    PETSTORE_REPO_URL
 )
 
 import json, requests, traceback
+from random import randint
 
 LOGGER = loggers.create_logger_module("devops-intelligence-publisher")
 
@@ -23,7 +25,7 @@ LOGGER = loggers.create_logger_module("devops-intelligence-publisher")
 def post_build_data(tenant_url, bearer_token):
 
     try:
-        TOKEN_API = "dash/api/build/v1/config/tokens"
+        TOKEN_API = "dash/api/build/v3/config/tokens"
         DEVOPS_BUILD_TOKEN = (
             BUILD_TOKEN if BUILD_TOKEN != "" else tokens.get_token("BUILD", tenant_url, bearer_token, TOKEN_API).token
         )
@@ -31,27 +33,21 @@ def post_build_data(tenant_url, bearer_token):
 
         body = BuildTemplate()
 
-        body.build_id = RUN_ID
-
-        date = datetime.utcnow()
-
-        body.built_at = date.isoformat("T") + "Z"
-
-        body.duration = BUILD_DURATION_TIME * 1000000000
-
-        body.href = BUILD_HREF
-
         body.branch = BRANCH
-
-        body.commit = COMMIT
-
         body.build_engine = BUILD_ENGINE
-
+        body.build_id = RUN_ID
         body.build_status = BUILD_STATUS
-
-        body.service_name = SERVICE_NAME
-
-        body.serviceoverride = True
+        date = datetime.utcnow()
+        body.built_at = date.isoformat("T") + "Z"
+        body.commit = COMMIT
+        body.details = "No details"
+        body.duration = BUILD_DURATION_TIME * 1000000000
+        body.event_type = "push"
+        body.pull_request_number = str(randint(10,100))
+        body.repo_url = PETSTORE_REPO_URL
+        body.technical_service_name = SERVICE_NAME
+        body.technical_service_override = True        
+        body.href = BUILD_HREF
 
         headers = {
             "Authorization": "TOKEN " + DEVOPS_BUILD_TOKEN,

@@ -1,20 +1,17 @@
 from datetime import datetime, timedelta
 import json
-from random import randint, choice
-import uuid
 import requests
 import os
 import traceback
-import uuid
 
 from common_utils.constants import SECURE_TOKEN, loggers, SERVICE_NAME, VULNERABILITIES_URL_TEMPLATE, ImageScanTemplate, VulnerabilityTemplate
 from load_data.tokens import tokens
 
 LOGGER = loggers.create_logger_module("devops-intelligence-publisher")
 
-TOKEN_API = "dash/api/dev_secops/v1/config/tokens"
+TOKEN_API = "dash/api/dev_secops/v3/config/tokens"
 SCANNED_BY = "snyk"
-LIMIT_PER_REQUEST = 100
+LIMIT_PER_REQUEST = 50
 
 def __chunks(lst, n):
     for i in range(0, len(lst), n):
@@ -25,8 +22,9 @@ def __publish_image_scans(service_name,raw_json,tenant_url,secure_token):
     try:
 
         scan = ImageScanTemplate()
-        scan.servicename = service_name
-        scan.serviceoverride = True
+        scan.technical_service_name = service_name
+        scan.technicalserviceoverride = True
+        scan.provider_href = "https://snyk.io/"
 
         if not isinstance(raw_json, list):
             raw_json = [raw_json]
@@ -60,7 +58,7 @@ def __publish_image_scans(service_name,raw_json,tenant_url,secure_token):
 
         for chunck in __chunks(vulnerabilities,LIMIT_PER_REQUEST):
 
-            scan.servicename = f"{scan.servicename}-{chunk_counter}"
+            scan.technical_service_name = f"{scan.technical_service_name}-{chunk_counter}"
 
             chunk_counter +=1
 
@@ -68,7 +66,7 @@ def __publish_image_scans(service_name,raw_json,tenant_url,secure_token):
 
             date = (datetime.utcnow() - timedelta(days=0)).isoformat("T")+"Z"
             
-            ENDPOINT = VULNERABILITIES_URL_TEMPLATE.format( tenant_url, scan.servicename, SCANNED_BY, date )
+            ENDPOINT = VULNERABILITIES_URL_TEMPLATE.format( tenant_url, SCANNED_BY, date )
             
             payload = scan.__dict__
 

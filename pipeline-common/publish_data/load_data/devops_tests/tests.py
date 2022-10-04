@@ -24,7 +24,7 @@ def post_tests_data(tenant_url, bearer_token):
 
     try:
 
-        TOKEN_API = "dash/api/test/v1/config/tokens"
+        TOKEN_API = "dash/api/test/v3/config/tokens"
         DEVOPS_TEST_TOKEN = (
             TEST_TOKEN if TEST_TOKEN != "" else tokens.get_token("TEST", tenant_url, bearer_token, TOKEN_API).token
         )
@@ -32,13 +32,11 @@ def post_tests_data(tenant_url, bearer_token):
         ENDPOINT = TEST_URL_TEMPLATE.format(tenant_url, TEST_TYPE, RUN_ID)
 
         params = (
-            ("serviceName", SERVICE_NAME),
+            ("technicalServiceName", SERVICE_NAME),
             ("fileType", TEST_FILE_TYPE),
             ("testEngine", TEST_ENGINE),
-            ("providerhref", TEST_HREF if TEST_HREF != "" else tenant_url),
             ("environmentname", TEST_ENVIRONMENT if TEST_ENVIRONMENT != "" else SERVICE_NAME),
-            ("releasename", TEST_RELEASE if TEST_RELEASE != "" else SERVICE_NAME),
-            ("serviceOverride", True),
+            ("releasename", TEST_RELEASE if TEST_RELEASE != "" else SERVICE_NAME)
         )
 
         m = MultipartEncoder(

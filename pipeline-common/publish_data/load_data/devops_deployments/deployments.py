@@ -13,9 +13,11 @@ from common_utils.constants import (
     RUN_ID,
     PROVIDER,
     DEPLOY_TOKEN,
+    TOOL
 )
 
 import json, requests, traceback
+from random import randint
 
 LOGGER = loggers.create_logger_module("devops-intelligence-publisher")
 
@@ -24,7 +26,7 @@ def post_deployment_data(tenant_url, bearer_token):
 
     try:
 
-        TOKEN_API = "dash/api/deployments/v1/config/tokens"
+        TOKEN_API = "dash/api/deployments/v4/config/tokens"
         DEVOPS_DEPLOYMENTS_TOKEN = (
             DEPLOY_TOKEN
             if DEPLOY_TOKEN != ""
@@ -35,27 +37,21 @@ def post_deployment_data(tenant_url, bearer_token):
         body = DeploymentTemplate()
 
         body.deploymentid = RUN_ID
-
+        body.name = SERVICE_NAME
+        body.technical_service_name = SERVICE_NAME
+        body.provider = PROVIDER
+        body.tool = TOOL
+        body.status = DEPLOYMENT_STATUS
         body.duration = DEPLOY_DURATION_TIME * 1000000
-
         date = datetime.utcnow()
         body.creation_date = date.isoformat("T") + "Z"
-
-        body.endpoint_hostname = DEPLOYMENT_HOSTNAME
-
-        body.endpoint_service_id = DEPLOYMENT_SERVICE_ID
-
-        body.name = SERVICE_NAME
-
-        body.provider = PROVIDER
-
         body.providerhref = DEPLOYMENT_HREF if DEPLOYMENT_HREF != "" else tenant_url
-
-        body.status = DEPLOYMENT_STATUS
-
-        body.service_name = SERVICE_NAME
-
-        body.serviceoverride = True
+        body.technicalserviceoverride = True
+        body.endpoint_hostname = DEPLOYMENT_HOSTNAME
+        body.endpoint_technical_service_id = DEPLOYMENT_SERVICE_ID
+        body.release = f"{randint(5,11)}.{randint(0,22)}.{randint(0,22)}"
+        body.environment = "production"
+        body.isproduction = True
 
         headers = {
             "Authorization": "TOKEN " + DEVOPS_DEPLOYMENTS_TOKEN,

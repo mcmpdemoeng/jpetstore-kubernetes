@@ -37,8 +37,12 @@ class BuildTemplate:
         self.commit = None
         self.build_engine = None
         self.build_status = None
-        self.service_name = None
-        self.serviceoverride = True
+        self.technical_service_name = None
+        self.technical_service_override = True
+        self.details = None
+        self.event_type = None
+        self.pull_request_number = None
+        self.repo_url = None
 
 
 class TestTemplate:
@@ -57,19 +61,24 @@ class DeploymentTemplate:
         self.deploymentid = None
         self.duration = 100572
         self.endpoint_hostname = None
-        self.endpoint_service_id = None
+        self.endpoint_technical_service_id = None
         self.name = None
         self.provider = None
         self.providerhref = None
-        self.service_name = None
-        self.serviceoverride = True
+        self.technical_service_name = None
+        self.technicalserviceoverride = True
         self.status = None
+        self.tool = None
+        self.release = None
+        self.environment = None
+        self.isproduction = None
 
 class ImageScanTemplate:
     def __init__(self):
         self.vulnerable_image_scan = []
-        self.serviceoverride = None
-        self.servicename = None
+        self.technicalserviceoverride = None
+        self.technical_service_name = None
+        self.provider_href = ""
 
 class VulnerabilityTemplate:
     def __init__(self,cvss,description,image_digest,pack_name,pack_path,pack_version,severity,url,id):
@@ -95,6 +104,8 @@ COMMIT = os.getenv("COMMIT", "")
 
 PROVIDER = os.getenv("PROVIDER", "")
 
+TOOL = os.getenv("TOOL", "not specified")
+
 UTC_FORMAT = "%FT%TZ"
 
 # Tokens if they are already created for publish data to DevOps Intelligence
@@ -104,13 +115,13 @@ TEST_TOKEN = os.getenv("TEST_TOKEN", "")
 DEPLOY_TOKEN = os.getenv("DEPLOY_TOKEN", "")
 SECURE_TOKEN = os.getenv("SECURE_TOKEN","")
 
-VULNERABILITIES_URL_TEMPLATE = "{0}dash/api/dev_secops/v1/services/{1}/image-scan?scannedBy={2}&scannedTime={3}"
+VULNERABILITIES_URL_TEMPLATE = "{0}dash/api/dev_secops/v3/technical-services/image-scan?scannedBy={1}&scannedTime={2}"
 
 """
 {0} tenant url (not api url)
 {1} service name without  any '/' char
 """
-BUILD_URL_TEMPLATE = "{0}dash/api/build/v1/services/builds"
+BUILD_URL_TEMPLATE = "{0}dash/api/build/v3/technical-services/builds"
 
 BUILD_STATUS = "passed" if os.getenv("BUILD_STATUS", "") == "success" else "failed"
 BUILD_ENGINE = os.getenv("BUILD_ENGINE", "")
@@ -122,7 +133,7 @@ BUILD_HREF = os.getenv("BUILD_HREF", "")
 {1} run unique id
 {2} service name without any '/' char
 """
-TEST_URL_TEMPLATE = "{0}dash/api/test/v1/services/tests/{1}/run/{2}"
+TEST_URL_TEMPLATE = "{0}dash/api/test/v3/technical-services/tests/{1}/run/{2}"
 
 TEST_TYPE = os.getenv("TEST_TYPE", "unit")
 TEST_FILE_TYPE = os.getenv("TEST_FILE_TYPE", "xunit")
@@ -136,7 +147,7 @@ TEST_HREF = os.getenv("TEST_HREF", "")
 """
 {0} tenant url (not api url)
 """
-DEPLOYMENT_URL_TEMPLATE = "{0}dash/api/deployments/v3/services/deployments"
+DEPLOYMENT_URL_TEMPLATE = "{0}dash/api/deployments/v4/technical-services/deployments"
 
 DEPLOYMENT_PROVIDERS = ["GoCD", "Travis", "Jenkins", "IBM Cloud", "AWS", "Azure", "Google"]
 DEPLOYMENT_STATUS = "deployed" if os.getenv("DEPLOYMENT_STATUS", "") == "success" else "failed"
@@ -159,3 +170,6 @@ GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 # GITHUB_TOKEN = os.getenv("TOKEN_GITHUB")
 GITHUB_REPO = os.getenv("REPO")
 IS_GITHUB = True if os.getenv("IS_GITHUB", "").lower() in ["true", "1", "t"] else False
+
+
+PETSTORE_REPO_URL = "https://github.com/mcmpdemoeng/jpetstore-kubernetes"
