@@ -32,6 +32,7 @@ def post_tests_data(tenant_url, bearer_token):
         ENDPOINT = TEST_URL_TEMPLATE.format(tenant_url, TEST_TYPE, RUN_ID)
 
         params = (
+            ("technicalServiceOverride", True),
             ("technicalServiceName", SERVICE_NAME),
             ("fileType", TEST_FILE_TYPE),
             ("testEngine", TEST_ENGINE),
