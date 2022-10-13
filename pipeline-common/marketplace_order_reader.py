@@ -22,11 +22,11 @@ def get_order_number_details(tenant_system_user_name, tenant_system_user_api_key
     infrastructure_name = response["data"]["orderItems"][0]["serviceOfferingName"]
 
     for c in configs:
-        if "Parameters" in str(c["configGroup"]):
+        if "parameters" in str(c["configGroup"]):
             inputs = c["config"]
 
     for param in inputs:
-        if param["configId"] == "administratorLoginPassword":
+        if param["configId"] == "administratorPassword":
             data["db_password"] = param["values"][0]["value"]
 
     return True, data
@@ -80,30 +80,30 @@ if __name__ == "__main__":
         for r in service_details["resources"]:
 
             # Get kubeconfig infor and FQDN
-            if r["resourceType"] == "Microsoft.ContainerService/ManagedClusters":
+            if r["resourceType"] == "azurerm_kubernetes_cluster":
                 for output in r["templateOutputProperties"]:
 
-                    if output["type"] == "properties":
-                        fqdn = output["value"]["Addon Profiles"]["Http Application Routing"]["Config"][
-                            "HTTP Application Routing Zone Name"
-                        ]
+                    if output["name"] == "Http Application Routing Zone Name":
+                        fqdn = output["value"]
 
-                    if output["type"] == "kubeconfig" and output["value"]["kubeconfigs"][0]["name"] == "clusterAdmin":
-                        kubeconfig = output["value"]["kubeconfigs"][0]["value"]
-                        kubeconfig = str(base64.b64decode(kubeconfig), "utf-8")
+                    if output["name"] == "Kube Config Raw":
+                        kubeconfig = output["value"]
+                        
 
             # Get database user, password and url
-            if r["resourceType"] == "Microsoft.DBforMySQL/servers":
+            if r["resourceType"] == "azurerm_mysql_server":
 
                 db_server_name = r["name"]
 
                 for output in r["templateOutputProperties"]:
 
-                    if output["type"] == "properties":
-                        db_url = output["value"]["Fully Qualified Domain Name"]
-                        db_user = output["value"]["Administrator Login"] + "@" + db_server_name
+                    if output["name"] == "Fqdn":
+                        db_url = output["value"]
+                    if output["name"] == "Administrator Login":
+                        db_user = output["value"]
 
         # Save files
+        db_user = db_user + "@" + db_url
         file_names = ["tmp_kube_config", "fqdn", "db_url", "db_user", "db_password"]
         file_contents = [kubeconfig, fqdn, db_url, db_user, db_password]
 
