@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: prometheus-ui
@@ -11,6 +11,10 @@ spec:
   - host: prom.petstoreiks-a667bfc9edb420e24a2cb071ae46cb42-0000.us-south.containers.appdomain.cloud
     http:
       paths:
-      - backend:
-          serviceName: prometheus-service
-          servicePort: 8080
+       - path: /
+         pathType: ImplementationSpecific
+         backend:
+           service: 
+             name: prometheus-service
+             port: 
+               number: 8080
