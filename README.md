@@ -1,4 +1,4 @@
-# Modernize and Extend: JPetStore on IBM Cloud Kubernetes Service.
+# Modernize and Extend: JPetStore on IBM Cloud Kubernetes Service
 
 This demo modernizes an existing Java web application (JPetStore) by:
 
