@@ -12,20 +12,6 @@
 
 <body bgcolor="white">
 
-  <script type="text/javascript">
-    let utag_data = {"adl_site_hierarchy":["magazine"],"adl_category":"petstore","adl_subcategory":"","adl_language":"en","adl_country":"language-masters","adl_page_type":"","page_name":"petstore","adl_page_url":"http://jpetstore-web.cd6578cfa15a4488b1b8.eastus.aksapp.io/shop/index.do"};
-  </script>
-
-  <script type="text/javascript">
-    function importUtagScript() {
-        (function(a,b,c,d){
-            a='https://tags.tiqcdn.com/utag/kyndryl/dev/dev/utag.js';
-            b=document;c='script';d=b.createElement(c);d.src=a;d.type='text/java'+c;d.async= true;
-            a=b.getElementsByTagName(c)[3];a.parentNode.insertBefore(d,a);
-        })();
-    }
-  </script>
-
 <table background="../images/bkg-topbar.gif" border="0" cellspacing="0" cellpadding="5" width="100%">
   <tbody>
   <tr>
