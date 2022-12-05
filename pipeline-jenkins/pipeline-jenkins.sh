@@ -5,7 +5,7 @@ echo "Updating order status..."
 if [[ -f ORDER_NUMBER.txt ]]
 then
     export ORDER_NUMBER=$(cat ORDER_NUMBER.txt)
-    export ORDER_NUMBER=$(cat FULFILLMENT_ID.txt)
+    export FULFILLMENT_ID=$(cat FULFILLMENT_ID.txt)
 fi
 API_URL="${TENANT_URL/.multicloud-ibm.com/-api.multicloud-ibm.com}api/fulfillment/prov_posthook_response"
 PAYLOAD='{"additionalMessage":"Provisioning Completed. Check build _BUILDconsole","comments":"Provisioned Completed.","orderNumber":"_ORD","serviceFulfillmentId":"_FUL","status":"ProvisionCompleted","version":""}'
