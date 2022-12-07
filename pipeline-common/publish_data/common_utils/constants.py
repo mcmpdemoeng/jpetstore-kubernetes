@@ -125,7 +125,7 @@ BUILD_URL_TEMPLATE = "{0}dash/api/build/v3/technical-services/builds"
 
 BUILD_STATUS = "passed" if os.getenv("BUILD_STATUS", "") == "success" else "failed"
 BUILD_ENGINE = os.getenv("BUILD_ENGINE", "")
-BUILD_DURATION_TIME = int(os.getenv("BUILD_DURATION_TIME", 1))
+BUILD_DURATION_TIME = int( os.getenv("BUILD_DURATION_TIME", "1").replace("\n","") )
 BUILD_HREF = os.getenv("BUILD_HREF", "")
 
 """
