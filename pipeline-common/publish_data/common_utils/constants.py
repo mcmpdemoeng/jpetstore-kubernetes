@@ -151,7 +151,7 @@ DEPLOYMENT_URL_TEMPLATE = "{0}dash/api/deployments/v4/technical-services/deploym
 
 DEPLOYMENT_PROVIDERS = ["GoCD", "Travis", "Jenkins", "IBM Cloud", "AWS", "Azure", "Google"]
 DEPLOYMENT_STATUS = "deployed" if os.getenv("DEPLOYMENT_STATUS", "") == "success" else "failed"
-DEPLOY_DURATION_TIME = int(os.getenv("DEPLOY_DURATION_TIME", 1))
+DEPLOY_DURATION_TIME = int( os.getenv("DEPLOY_DURATION_TIME", "1").replace("\n",'') )
 DEPLOYMENT_HOSTNAME = os.getenv("DEPLOYMENT_HOSTNAME", "HOSTNAME")
 DEPLOYMENT_SERVICE_ID = os.getenv("DEPLOYMENT_SERVICE_ID", "SERVICE_ID")
 DEPLOYMENT_HREF = os.getenv("DEPLOYMENT_HREF", "")
