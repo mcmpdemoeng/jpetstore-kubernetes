@@ -178,7 +178,7 @@ echo "$((enddate - startdate))" >> deploy_duration_time
 export TENANT_SYSTEM_USER_NAME="${USER_ID}"
 export TENANT_SYSTEM_USER_API_KEY="${USER_API_KEY}"
 
-export SERVICE_NAME="petstore_on_aks_jenkins"
+export SERVICE_NAME="RT_petstore_on_aks_jenkins"
 
 export BUILD_DURATION_TIME=$(cat build_duration_time)
 export BUILD_ENGINE="Jenkins"
