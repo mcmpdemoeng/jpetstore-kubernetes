@@ -2,12 +2,19 @@
 #sleep 120
 
 echo "Updating order status..."
-
+if [[ -f ORDER_NUMBER.txt ]]
+then
+    export ORDER_NUMBER=$(cat ORDER_NUMBER.txt)
+    export FULFILLMENT_ID=$(cat FULFILLMENT_ID.txt)
+fi
 API_URL="${TENANT_URL/.multicloud-ibm.com/-api.multicloud-ibm.com}api/fulfillment/prov_posthook_response"
 PAYLOAD='{"additionalMessage":"Provisioning Completed. Check build _BUILDconsole","comments":"Provisioned Completed.","orderNumber":"_ORD","serviceFulfillmentId":"_FUL","status":"ProvisionCompleted","version":""}'
 PAYLOAD="${PAYLOAD/_ORD/"$ORDER_NUMBER"}"
 PAYLOAD="${PAYLOAD/_FUL/"$FULFILLMENT_ID"}"
 PAYLOAD="${PAYLOAD/_BUILD/"$BUILD_URL"}"
+
+echo $ORDER_NUMBER > ORDER_NUMBER.txt
+echo $FULFILLMENT_ID > FULFILLMENT_ID.txt
 
 echo "$PAYLOAD" > payload.json
 cat payload.json
@@ -171,7 +178,7 @@ echo "$((enddate - startdate))" >> deploy_duration_time
 export TENANT_SYSTEM_USER_NAME="${USER_ID}"
 export TENANT_SYSTEM_USER_API_KEY="${USER_API_KEY}"
 
-export SERVICE_NAME="petstore_on_aks_jenkins"
+export SERVICE_NAME="RT_petstore_on_aks_jenkins"
 
 export BUILD_DURATION_TIME=$(cat build_duration_time)
 export BUILD_ENGINE="Jenkins"
