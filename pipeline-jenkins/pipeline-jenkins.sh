@@ -2,7 +2,7 @@
 #sleep 120
 
 echo "Updating order status..."
-if [[ -f ORDER_NUMBER.txt ]]
+if [[ -f ORDER_NUMBER.txt ]] && [[ $ORDER_NUMBER == "" ]]
 then
     export ORDER_NUMBER=$(cat ORDER_NUMBER.txt)
     export FULFILLMENT_ID=$(cat FULFILLMENT_ID.txt)
