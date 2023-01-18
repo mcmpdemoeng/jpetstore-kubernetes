@@ -49,7 +49,7 @@ def post_deployment_data(tenant_url, bearer_token):
         body.technicalserviceoverride = True
         body.endpoint_hostname = DEPLOYMENT_HOSTNAME
         body.endpoint_technical_service_id = DEPLOYMENT_SERVICE_ID
-        body.release = time.strftime("%w")
+        body.release = f"release-2023-{time.strftime("%w")}"
         body.environment = "production"
         body.isproduction = True
 
