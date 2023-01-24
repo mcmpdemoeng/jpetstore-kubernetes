@@ -23,6 +23,8 @@ httpHost: petstore-web.app
 
 isIKS: false
 
+isDBAAS: true
+
 mysql:
   url: ''
   username: ''
