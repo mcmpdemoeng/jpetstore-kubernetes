@@ -8,6 +8,7 @@ image:
   repository: <REGISTRY>/<NAMESPACE> # Ex: us.icr.io/mynamespace
   pullPolicy: Always
   pullSecret: ''
+  tag: latest
 
 namespace: 'jpetstore'
 
@@ -21,3 +22,11 @@ isLB: true
 httpHost: petstore-web.app
 
 isIKS: false
+
+isDBAAS: true
+
+mysql:
+  url: ''
+  username: ''
+  password: ''
+  
