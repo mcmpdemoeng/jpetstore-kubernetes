@@ -21,8 +21,8 @@ LOGGER = loggers.create_logger_module("devops-intelligence-publisher")
 
 
 def post_tests_data(tenant_url, bearer_token):
-    post_test_cases(tenant_url=tenant_url, bearer_token=bearer_token, test_type="functional")
     post_test_cases(tenant_url=tenant_url, bearer_token=bearer_token, test_type="unit")
+    post_test_cases(tenant_url=tenant_url, bearer_token=bearer_token, test_type="functional")
 
 
 
@@ -65,18 +65,27 @@ def post_test_cases( tenant_url, bearer_token, test_type="unit" ):
 
         LOGGER.info(params, m.fields)
 
+        print( "publishing test data")
         response = requests.post(url=ENDPOINT, headers=headers, data=m, params=params)
 
 
         LOGGER.info("Code = " + str(response.status_code))
-
+        print(
+            "Checking if response is not 200 range"
+        )
         if response.status_code != 200 and response.status_code != 201:
+            print(
+                "response is not 200 range"
+            )
             LOGGER.error("Error = " + str(response.text))
             return False, str(response.text)
 
     except Exception as e:
+        print(
+            "Inside exeption line 85"
+        )
         traceback.print_exc()
         LOGGER.error(str(e))
         return False, str(e)
-
+    print("everyting fine returning True, None")
     return True, None
