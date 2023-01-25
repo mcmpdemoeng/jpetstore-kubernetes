@@ -21,7 +21,12 @@ LOGGER = loggers.create_logger_module("devops-intelligence-publisher")
 
 
 def post_tests_data(tenant_url, bearer_token):
+    post_test_cases(tenant_url=tenant_url, bearer_token=bearer_token, test_type="functional")
+    post_test_cases(tenant_url=tenant_url, bearer_token=bearer_token, test_type="unit")
 
+
+
+def post_test_cases( tenant_url, bearer_token, test_type="unit" ):
     try:
 
         TOKEN_API = "dash/api/test/v3/config/tokens"
@@ -29,7 +34,7 @@ def post_tests_data(tenant_url, bearer_token):
             TEST_TOKEN if TEST_TOKEN != "" else tokens.get_token("TEST", tenant_url, bearer_token, TOKEN_API).token
         )
 
-        ENDPOINT = TEST_URL_TEMPLATE.format(tenant_url, TEST_TYPE, RUN_ID)
+        ENDPOINT = TEST_URL_TEMPLATE.format( tenant_url, test_type, RUN_ID )
 
         params = (
             ("technicalServiceOverride", True),
@@ -60,6 +65,10 @@ def post_tests_data(tenant_url, bearer_token):
 
         LOGGER.info(params, m.fields)
 
+        response = requests.post(url=ENDPOINT, headers=headers, data=m, params=params)
+
+        #Post Functional test
+        ENDPOINT = TEST_URL_TEMPLATE.format(tenant_url, "function", RUN_ID)
         response = requests.post(url=ENDPOINT, headers=headers, data=m, params=params)
 
         LOGGER.info("Code = " + str(response.status_code))

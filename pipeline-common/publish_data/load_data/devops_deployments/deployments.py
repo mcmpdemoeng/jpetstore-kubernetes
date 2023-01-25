@@ -52,7 +52,6 @@ def post_deployment_data(tenant_url, bearer_token):
         body.release = f'release-2023-{time.strftime("%w")}'
         body.environment = "production"
         body.isproduction = True
-
         headers = {
             "Authorization": "TOKEN " + DEVOPS_DEPLOYMENTS_TOKEN,
             "Content-Type": "application/json",
