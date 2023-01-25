@@ -126,7 +126,7 @@ BUILD_URL_TEMPLATE = "{0}dash/api/build/v3/technical-services/builds"
 
 BUILD_STATUS = "passed" if os.getenv("BUILD_STATUS", "") == "success" else "failed"
 BUILD_ENGINE = os.getenv("BUILD_ENGINE", "")
-BUILD_DURATION_TIME =  random.randint(1,5) if int( os.getenv("BUILD_DURATION_TIME", "1").replace("\n","") ) == 1 else os.getenv("BUILD_DURATION_TIME")
+BUILD_DURATION_TIME =  random.randint(1,5) if int( os.getenv("BUILD_DURATION_TIME", "1").replace("\n","") ) == 1 else int( os.getenv("BUILD_DURATION_TIME", "1").replace("\n","") )
 BUILD_HREF = os.getenv("BUILD_HREF", "")
 
 """
@@ -152,7 +152,7 @@ DEPLOYMENT_URL_TEMPLATE = "{0}dash/api/deployments/v4/technical-services/deploym
 
 DEPLOYMENT_PROVIDERS = ["GoCD", "Travis", "Jenkins", "IBM Cloud", "AWS", "Azure", "Google"]
 DEPLOYMENT_STATUS = "deployed" if os.getenv("DEPLOYMENT_STATUS", "") == "success" else "failed"
-DEPLOY_DURATION_TIME =  random.randint(1,5) if int( os.getenv("DEPLOY_DURATION_TIME", "1").replace("\n",'') ) == 1 else os.getenv("DEPLOY_DURATION_TIME")
+DEPLOY_DURATION_TIME =  random.randint(1,5) if int( os.getenv("DEPLOY_DURATION_TIME", "1").replace("\n",'') ) == 1 else int( os.getenv("DEPLOY_DURATION_TIME").replace("\n",'') )
 
 DEPLOYMENT_HOSTNAME = os.getenv("DEPLOYMENT_HOSTNAME", "HOSTNAME")
 DEPLOYMENT_SERVICE_ID = os.getenv("DEPLOYMENT_SERVICE_ID", "SERVICE_ID")
