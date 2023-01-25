@@ -67,9 +67,6 @@ def post_test_cases( tenant_url, bearer_token, test_type="unit" ):
 
         response = requests.post(url=ENDPOINT, headers=headers, data=m, params=params)
 
-        #Post Functional test
-        ENDPOINT = TEST_URL_TEMPLATE.format(tenant_url, "function", RUN_ID)
-        response = requests.post(url=ENDPOINT, headers=headers, data=m, params=params)
 
         LOGGER.info("Code = " + str(response.status_code))
 
