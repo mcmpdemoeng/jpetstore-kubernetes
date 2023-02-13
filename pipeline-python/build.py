@@ -163,7 +163,7 @@ class Builder:
             return error
 
 
-    def login_to_docker(dockerUser="", dockerPassoword=""):
+    def login_to_docker(self, dockerUser, dockerPassoword):
         """
         This function will return 'None' if completed successfully, otherwise an error string will be return
         """
