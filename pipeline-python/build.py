@@ -110,7 +110,7 @@ class Builder:
 
         self.built_at = datetime.datetime.utcnow().isoformat("T") + "Z"
         buildCommand = f"docker build -t {imageName} {dockerFileDirectory}"
-
+        self.details = f"Image -> {imageName}"
         try:
             startTime = datetime.datetime.now()
             returnCode = os.system( buildCommand )
