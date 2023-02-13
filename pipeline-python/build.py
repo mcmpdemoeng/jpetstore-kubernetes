@@ -169,10 +169,13 @@ class Builder:
         """
 
         loginCommand = f"docker login -u {dockerUser} -p {dockerPassoword}"
+
         loginCommand = loginCommand.split(" ")
 
         try:
-            subprocess.run(loginCommand)
+            login = subprocess.run(loginCommand, capture_output=True)
+            if login.returncode != 0:
+                raise Exception(f"Fail to login to docker\nError: {login.stderr}\nCommand: {loginCommand}")
             return None
         except BaseException as error:
 
@@ -192,6 +195,6 @@ if __name__ == "__main__":
         buildtest.__dict__
     )
     print(
-        buildtest.post_data_into_tenant(tenantUrl="https://mcmp-explore-jamesxavier2-mar16-220316202344.multicloud-ibm.com/", buildToken="HzxoV8qRi3nO3tmBX3cjg_GzfCxIz0rflc3URMZ1UmHJpmxyTJmBwa1-4JK1sSRc")
+        buildtest.post_data_into_tenant(tenantUrl="https://mcmp-explore-jamesxavier2-mar16-220316202344.multicloud-ibm.com/", buildToken="")
     )
 
