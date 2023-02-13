@@ -226,7 +226,7 @@ def build_petstore( dockerFileDirectory=".", dockerUser="", dockerPassword="", f
     if pushToDockerRepo:
         if not dockerUser or not dockerPassword:
             raise Exception("Error:build_petstore: dockerUser and dockerPassword are required for publishment")
-        petstoreBuild.login_to_docker()
+        petstoreBuild.login_to_docker( dockerUser=dockerUser, dockerPassoword=dockerPassword )
         petstoreBuild.upload_docker_image( fullImageName )
     if publishToTenant:
         if not tenantUrl or not buildToken:
