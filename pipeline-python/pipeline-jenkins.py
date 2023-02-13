@@ -45,16 +45,16 @@ def main():
     print( json.dumps( pipelineParams, indent=3 ) )
     buildUrl =  os.getenv( "BUILD_URL", "http://example.net" )
 
-    error = update_completed_order_status( 
-        tenantUrl=pipelineParams['tenant_url'], 
-        userID=pipelineParams['user_id'], 
-        userApiKey=pipelineParams['user_api_key'], 
-        orderNumber=pipelineParams["order_number"],   
-        fulfillmentId=pipelineParams["fulfillment_id"],
-        buildUrl=buildUrl
-        )
-    if error:
-        print("Warning: Fail to update order status")
+    # error = update_completed_order_status( 
+    #     tenantUrl=pipelineParams['tenant_url'], 
+    #     userID=pipelineParams['user_id'], 
+    #     userApiKey=pipelineParams['user_api_key'], 
+    #     orderNumber=pipelineParams["order_number"],   
+    #     fulfillmentId=pipelineParams["fulfillment_id"],
+    #     buildUrl=buildUrl
+    # )
+    # if error:
+    #     print("Warning: Fail to update order status")
 
     petstore_pipeline(params=pipelineParams)
 
@@ -100,7 +100,7 @@ def petstore_pipeline(  params: dict  ):
     technicalServiceName = "RT_petstore_on_aks_jenkins"
  
     print("Building pestore web image")
-    build_petstore( 
+    result = build_petstore( 
         dockerFileDirectory="../jpetstore",
         dockerUser=params['docker_user'], 
         dockerPassword=params['docker_password'], 
@@ -113,7 +113,7 @@ def petstore_pipeline(  params: dict  ):
         )
 
     print("Building pestore db image")
-    build_petstore( 
+    result = build_petstore( 
         dockerFileDirectory="../",
         dockerUser=params['docker_user'], 
         dockerPassword=params['docker_password'], 
@@ -126,24 +126,24 @@ def petstore_pipeline(  params: dict  ):
         )
     print("testing pestore")
 
-    test_petstore( 
-        tenantUrl=params["tenant_url"], 
-        testToken=params["test_token"], 
-        technicalServiceName=technicalServiceName 
-    )
+    # result = test_petstore( 
+    #     tenantUrl=params["tenant_url"], 
+    #     testToken=params["test_token"], 
+    #     technicalServiceName=technicalServiceName 
+    # )
     
-    tenantApiUrl = sanitazeTenantUrl(tenantUrl=params["tenant_url"], urlType="api")
-    print("deploying pestore")
-    deploy_Petstore( 
-        dockerUser=params["docker_user"],
-        imageTag="latest",
-        tenantUserID=params["user_id"],
-        tenantUserApiKey=params["user_api_key"],
-        tenantApiURL=tenantApiUrl,
-        orderNumber=params["order_number"],
-        deployToken=params["deploy_token"],
-        publishToTenant=True
-     )
+    # tenantApiUrl = sanitazeTenantUrl(tenantUrl=params["tenant_url"], urlType="api")
+    # print("deploying pestore")
+    # result = deploy_Petstore( 
+    #     dockerUser=params["docker_user"],
+    #     imageTag="latest",
+    #     tenantUserID=params["user_id"],
+    #     tenantUserApiKey=params["user_api_key"],
+    #     tenantApiURL=tenantApiUrl,
+    #     orderNumber=params["order_number"],
+    #     deployToken=params["deploy_token"],
+    #     publishToTenant=True
+    #  )
 
     #secure_Petstore()
 

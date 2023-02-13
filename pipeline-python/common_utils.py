@@ -2,7 +2,7 @@ import logging as LOGGER
 import requests
 import subprocess
 import os
-
+import json
 def sanitazeTenantUrl(tenantUrl:str, urlType:str ="url"):
     """
     tenantUrl: string
