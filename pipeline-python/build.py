@@ -47,7 +47,7 @@ import uuid
 
 
 class Builder:
-    def __init__(self, buildId, tecnicalServiceName, buildEngine="Jenkins",commitNumber="606b16c15ea6ade03fe70dc9a88c306a54be7a14", buildUrl="http://13.82.103.214:8080/view/RedThread/job/redthread-petstore-deployment-template/71/console", hostname="13.82.103.214:8080", pullRequestNumber="23", repoUrl="https://github.com/mcmpdemoeng/jpetstore-kubernetes.git", details="" ):
+    def __init__(self,  tecnicalServiceName, buildId=uuid.uuid4().__str__(), buildEngine="Jenkins", commitNumber="606b16c15ea6ade03fe70dc9a88c306a54be7a14", buildUrl="http://13.82.103.214:8080/view/RedThread/job/redthread-petstore-deployment-template/71/console", hostname="13.82.103.214:8080", pullRequestNumber="23", repoUrl="https://github.com/mcmpdemoeng/jpetstore-kubernetes.git", details="" ):
 
         self.branch = f'release-2023-{time.strftime("%m.%d")}'
         self.build_engine = buildEngine
@@ -82,7 +82,20 @@ class Builder:
         }
 
         response, success, errorMessage = make_web_request(url=endpointUrl, payload=payload, headers=headers, requestMethod=requests.post)
-
+        if self.build_status == "failed" and success:
+            print(f""" 
+            Publlished build data succesfully:
+            {self.__dict__}
+            Exiting with status code 1 due to build failure when it ran
+            """)
+            exit(1)
+        elif self.build_status == "failed" and not success:
+            print(f""" 
+            Fail to publish data:
+           {self.__dict__}
+            Exiting with status code 1 due to build failure when it ran and fail in data publishment
+            """)
+            exit(1)
         return success, errorMessage
 
 
@@ -101,7 +114,19 @@ class Builder:
 
         try:
             startTime = datetime.datetime.now()
-            subprocess.run( buildCommand )
+            buildProcess = subprocess.run( buildCommand, capture_output=True )
+            
+            successFulBuild = buildProcess.returncode == 0
+            if not successFulBuild:
+                self.build_status = "failed"
+                endTime = datetime.datetime.now()
+                self.duration = (endTime - startTime).microseconds * 10000
+                print(f"Error: {buildProcess.stderr.decode('UTF-8')} ")
+                return {
+                "buildDuration": self.duration,
+                "buildStatus" : self.build_status
+            }
+
             endTime = datetime.datetime.now()
             self.build_status = "passed"
             self.duration = (endTime - startTime).microseconds * 1000

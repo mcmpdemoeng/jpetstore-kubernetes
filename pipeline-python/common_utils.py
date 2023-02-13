@@ -26,7 +26,6 @@ def sanitazeTenantUrl(tenantUrl:str, urlType:str ="url"):
 
     elif urlType  ==  "api":
         
-
         if not "-api" in splitUrlList[0]:
             splitUrlList[0] = f"{splitUrlList[0]}-api"
         

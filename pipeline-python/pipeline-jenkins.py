@@ -97,27 +97,32 @@ def petstore_pipeline(  params: dict  ):
     fullDBImageName = f"{params['docker_user']}/jpetstore-db:latest"
     technicalServiceName = "RT_petstore_on_aks_jenkins"
  
-
+    print("Building pestore web image")
     build_petstore( 
+        dockerFileDirectory="../jpetstore",
         dockerUser=params['docker_user'], 
         dockerPassword=params['docker_password'], 
         fullImageName=fullWebImageName, 
         tenantUrl=params['tenant_url'], 
         buildToken=params['build_token'], 
-        publishToTenant=True, 
+        publishToTenant=True,
         pushToDockerRepo=True,
-        technicalServiceName=technicalServiceName  
-        )
-
-    build_petstore( 
-        dockerUser=params['docker_user'], 
-        dockerPassword=params['docker_password'], 
-        fullImageName=fullDBImageName, tenantUrl=params['tenant_url'], 
-        buildToken=params['build_token'], 
-        publishToTenant=True, 
-        pushToDockerRepo=False,
         technicalServiceName=technicalServiceName
         )
+
+    print("Building pestore db image")
+    build_petstore( 
+        dockerFileDirectory="../",
+        dockerUser=params['docker_user'], 
+        dockerPassword=params['docker_password'], 
+        fullImageName=fullDBImageName,
+        tenantUrl=params['tenant_url'],
+        buildToken=params['build_token'],
+        publishToTenant=True,
+        pushToDockerRepo=True,
+        technicalServiceName=technicalServiceName
+        )
+    print("testing pestore")
 
     test_petstore( 
         tenantUrl=params["tenant_url"], 
@@ -126,6 +131,7 @@ def petstore_pipeline(  params: dict  ):
     )
     
     tenantApiUrl = sanitazeTenantUrl(tenantUrl=params["tenant_url"], urlType="api")
+    print("deploying pestore")
     deploy_Petstore( 
         dockerUser=params["docker_user"],
         imageTag="latest",
@@ -209,17 +215,17 @@ def read_state_file(fileName: str):
         print(  f"Fail to read file {STATE_FILENAME}, \n if this error persists delete the file and send all parameters to the pipeline"  )
         raise Exception(f"Unable to read '{STATE_FILENAME}'\nError: {error} ")
 
-def build_petstore( dockerUser="", dockerPassword="", fullImageName="", tenantUrl="", buildToken="", publishToTenant=False, pushToDockerRepo=False, technicalServiceName="RT_petstore_on_aks_jenkins" ):
+def build_petstore( dockerFileDirectory=".", dockerUser="", dockerPassword="", fullImageName="", tenantUrl="", buildToken="", publishToTenant=False, pushToDockerRepo=False, technicalServiceName="RT_petstore_on_aks_jenkins" ):
 
     petstoreBuild = build.Builder( buildId=uuid.uuid4().__str__(), tecnicalServiceName=technicalServiceName )
     startTime = datetime.datetime.now()
-    petstoreBuild.create_docker_image( dockerFileDirectory="../", imageName=fullImageName )
+    petstoreBuild.create_docker_image( dockerFileDirectory=dockerFileDirectory, imageName=fullImageName )
     
     if pushToDockerRepo:
         if not dockerUser or not dockerPassword:
             raise Exception("Error:build_petstore: dockerUser and dockerPassword are required for publishment")
         petstoreBuild.login_to_docker()
-        petstoreBuild.upload_docker_image(fullImageName)
+        petstoreBuild.upload_docker_image( fullImageName )
     if publishToTenant:
         if not tenantUrl or not buildToken:
             raise Exception("Error:build_petstore: tenantUrl and buildToken are required for publishment")

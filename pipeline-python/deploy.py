@@ -6,16 +6,18 @@ import os
 import random
 import time 
 import logging
+import uuid
+
 from emp_order_reader import get_petstore_infrasturcture_details
 from common_utils import *
 
 
 class Deploy:
 
-    def __init__(self, technical_service_name="RT_petstore_on_aks_jenkins", duration=100572, name="petstore_deployment", applicaitonUrl="http://jpetstore-web.cd6578cfa15a4488b1b8.eastus.aksapp.io/shop/index.do", provider="Azure", status="fail", environment="production", isProduction=True,deployUrl="http://13.82.103.214:8080/view/RedThread/job/redthread-petstore-deployment-template/71/console" ):
+    def __init__(self, deployId=uuid.uuid4().__str__(), technical_service_name="RT_petstore_on_aks_jenkins", duration=100572, name="petstore_deployment", applicaitonUrl="http://jpetstore-web.cd6578cfa15a4488b1b8.eastus.aksapp.io/shop/index.do", provider="Azure", status="fail", environment="production", isProduction=True,deployUrl="http://13.82.103.214:8080/view/RedThread/job/redthread-petstore-deployment-template/71/console" ):
 
         self.creation_date = datetime.datetime.utcnow().isoformat("T") + "Z"
-        self.deploymentid = os.getenv( "BUILD_ID", random.randint(500000,1000000000) )
+        self.deploymentid = os.getenv( "BUILD_ID", deployId )
         self.duration = duration
         self.endpoint_hostname = applicaitonUrl
         self.endpoint_technical_service_id = f"{applicaitonUrl}".replace("http://","") #TODO: We can improve this
@@ -134,9 +136,8 @@ if __name__ == "__main__":
     dep.deploy_petstore(
         dockerUser="mcmpdemo",
         imageTag="latest",
-        tenantUserID="625090e80f8c6927409061d4",
-        #replace this
-        tenantUserApiKey="",
+        tenantUserID="625090e80f8c6927409061d4", #mariobv userid
+        tenantUserApiKey="", #replace this
         tenantApi="https://mcmp-learn-api.multicloud-ibm.com",
         orderNumber="6JKY1AMSY4"
     )
