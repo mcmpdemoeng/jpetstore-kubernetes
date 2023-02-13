@@ -1,7 +1,7 @@
 import time
 import datetime
 import requests
-import subprocess
+import os
 from common_utils import *
 import uuid
 # def create_docker_image( imageName="defaultName", dockerFileDirectory="./", dockerfilename="Dockerfile", imageTag=None ):
@@ -37,7 +37,7 @@ import uuid
 #         serverResponse = dockerClient.images.push(repository=repository, auth_config=creds)
 #         return serverResponse
 #     except BaseException as error:
-        
+
 #         print(f"Fail to upload image '{imageTag}' to repository '{repository}'\nError: {error}")
 #         return False
 
@@ -71,7 +71,7 @@ class Builder:
 
         tenantUrl = sanitazeTenantUrl(tenantUrl)
         endpointUrl = f"{tenantUrl}dash/api/build/v3/technical-services/builds"
-        
+
         payload = self.__dict__
 
         headers = {
@@ -82,14 +82,14 @@ class Builder:
 
         response, success, errorMessage = make_web_request(url=endpointUrl, payload=payload, headers=headers, requestMethod=requests.post)
         if self.build_status == "failed" and success:
-            print(f""" 
+            print(f"""
             Publlished build data succesfully:
             {self.__dict__}
             Exiting with status code 1 due to build failure when it ran
             """)
             exit(1)
         elif self.build_status == "failed" and not success:
-            print(f""" 
+            print(f"""
             Fail to publish data:
            {self.__dict__}
             Exiting with status code 1 due to build failure when it ran and fail in data publishment
@@ -103,24 +103,23 @@ class Builder:
         """
         This function will return 'None' if completed successfully, otherwise an error string will be return
         """
-        subprocess.run( [ "docker", "logout" ] )
+        os.system( "docker logout" )
 
 
     def create_docker_image(self,  imageName="defaultName", dockerFileDirectory=".",   ):
 
         self.built_at = datetime.datetime.utcnow().isoformat("T") + "Z"
-        buildCommand = ["docker", "build", "-t", imageName, dockerFileDirectory]
+        buildCommand = f"docker build -t {imageName} {dockerFileDirectory}"
 
         try:
             startTime = datetime.datetime.now()
-            buildProcess = subprocess.run( buildCommand, capture_output=True )
-            
-            successFulBuild = buildProcess.returncode == 0
+            returnCode = os.system( buildCommand )
+
+            successFulBuild = returnCode == 0
             if not successFulBuild:
                 self.build_status = "failed"
                 endTime = datetime.datetime.now()
                 self.duration = (endTime - startTime).microseconds * 10000
-                print(f"Error: {buildProcess.stderr.decode('UTF-8')} ")
                 return {
                 "buildDuration": self.duration,
                 "buildStatus" : self.build_status
@@ -152,12 +151,17 @@ class Builder:
         """
         This function will return 'None' if completed successfully, otherwise an error string will be return
         """
-        
+
         pushCommand = f"docker push {fullImangeName}"
-        pushCommand = pushCommand.split(" ")
+
         try:
-            subprocess.run(pushCommand)
-            return None
+            returnCode = os.system(pushCommand)
+            successfullyExecuted =  returnCode == 0
+            if successfullyExecuted:
+
+                return None
+            else:
+                return f"Fail to push\nCommand: {pushCommand}"
 
         except BaseException as error:
             return error
@@ -170,12 +174,13 @@ class Builder:
 
         loginCommand = f"docker login -u {dockerUser} -p {dockerPassoword}"
 
-        loginCommand = loginCommand.split(" ")
+        # loginCommand = loginCommand.split(" ")
 
         try:
-            login = subprocess.run(loginCommand, capture_output=True)
-            if login.returncode != 0:
-                raise Exception(f"Fail to login to docker\nError: {login.stderr}\nCommand: {loginCommand}")
+            returnCode = os.system(loginCommand)
+            successfullyExecuted = returnCode == 0
+            if not successfullyExecuted:
+                raise Exception(f"Fail to login to docker\nCommand: {loginCommand}")
             return None
         except BaseException as error:
 
