@@ -50,7 +50,7 @@ class Builder:
 
         self.branch = f'release-2023-{time.strftime("%m.%d")}'
         self.build_engine = buildEngine
-        self.build_id = os.getenv('BUILD_NUMBER', buildId )
+        self.build_id = buildId
         self.build_status = None
         self.built_at =  None
         self.commit = os.getenv("COMMIT_NUMBER", commitNumber)
