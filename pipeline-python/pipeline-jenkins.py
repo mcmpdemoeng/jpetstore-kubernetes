@@ -87,7 +87,7 @@ def update_completed_order_status( tenantUrl:str, userID:str, userApiKey:str, or
 
     response, operationSuccess, errorMessage = make_web_request( url=endpointUrl, headers=headers, payload=payload, requestMethod=requests.post )
     if not operationSuccess:
-        raise Exception( f'Unable to update order status "{orderNumber}, with the credentials provided"\nError: "{errorMessage}"' )
+        return f'Unable to update order status "{orderNumber}, with the credentials provided"\nError: "{errorMessage}"' 
     
     return None
 
