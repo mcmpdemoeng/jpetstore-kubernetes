@@ -45,14 +45,16 @@ def main():
     print( json.dumps( pipelineParams, indent=3 ) )
     buildUrl =  os.getenv( "BUILD_URL", "http://example.net" )
 
-    # error = update_completed_order_status( 
-    #     tenantUrl=pipelineParams['tenant_url'], 
-    #     userID=pipelineParams['user_id'], 
-    #     userApiKey=pipelineParams['user_api_key'], 
-    #     orderNumber=pipelineParams["order_number"],   
-    #     fulfillmentId=pipelineParams["fulfillment_id"],
-    #     buildUrl=buildUrl
-    #     )
+    error = update_completed_order_status( 
+        tenantUrl=pipelineParams['tenant_url'], 
+        userID=pipelineParams['user_id'], 
+        userApiKey=pipelineParams['user_api_key'], 
+        orderNumber=pipelineParams["order_number"],   
+        fulfillmentId=pipelineParams["fulfillment_id"],
+        buildUrl=buildUrl
+        )
+    if error:
+        print("Warning: Fail to update order status")
 
     petstore_pipeline(params=pipelineParams)
 
