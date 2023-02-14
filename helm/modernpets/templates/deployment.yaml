@@ -850,3 +850,855 @@ spec:
             limits:
               memory: "500Mi"
               cpu: "500m"
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+        engine: argo
+    spec:
+      containers:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+  labels:
+    timestamp: "2023-02-14"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+        engine: argo
+    spec:
+      containers:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+        engine: argo
+    spec:
+      containers:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+  labels:
+    timestamp: "2023-02-14"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+        engine: argo
+        release: release-2023-02-14
+    spec:
+      containers:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+        engine: argo
+    spec:
+      containers:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+  labels:
+    timestamp: "2023-02-14"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+        engine: argo
+    spec:
+      containers:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+        engine: argo
+    spec:
+      containers:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+  labels:
+    timestamp: "2023-02-14"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+        engine: argo
+        release: release-2023-02-14
+    spec:
+      containers:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+        engine: argo
+    spec:
+      containers:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+  labels:
+    timestamp: "2023-02-14"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+        engine: argo
+    spec:
+      containers:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+        engine: argo
+    spec:
+      containers:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+  labels:
+    timestamp: "2023-02-14"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+        engine: argo
+        release: release-2023-02-14
+    spec:
+      containers:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+        engine: argo
+    spec:
+      containers:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+  labels:
+    timestamp: "2023-02-14"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+        engine: argo
+    spec:
+      containers:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+        engine: argo
+    spec:
+      containers:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jpetstoreweb
+  labels:
+    timestamp: "2023-02-14"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jpetstoreweb
+  template:
+    metadata:
+      labels:
+        app: jpetstoreweb
+        engine: argo
+        release: release-1676413304
+    spec:
+      containers:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.username
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
