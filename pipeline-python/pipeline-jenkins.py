@@ -95,42 +95,42 @@ def update_completed_order_status( tenantUrl:str, userID:str, userApiKey:str, or
 
 def petstore_pipeline(  params: dict  ):
 
-    fullWebImageName = f"{params['docker_user']}/jpetstore-web:latest"
-    fullDBImageName = f"{params['docker_user']}/jpetstore-db:latest"
+    # fullWebImageName = f"{params['docker_user']}/jpetstore-web:latest"
+    # fullDBImageName = f"{params['docker_user']}/jpetstore-db:latest"
     technicalServiceName = "RT_petstore_on_aks_jenkins"
  
-    print("Building pestore web image")
-    result = build_petstore( 
-        dockerFileDirectory="../jpetstore",
-        dockerUser=params['docker_user'], 
-        dockerPassword=params['docker_password'], 
-        fullImageName=fullWebImageName, 
-        tenantUrl=params['tenant_url'], 
-        buildToken=params['build_token'], 
-        publishToTenant=True,
-        pushToDockerRepo=True,
-        technicalServiceName=technicalServiceName
-        )
+    # print("Building pestore web image")
+    # result = build_petstore( 
+    #     dockerFileDirectory="../jpetstore",
+    #     dockerUser=params['docker_user'], 
+    #     dockerPassword=params['docker_password'], 
+    #     fullImageName=fullWebImageName, 
+    #     tenantUrl=params['tenant_url'], 
+    #     buildToken=params['build_token'], 
+    #     publishToTenant=True,
+    #     pushToDockerRepo=True,
+    #     technicalServiceName=technicalServiceName
+    #     )
 
-    print("Building pestore db image")
-    result = build_petstore( 
-        dockerFileDirectory="../",
-        dockerUser=params['docker_user'], 
-        dockerPassword=params['docker_password'], 
-        fullImageName=fullDBImageName,
-        tenantUrl=params['tenant_url'],
-        buildToken=params['build_token'],
-        publishToTenant=True,
-        pushToDockerRepo=True,
-        technicalServiceName=technicalServiceName
-        )
+    # print("Building pestore db image")
+    # result = build_petstore( 
+    #     dockerFileDirectory="../",
+    #     dockerUser=params['docker_user'], 
+    #     dockerPassword=params['docker_password'], 
+    #     fullImageName=fullDBImageName,
+    #     tenantUrl=params['tenant_url'],
+    #     buildToken=params['build_token'],
+    #     publishToTenant=True,
+    #     pushToDockerRepo=True,
+    #     technicalServiceName=technicalServiceName
+    #     )
     print("testing pestore")
 
-    # result = test_petstore( 
-    #     tenantUrl=params["tenant_url"], 
-    #     testToken=params["test_token"], 
-    #     technicalServiceName=technicalServiceName 
-    # )
+    result = test_petstore( 
+        tenantUrl=params["tenant_url"], 
+        testToken=params["test_token"], 
+        technicalServiceName=technicalServiceName 
+    )
     
     # tenantApiUrl = sanitazeTenantUrl(tenantUrl=params["tenant_url"], urlType="api")
     # print("deploying pestore")
