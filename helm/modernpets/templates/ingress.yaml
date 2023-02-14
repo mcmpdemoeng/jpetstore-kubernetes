@@ -13,7 +13,7 @@ metadata:
     app: jpetstoreweb
 spec:
   rules:
-  - host: "jpetstore-web.{{ .Values.httpHost }}"
+  - host: "jpetstore-web-app.{{ .Values.httpHost }}"
     http:
       paths:
         - path: /
