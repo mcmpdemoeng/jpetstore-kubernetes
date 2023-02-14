@@ -124,26 +124,26 @@ def petstore_pipeline(  params: dict  ):
     #     pushToDockerRepo=True,
     #     technicalServiceName=technicalServiceName
     #     )
-    print("testing pestore")
+    # print("testing pestore")
 
-    result = test_petstore( 
-        tenantUrl=params["tenant_url"], 
-        testToken=params["test_token"], 
-        technicalServiceName=technicalServiceName 
-    )
+    # result = test_petstore( 
+    #     tenantUrl=params["tenant_url"], 
+    #     testToken=params["test_token"], 
+    #     technicalServiceName=technicalServiceName 
+    # )
     
-    # tenantApiUrl = sanitazeTenantUrl(tenantUrl=params["tenant_url"], urlType="api")
-    # print("deploying pestore")
-    # result = deploy_Petstore( 
-    #     dockerUser=params["docker_user"],
-    #     imageTag="latest",
-    #     tenantUserID=params["user_id"],
-    #     tenantUserApiKey=params["user_api_key"],
-    #     tenantApiURL=tenantApiUrl,
-    #     orderNumber=params["order_number"],
-    #     deployToken=params["deploy_token"],
-    #     publishToTenant=True
-    #  )
+    tenantApiUrl = sanitazeTenantUrl(tenantUrl=params["tenant_url"], urlType="api")
+    print("deploying pestore")
+    result = deploy_Petstore( 
+        dockerUser=params["docker_user"],
+        imageTag="latest",
+        tenantUserID=params["user_id"],
+        tenantUserApiKey=params["user_api_key"],
+        tenantApiURL=tenantApiUrl,
+        orderNumber=params["order_number"],
+        deployToken=params["deploy_token"],
+        publishToTenant=True
+     )
 
     #secure_Petstore()
 
@@ -250,6 +250,7 @@ def test_petstore( tenantUrl, testToken, technicalServiceName ):
     except:
         print("Error: Fail to publish test data")
         print(tester.__dict__)
+
     
 def deploy_Petstore( tenantUserID,  tenantUserApiKey, tenantApiURL,  orderNumber, deployToken="", imageTag="latest", dockerUser="mcmpdemo",publishToTenant=False ):
     deployment = Deploy()

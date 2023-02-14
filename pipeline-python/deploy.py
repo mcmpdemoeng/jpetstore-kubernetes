@@ -126,6 +126,10 @@ class Deploy:
 
         response, success, errorMessage = make_web_request(url=endpointUrl, payload=payload, headers=headers, requestMethod=requests.post)
 
+        print(
+            f"Deploy publishment status code : {response.status_code}"
+        )
+
         return success, errorMessage
 
 

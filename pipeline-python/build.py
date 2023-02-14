@@ -81,6 +81,9 @@ class Builder:
         }
 
         response, success, errorMessage = make_web_request(url=endpointUrl, payload=payload, headers=headers, requestMethod=requests.post)
+        print(
+            f"Build publishment status code : {response.status_code}"
+        )
         if self.build_status == "failed" and success:
             print(f"""
             Publlished build data succesfully:

@@ -84,7 +84,9 @@ class Tester:
         }
 
         response, succesfulOperation, errorMessage = make_web_request(url=endpoint, payload=payload, headers=headers, requestMethod=requests.post, params=params)
-        
+        print(
+            f"Test publishment status code : {response.status_code}"
+        )
         return succesfulOperation, errorMessage
 
 
