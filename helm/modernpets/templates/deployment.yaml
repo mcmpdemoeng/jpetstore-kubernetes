@@ -11,6 +11,7 @@ spec:
     metadata:
       labels:
         app: jpetstoreweb
+        engine: argo
     spec:
       containers:
       - name: jpetstoreweb
