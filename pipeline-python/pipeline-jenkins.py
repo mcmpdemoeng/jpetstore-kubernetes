@@ -43,18 +43,20 @@ def main():
     parserValues = parser()
     pipelineParams = configure_pipeline_status( parserValues )
     print( json.dumps( pipelineParams, indent=3 ) )
-    buildUrl =  os.getenv( "BUILD_URL", "http://example.net" )
+    buildUrl =  os.getenv( "BUILD_URL", "http://13.82.103.214:8080/view/RedThread/job/redthread-petstore-deployment-template/71/console" )
 
-    # error = update_completed_order_status( 
-    #     tenantUrl=pipelineParams['tenant_url'], 
-    #     userID=pipelineParams['user_id'], 
-    #     userApiKey=pipelineParams['user_api_key'], 
-    #     orderNumber=pipelineParams["order_number"],   
-    #     fulfillmentId=pipelineParams["fulfillment_id"],
-    #     buildUrl=buildUrl
-    # )
-    # if error:
-    #     print("Warning: Fail to update order status")
+    tenantUrl = sanitazeTenantUrl(pipelineParams['tenant_url'])
+
+    error = update_completed_order_status( 
+        tenantUrl=tenantUrl, 
+        userID=pipelineParams['user_id'], 
+        userApiKey=pipelineParams['user_api_key'], 
+        orderNumber=pipelineParams["order_number"],   
+        fulfillmentId=pipelineParams["fulfillment_id"],
+        buildUrl=buildUrl
+    )
+    if error:
+        print("Warning: Fail to update order status")
 
     petstore_pipeline(params=pipelineParams)
 
