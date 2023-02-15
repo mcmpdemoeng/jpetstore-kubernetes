@@ -87,7 +87,7 @@ def parse_service_instance_details( jsonData ):
     kubeconfig = ""
     db_url = ""
     db_user = ""
-    print(len(jsonData["resources"]))
+    print(f"Number of resources in order: {len(jsonData['resources'])}" )
 
     for resouce in jsonData["resources"]:
         # Get kubeconfig infor and FQDN
@@ -95,8 +95,6 @@ def parse_service_instance_details( jsonData ):
             for output in resouce["templateOutputProperties"]:
 
                 if output["name"] == "Http Application Routing Zone Name":
-                    print('application routing found')
-                    print(output)
                     fqdn = output["value"]
 
                 if output["name"] == "Kube Config Raw":
