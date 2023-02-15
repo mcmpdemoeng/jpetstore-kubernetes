@@ -90,10 +90,8 @@ def parse_service_instance_details( jsonData ):
     print(len(jsonData["resources"]))
 
     for resouce in jsonData["resources"]:
-        print(f"resource -> {resouce.keys()}")
         # Get kubeconfig infor and FQDN
         if resouce["resourceType"] == "azurerm_kubernetes_cluster":
-            print('inside k8s cluster resour')
             for output in resouce["templateOutputProperties"]:
 
                 if output["name"] == "Http Application Routing Zone Name":
