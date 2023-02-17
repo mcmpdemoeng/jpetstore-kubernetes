@@ -15,8 +15,8 @@ data:
         for: 5s
         labels:
           severity: critical
-          namespace: "{{ $labels.namespace }}"
-          pod: "{{ $labels.pod }}"
+          namespace: {{ "{{" }} $labels.namespace }}
+          pod: {{ "{{" }} $labels.pod }}
         annotations: 
           summary: High CPU Usage
           description: "pod is using more cpu"
@@ -25,8 +25,8 @@ data:
         for: 5s
         labels:
           severity: critical
-          namespace: "{{ $labels.namespace }}"
-          pod: "{{ $labels.pod }}"
+          namespace: {{ "{{" }} $labels.namespace }}
+          pod: {{ "{{" }} $labels.pod }}
         annotations:
           summary: High Memory Usage
       - alert: High CPU load
@@ -34,8 +34,8 @@ data:
         for: 0m
         labels:
           severity: critical
-          namespace: "{{ $labels.namespace }}"
-          pod: "{{ $labels.pod }}"
+          namespace: {{ "{{" }} $labels.namespace }}
+          pod: {{ "{{" }} $labels.pod }}
         annotations:
           summary: "CPU load is > 20%\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
       - alert: High incoming request on network
@@ -43,8 +43,8 @@ data:
         for: 0m
         labels:
           severity: critical
-          namespace: "{{ $labels.namespace }}"
-          pod: "{{ $labels.pod }}"
+          namespace: {{ "{{" }} $labels.namespace }}
+          pod: {{ "{{" }} $labels.pod }}
         annotations:
           summary: "Host network interfaces are probably receiving too much data"
 
