@@ -8,7 +8,7 @@ import time
 import logging
 import uuid
 
-from emp_order_reader import get_petstore_infrasturcture_details
+from emp_order_reader import read_petstore_order
 from common_utils import *
 
 
@@ -41,7 +41,13 @@ class Deploy:
         self.creation_date = datetime.datetime.utcnow().isoformat("T") + "Z"
         tenantApi = sanitazeTenantUrl( tenantApi, "api" )
 
-        petstore_details = get_petstore_infrasturcture_details( tenant_system_user_name=tenantUserID, tenant_system_user_api_key=tenantUserApiKey, tenant_api_url=tenantApi, order_number=orderNumber )
+        petstore_details = read_petstore_order(
+            tenantApiUrl=tenantApi,
+            tenantUserId=tenantUserID,
+            tenantUserApikey=tenantUserApiKey,
+            orderNumber=orderNumber,
+            createKubeconfigFile=True
+        )
         startTime = datetime.datetime.now()
         try:
             self.deploy_petstore_helmchart(
