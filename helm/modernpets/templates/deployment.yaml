@@ -5,47 +5,48 @@ metadata:
 spec:
   replicas: 1
   selector:
-      matchLabels:
-        app: jpetstoreweb
+    matchLabels:
+      app: jpetstoreweb
   template:
     metadata:
       labels:
         app: jpetstoreweb
+        release: release-1676648382
     spec:
       containers:
-      - name: jpetstoreweb
-        image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
-        imagePullPolicy: Always
-        env:
-          - name: VERSION
-            value: "1"
-          - name: mysqlUrl
-            valueFrom:
-              secretKeyRef:
-                name: mysql-creds
-                key: mysql.url
-          - name: mysqlUser
-            valueFrom:
+        - name: jpetstoreweb
+          image: "{{ .Values.image.repository }}/jpetstoreweb:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          env:
+            - name: VERSION
+              value: "1"
+            - name: mysqlUrl
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.url
+            - name: mysqlUser
+              valueFrom:
                 secretKeyRef:
                   name: mysql-creds
                   key: mysql.username
-          - name: mysqlPass
-            valueFrom:
-              secretKeyRef:
-                name: mysql-creds
-                key: mysql.password
-        ports:
-        - containerPort: 9080
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 9080
-          initialDelaySeconds: 10
-          periodSeconds: 5
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "250m"
-          limits:
-            memory: "500Mi"
-            cpu: "500m"
+            - name: mysqlPass
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-creds
+                  key: mysql.password
+          ports:
+            - containerPort: 9080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
