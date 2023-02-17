@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+spec:
+  destination:
+    server: 'https://petstoraksdns-09e690fe.hcp.eastus.azmk8s.io:443'
+    namespace: jpetstore
+  project: readthread
+  source:
+    repoURL: 'https://github.com/mcmpdemoeng/jpetstore-kubernetes'
+    path: helm/modernpets
+    targetRevision: release-2023-02-17
+    helm:
+      parameters:
+        - name: image.repository
+          value: mcmpdemo
+        - name: image.tag
+          value: '89'
+        - name: httpHost
+          value: 60900e54e2184aeca94a.eastus.aksapp.io
+        - name: replicaCount
+          value: '1'
+        - name: mysql.password
+          value: UGFzc3cwcmQx
+        - name: mysql.url
+          value: bGVhcm5wZXRzdG9yZWFyZ28ubXlzcWwuZGF0YWJhc2UuYXp1cmUuY29t
+        - name: mysql.username
+          value: QWRtaW5henVyZWRiMUBsZWFybnBldHN0b3JlYXJnbw==
+  syncPolicy:
+    automated: {}
