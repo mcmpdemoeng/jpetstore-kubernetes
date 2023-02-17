@@ -37,7 +37,7 @@ data:
           namespace: {{ "{{" }} $labels.namespace }}
           pod: {{ "{{" }} $labels.pod }}
         annotations:
-          summary: "CPU load is > 20%\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          summary: "CPU load is > 20%\n  VALUE = {{ "{{" }} $value }}\n  LABELS = {{ $labels }}"
       - alert: High incoming request on network
         expr: sum by (instance) (rate(node_network_receive_bytes_total[2m])) / 1024 > 1
         for: 0m
