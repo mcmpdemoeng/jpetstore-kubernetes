@@ -55,7 +55,7 @@ class Secure:
 
             scans.append( vulnerability.__dict__ )
 
-
+        return scans
 
     def publish_secure_licenses(self, tenant_url, secureToken  ):
 

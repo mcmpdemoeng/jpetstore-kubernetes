@@ -10,7 +10,7 @@ from testpetstore import Tester
 from deploy import Deploy
 from datetime import datetime
 import uuid
-from secure import *
+from secure import Secure
 import deployMonitoring
 STATE_FILENAME = "jpetstore-pipeline-status.json"
 
@@ -149,7 +149,10 @@ def petstore_pipeline(  params: dict  ):
      )
 
     secure_Petstore(tenantUrl=params["tenant_url"], secureToken=params["secure_token"])
-    deployMonitoring.deploy_petstore_monitoring()
+    successfulOperation = deployMonitoring.deploy_petstore_monitoring()
+    if not successfulOperation:
+        print("Warning: Unable to install monitoring")
+
 
 def configure_pipeline_status( newValues: dict ):
 
