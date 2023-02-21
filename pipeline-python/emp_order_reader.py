@@ -1,6 +1,10 @@
 import os, requests
 import common_utils
 
+
+
+##TODO: We can wrap all this into a orderReader class
+
 def get_order_details(tenant_user_id, tenant_system_user_api_key, order_number, tenant_api_url):
     """
     Returns a dictionary with 'db_password', 'service_instance_id' keys.
@@ -58,7 +62,8 @@ def parse_petstore_order_details(jsonData):
         exit(1)
 
 
-def get_petstore_service_instance_details( tenant_system_user_id, tenant_system_user_api_key, service_instance_id, tenant_api_url ):
+def get_petstore_service_instance_details( tenant_system_user_id, tenant_system_user_api_key, service_instance_id, tenant_api_url, maxRetries=4, currentReties=0 ):
+    
     print("Reading service instace details")
     ENDPOINT = f"{tenant_api_url}v3/api/services/azure/{service_instance_id}"
     headers = {
@@ -66,6 +71,16 @@ def get_petstore_service_instance_details( tenant_system_user_id, tenant_system_
         "apikey": tenant_system_user_api_key
     }
     response, isSuccessfulResponse, _  = common_utils.make_web_request( requestMethod=requests.get, url=ENDPOINT, headers=headers )
+    timeOutError = response.status_code == 504
+    if timeOutError:
+        print("Warning: Time out getting petstore service instance details")
+        if currentReties >= maxRetries:
+            print(f"Error: time out error, tried {currentReties} times")
+            exit(1)
+        currentReties += 1
+        print("Retrying to get petstore service instance details")
+        get_petstore_service_instance_details( tenant_system_user_id, tenant_system_user_api_key, service_instance_id, tenant_api_url, currentReties=currentReties)
+    
     if not isSuccessfulResponse:
         print("Error:  'get_petstore_service_instance_details' func was unable to get a successful response")
         exit(1)
@@ -81,6 +96,7 @@ def get_petstore_service_instance_details( tenant_system_user_id, tenant_system_
     print("Done reading service instance details")
 
     return details
+
 
 def parse_service_instance_details( jsonData ):
     fqdn = ""
@@ -152,9 +168,9 @@ def read_petstore_order( tenantApiUrl, tenantUserId, tenantUserApikey, orderNumb
 if __name__ == "__main__":
     print(
         read_petstore_order(
-            tenantApiUrl="https://mcmp-learn-api.multicloud-ibm.com",
-            tenantUserId="625090e80f8c6927409061d4",
-            tenantUserApikey="ca10f694-8dd2-596b-a3c1-d3df9c5a27db",
-            orderNumber="6JKY1AMSY4"
+            tenantApiUrl="https://mcmp-redthread-test1aws-uiauto.multicloud-ibm.com/",
+            tenantUserId="",
+            tenantUserApikey="",
+            orderNumber=""
         )
     )
