@@ -38,7 +38,7 @@ class Secure:
         return success
 
     def __generate_vulnerability_data(self):
-
+        scans = []
         for _ in range(randint(5,10)):
 
             vulnerability = VulnerabilityTemplate()
@@ -53,7 +53,7 @@ class Secure:
             vulnerability.url_datasource = "https://democloud/datasourceurl"
             vulnerability.vulnerability_id = str(uuid.uuid4())
 
-            self.vulnerable_image_scan.append( vulnerability.__dict__ )
+            scans.append( vulnerability.__dict__ )
 
 
 
