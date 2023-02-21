@@ -8,7 +8,7 @@ from common_utils import *
 import build
 from testpetstore import Tester
 from deploy import Deploy
-import datetime
+from datetime import datetime
 import uuid
 from secure import *
 import deployMonitoring
@@ -223,7 +223,7 @@ def read_state_file(fileName: str):
 def build_petstore( dockerFileDirectory=".", dockerUser="", dockerPassword="", fullImageName="", tenantUrl="", buildToken="", publishToTenant=False, pushToDockerRepo=False, technicalServiceName="RT_petstore_on_aks_jenkins" ):
 
     petstoreBuild = build.Builder( buildId=uuid.uuid4().__str__(), tecnicalServiceName=technicalServiceName )
-    startTime = datetime.datetime.now()
+    startTime = datetime.now()
     petstoreBuild.create_docker_image( dockerFileDirectory=dockerFileDirectory, imageName=fullImageName )
     
     if pushToDockerRepo:
@@ -237,7 +237,7 @@ def build_petstore( dockerFileDirectory=".", dockerUser="", dockerPassword="", f
         tenantUrl = sanitazeTenantUrl( tenantUrl )
         petstoreBuild.post_data_into_tenant(buildToken=buildToken, tenantUrl=tenantUrl)
 
-    duration =   datetime.datetime.now() - startTime
+    duration =   datetime.now() - startTime
     SecondsDuration = duration.total_seconds()
     
 
