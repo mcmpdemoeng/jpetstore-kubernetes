@@ -65,7 +65,7 @@ class Secure:
 
             date = datetime.utcnow().isoformat("T")+"Z"
 
-            ENDPOINT = f"{tenant_url}/dash/api/dev_secops/v3/technical-services/license-scan?scannedBy=anchore&scannedTime={date}"
+            ENDPOINT = f"{tenant_url}dash/api/dev_secops/v3/technical-services/license-scan?scannedBy=anchore&scannedTime={date}"
             scan = {"dependency_licenses": []}
 
             for _ in range(randint(5,10)):
