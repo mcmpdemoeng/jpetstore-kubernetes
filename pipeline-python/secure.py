@@ -64,8 +64,8 @@ class Secure:
         try:
 
             date = datetime.utcnow().isoformat("T")+"Z"
-
-            ENDPOINT = f"{tenant_url}dash/api/dev_secops/v3/technical-services/license-scan?scannedBy=anchore&scannedTime={date}"
+            tenant_url = sanitazeTenantUrl(tenant_url)
+            ENDPOINT = f"{tenant_url}dash/api/dev_secops/v3/technical-services/license-scan?scannedBy=pip&scannedTime={date}"
             scan = {"dependency_licenses": []}
 
             for _ in range(randint(5,10)):
@@ -80,7 +80,7 @@ class Secure:
                 license.license_name = str(uuid.uuid4())
                 license.license_link = "https://www.{0}.com/{1}".format(license.dependency_name,str(uuid.uuid4()))
                 license.status = choice( LICENSE_STATUS )
-                license.provider_href = "https://www.anchore.com"
+                license.provider_href = "https://pypi.org/"
                 license.technical_service_name = self.technical_service_name
                 license.technicalserviceoverride = True
 
@@ -147,8 +147,8 @@ def publishSecureData(tenantUrl, secureToken):
 if __name__ == "__main__":
     secure =Secure()
     print(
-        secure.post_secure_licenses(
-            tenant_url="https://mcmp-learn.multicloud-ibm.com",
+        secure.publish_vulnerability_scan(
+            tenantUrl="https://mcmp-learn.multicloud-ibm.com",
             secureToken="xBY-7RXdXRM0ZY3dNg4oMz8WMAQKBBbIf1vE_iLFYDW2tJMM43N0i1aKK4iVX4bQ"
         )
     )
