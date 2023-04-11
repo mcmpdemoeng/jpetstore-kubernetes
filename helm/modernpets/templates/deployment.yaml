@@ -11,7 +11,7 @@ spec:
     metadata:
       labels:
         app: jpetstoreweb
-        release: release-1681167606
+        release: release-1681254005
     spec:
       containers:
         - name: jpetstoreweb
