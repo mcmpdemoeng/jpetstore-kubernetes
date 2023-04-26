@@ -3,6 +3,8 @@ import requests
 import subprocess
 import os
 import json
+import logging
+
 def sanitazeTenantUrl(tenantUrl:str, urlType:str ="url"):
     """
     tenantUrl: string
@@ -40,7 +42,7 @@ def sanitazeTenantUrl(tenantUrl:str, urlType:str ="url"):
 def file_exists(path:str)-> bool:
     fileExists = os.path.exists("tmp_kube_config")
     if not fileExists:
-        print(f"Error: Kube config ('tmp_kube_config') not found in local paht")
+        print(f"Error: Kube config ('tmp_kube_config') not found in local path")
         localFiles = subprocess.getoutput("ls")
         print(f"ls output:\n{localFiles}")
     return fileExists
@@ -130,3 +132,7 @@ def validateJSON(jsonData):
     except ValueError as err:
         return False
     return True
+
+
+def get_logger():
+    return logging

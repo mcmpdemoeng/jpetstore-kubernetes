@@ -109,7 +109,7 @@ class Deploy:
             LOGGER.error(result.stderr)
             raise Exception( result.args )
 
-        print(
+        LOGGER.info(
             f"Your application is available at http://jpetstore-web.{petstoreHost}"
         )
 

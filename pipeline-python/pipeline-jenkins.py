@@ -4,14 +4,20 @@ import json
 import logging
 import requests
 import build
-from common_utils import *
+from datetime import datetime
+import uuid
+import logging
+
+from secure import Secure
+import deployMonitoring
 import build
 from testpetstore import Tester
 from deploy import Deploy
-from datetime import datetime
-import uuid
-from secure import Secure
-import deployMonitoring
+from common_utils import *
+
+logging.basicConfig(level=logging.INFO)
+LOGGER = logging.getLogger("Pipeline")
+
 STATE_FILENAME = "jpetstore-pipeline-status.json"
 
 def parser( validate_parameters = False ) -> dict:
@@ -43,7 +49,7 @@ def validate_parameters(parameters: dict) -> dict:
 def main():
     parserValues = parser()
     pipelineParams = configure_pipeline_status( parserValues )
-    print( json.dumps( pipelineParams, indent=3 ) )
+    LOGGER.info( json.dumps( pipelineParams, indent=3 ) )
     buildUrl =  os.getenv( "BUILD_URL", "http://13.82.103.214:8080/view/RedThread/job/redthread-petstore-deployment-template/71/console" )
 
     tenantUrl = sanitazeTenantUrl(pipelineParams['tenant_url'])
@@ -57,7 +63,7 @@ def main():
         buildUrl=buildUrl
     )
     if error:
-        print("Warning: Fail to update order status")
+        LOGGER.error("Fail to update order status")
 
     petstore_pipeline(params=pipelineParams)
 
@@ -102,7 +108,7 @@ def petstore_pipeline(  params: dict  ):
     fullDBImageName = f"{params['docker_user']}/jpetstore-db:latest"
     technicalServiceName = "RT_petstore_on_aks_jenkins"
  
-    print("Building pestore web image")
+    LOGGER.info("Building pestore web image")
     result = build_petstore( 
         dockerFileDirectory="../jpetstore",
         dockerUser=params['docker_user'], 
@@ -115,7 +121,7 @@ def petstore_pipeline(  params: dict  ):
         technicalServiceName=technicalServiceName
         )
 
-    print("Building pestore db image")
+    LOGGER.info("Building pestore db image")
     result = build_petstore( 
         dockerFileDirectory="../",
         dockerUser=params['docker_user'], 
@@ -127,7 +133,7 @@ def petstore_pipeline(  params: dict  ):
         pushToDockerRepo=True,
         technicalServiceName=technicalServiceName
         )
-    print("testing pestore")
+    LOGGER.info("testing pestore")
 
     result = test_petstore( 
         tenantUrl=params["tenant_url"], 
@@ -136,7 +142,7 @@ def petstore_pipeline(  params: dict  ):
     )
     
     tenantApiUrl = sanitazeTenantUrl(tenantUrl=params["tenant_url"], urlType="api")
-    print("deploying pestore")
+    LOGGER.info("deploying pestore")
     result = deploy_Petstore( 
         dockerUser=params["docker_user"],
         imageTag="latest",
@@ -151,7 +157,7 @@ def petstore_pipeline(  params: dict  ):
     secure_Petstore(tenantUrl=params["tenant_url"], secureToken=params["secure_token"])
     successfulOperation = deployMonitoring.deploy_petstore_monitoring()
     if not successfulOperation:
-        print("Warning: Unable to install monitoring")
+        LOGGER.error("Unable to install monitoring")
 
 
 def configure_pipeline_status( newValues: dict ):
@@ -160,23 +166,23 @@ def configure_pipeline_status( newValues: dict ):
 
     #verify if the file already exists
     if not os.path.exists( STATE_FILENAME ):
-        print(f"{STATE_FILENAME} doesnt exist, creating it...")
+        LOGGER.info(f"{STATE_FILENAME} doesnt exist, creating it...")
         write_to_file( STATE_FILENAME, json.dumps(newValues) )
         return newValues
     
     
-    print("State file already exists, comparing parameters")
+    LOGGER.info("State file already exists, comparing parameters")
 
     fileContent = read_state_file( STATE_FILENAME )
-    print(f"File state content ({STATE_FILENAME}):")
-    print(fileContent)
+    LOGGER.info(f"File state content ({STATE_FILENAME}):")
+    LOGGER.info(fileContent)
     dictFileContent = json.loads( fileContent )
 
     orderIsempty = newValues['order_number'] == ""
     fulfillmentIsEmpty = newValues['fulfillment_id'] == ""
 
     if orderIsempty:
-        print("Order is number is empty, reading order_nubmer and fulfillment_id values from state file")
+        LOGGER.info("Order is number is empty, reading order_nubmer and fulfillment_id values from state file")
         newValues["order_number"] = dictFileContent['order_number']
         newValues["fulfillment_id"] = dictFileContent["fulfillment_id"]
 
@@ -184,15 +190,15 @@ def configure_pipeline_status( newValues: dict ):
 
     elif not orderIsempty and not fulfillmentIsEmpty :
         #if  order number and fulfillment id overwrite the file
-        print(f"updating {STATE_FILENAME} " )
-        print()
+        LOGGER.info(f"updating {STATE_FILENAME} " )
         write_to_file( STATE_FILENAME, json.dumps(newValues) )
-        print("DONE")
+        LOGGER.info("DONE")
         return newValues         
     
     
     else:
-        print("To use a new petstore infrasturcture you are required to send the fulfillment_id and order_number, otherwise the old values from state file will be used")
+        LOGGER.error("To use a new petstore infrasturcture you are required to send the fulfillment_id and order_number, otherwise the old values from state file will be used")
+        LOGGER.warning("Using the old values from the state file")
         return dictFileContent
     #if this fails return the values and show a warning that we are not saving the status 
     #if posible write a log
@@ -206,7 +212,7 @@ def write_to_file( fileName:str, content:str ) -> str:
         return None
 
     except BaseException as error:
-        print(f"Fail to write {STATE_FILENAME}, \nError: {error}  ")
+        LOGGER.error(f"Fail to write {STATE_FILENAME}, \nError: {error}  ")
         return error
 
 def read_state_file(fileName: str):
@@ -220,7 +226,7 @@ def read_state_file(fileName: str):
         return fileContent
 
     except BaseException as error:
-        print(  f"Fail to read file {STATE_FILENAME}, \n if this error persists delete the file and send all parameters to the pipeline"  )
+        LOGGER.error(  f"Fail to read file {STATE_FILENAME}, \n if this error persists delete the file and send all parameters to the pipeline"  )
         raise Exception(f"Unable to read '{STATE_FILENAME}'\nError: {error} ")
 
 def build_petstore( dockerFileDirectory=".", dockerUser="", dockerPassword="", fullImageName="", tenantUrl="", buildToken="", publishToTenant=False, pushToDockerRepo=False, technicalServiceName="RT_petstore_on_aks_jenkins" ):
@@ -242,7 +248,9 @@ def build_petstore( dockerFileDirectory=".", dockerUser="", dockerPassword="", f
 
     duration =   datetime.now() - startTime
     SecondsDuration = duration.total_seconds()
-    
+    if petstoreBuild.build_status == "failed":
+        LOGGER.error(f"Fail to build {fullImageName}")
+        exit(1)
 
 def test_petstore( tenantUrl, testToken, technicalServiceName ):
     tester = Tester()
@@ -254,8 +262,8 @@ def test_petstore( tenantUrl, testToken, technicalServiceName ):
             technicalServiceName=technicalServiceName
         )
     except:
-        print("Error: Fail to publish test data")
-        print(tester.__dict__)
+        LOGGER.error("Error: Fail to publish test data")
+        LOGGER.info(tester.__dict__)
 
     
 def deploy_Petstore( tenantUserID,  tenantUserApiKey, tenantApiURL,  orderNumber, deployToken="", imageTag="latest", dockerUser="mcmpdemo",publishToTenant=False ):
@@ -285,53 +293,6 @@ def secure_Petstore( tenantUrl, secureToken ):
     if publishSLSuccessful and publishVSSuccessful:
         return True
     return False
-
-def make_web_request(url="", payload={}, headers={}, requestMethod=requests.get, logToIBM=False ):
-    
-    LOGGER = get_logger(  )
-
-    try:
-        # TODO - Chage the static arguments for dynamic ones
-        response = requestMethod(url=url, json=payload, headers=headers)
-        if response.status_code >= 200 and response.status_code < 300:
-            return response, True, ""
-
-        LOGGER.warning(
-            f"""Non 200 response from {url}
-            headers: {headers}
-            payload: {payload}
-            method:  {requestMethod.__name__}
-            response:{response.text}
-            response status code: {response.status_code}
-            """
-        )
-
-        return response, False, f"status code: {response.status_code}"
-
-    except requests.Timeout or requests.ConnectionError or requests.ConnectTimeout:
-        LOGGER.error(
-            f"""Fail to make request
-                headers: {headers}
-                payload: {payload}
-                error: Fail to connect to {url}  
-                """
-        )
-
-        return None, False, f"Fail to connect to {url}"
-
-    except Exception as error:
-        LOGGER.error(
-            f"""Fail to make request to {url}
-                headers: {headers}
-                payload: {payload}
-                error:  {error}  """
-        )
-
-        return None, False, f"Fail - {error} "
-
-
-def get_logger():
-    return logging
 
 
 if __name__ == "__main__":
