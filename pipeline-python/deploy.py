@@ -11,7 +11,8 @@ import uuid
 from emp_order_reader import read_petstore_order
 from common_utils import *
 
-
+logging.basicConfig(level=logging.INFO)
+LOGGER = logging.getLogger("Deploy")
 class Deploy:
 
     def __init__(self, deployId=uuid.uuid4().__str__(), technical_service_name="RT_petstore_on_aks_jenkins", duration=100572, name="petstore_deployment", applicaitonUrl="http://jpetstore-web.cd6578cfa15a4488b1b8.eastus.aksapp.io/shop/index.do", provider="Azure", status="fail", environment="production", isProduction=True,deployUrl="http://13.82.103.214:8080/view/RedThread/job/redthread-petstore-deployment-template/71/console" ):
@@ -28,7 +29,7 @@ class Deploy:
         self.technicalserviceoverride = True
         self.status = status
         self.tool = "Jenkins"
-        self.release = f'release-2023.{time.strftime("%m.%d")}'
+        self.release = f'release-2023.{time.strftime("%Y.%m.%d")}'
         self.environment = environment
         self.isproduction = isProduction
 
@@ -86,26 +87,26 @@ class Deploy:
         cleanPetstore = f"kubectl delete job jpetstoredb --ignore-not-found -n {namespace} --kubeconfig tmp_kube_config".split(" ")
         result = subprocess.run( cleanPetstore )
         if result.returncode != 0:
-            print("Fail to delete petstore job ( deployment step 1 )")
-            print(result.stdout)
-            print(result.stderr)
+            LOGGER.error("Fail to delete petstore job ( deployment step 1 )")
+            LOGGER.error(result.stdout)
+            LOGGER.error(result.stderr)
             raise Exception(f"fail to execute: {result.args}")
 
         defineHelmPath = f"helm package --destination {jenkinsHome}/modernpets ../helm/modernpets".split(" ")
         result = subprocess.run( defineHelmPath )
         if result.returncode != 0:
-            print(f"Fail to define petstore package location ( deployment step 2 )")
-            print(result.stdout)
-            print(result.stderr)
+            LOGGER.error(f"Fail to define petstore package location ( deployment step 2 )")
+            LOGGER.error(result.stdout)
+            LOGGER.error(result.stderr)
             raise Exception( result.args )
 
         helmUpgradeCommand = f"helm upgrade --install --wait --set image.repository={dockerRepo} --set image.tag={imageTag} --set mysql.url={base64.b64encode(mysqlUrl.encode('utf-8')).decode()} --set mysql.username={base64.b64encode(mysqlUser.encode('utf-8')).decode()} --set mysql.password={base64.b64encode(mysqlPassword.encode('utf-8')).decode()} --set isDBAAS=True --set isLB=False --set httpHost={petstoreHost} --namespace={namespace} --create-namespace {namespace} --kubeconfig tmp_kube_config {jenkinsHome}/modernpets/modernpets-0.1.5.tgz --debug".split(" ")
         result = subprocess.run( helmUpgradeCommand )
         endTime = datetime.datetime.now()
         if result.returncode != 0:
-            print(f"Fail to deploy petstore ( deployment step 3 )")
-            print(result.stdout)
-            print(result.stderr)
+            LOGGER.error(f"Fail to deploy petstore ( deployment step 3 )")
+            LOGGER.error(result.stdout)
+            LOGGER.error(result.stderr)
             raise Exception( result.args )
 
         print(
@@ -132,7 +133,7 @@ class Deploy:
 
         response, success, errorMessage = make_web_request(url=endpointUrl, payload=payload, headers=headers, requestMethod=requests.post)
 
-        print(
+        LOGGER.info(
             f"Deploy publishment status code : {response.status_code}"
         )
 

@@ -86,7 +86,7 @@ class Tester:
         }
 
         response, succesfulOperation, errorMessage = make_web_request(url=endpoint, payload=payload, headers=headers, requestMethod=requests.post, params=params)
-        print(
+        LOGGER.info(
             f"Test publishment status code : {response.status_code}"
         )
         return succesfulOperation, errorMessage
@@ -137,10 +137,10 @@ if __name__ == "__main__":
     #replace this variable to test
     testToken = ""
 
-    print(
+    LOGGER.info(
         tester.__dict__
     )
-    print(
+    LOGGER.info(
         tester.publish_test(
             tenantUrl="https://mcmp-explore-jamesxavier2-mar16-220316202344.multicloud-ibm.com/", testToken=testToken, runId="ksdfjkfdsjkldsjdddhe"
         )

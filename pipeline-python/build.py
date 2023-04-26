@@ -4,45 +4,9 @@ import requests
 import os
 from common_utils import *
 import uuid
-# def create_docker_image( imageName="defaultName", dockerFileDirectory="./", dockerfilename="Dockerfile", imageTag=None ):
-#     try:
-#         dockerClient = docker.from_env()
-#         parameters = {
-#             "path": dockerFileDirectory,
-#             "tag": imageTag,
-#         "dockerfile": dockerfilename,
-#         "pull": True
-#         }
-#         startTime = datetime.datetime.now()
-#         newImage, _ = dockerClient.images.build(**parameters )
-#         buildDuration = datetime.datetime.now() - startTime
-
-#         return {
-#             "buildDuration": buildDuration,
-#             "buildStatus": "success"
-#         }
-#     except BaseException as error:
-#         print(f"Error: Fail to build image in path '{dockerFileDirectory}'\nError: {error}")
-#         return {
-#             "buildDuration": None,
-#             "buildStatus": "fail"
-#         }
-# def upload_docker_image( repository="", imageTag=None, dockerUser="", dockerPassoword="" ):
-#     try:
-#         dockerClient = docker.from_env()
-#         creds = {
-#             "username": dockerUser,
-#             "password": dockerPassoword
-#         }
-#         serverResponse = dockerClient.images.push(repository=repository, auth_config=creds)
-#         return serverResponse
-#     except BaseException as error:
-
-#         print(f"Fail to upload image '{imageTag}' to repository '{repository}'\nError: {error}")
-#         return False
-
-
-
+import logging
+logging.basicConfig(level=logging.INFO)
+LOGGER = logging.getLogger("Build")
 
 
 class Builder:
@@ -81,18 +45,18 @@ class Builder:
         }
 
         response, success, errorMessage = make_web_request(url=endpointUrl, payload=payload, headers=headers, requestMethod=requests.post)
-        print(
+        LOGGER.info(
             f"Build publishment status code : {response.status_code}"
         )
         if self.build_status == "failed" and success:
-            print(f"""
+            LOGGER.error(f"""
             Publlished build data succesfully:
             {self.__dict__}
             Exiting with status code 1 due to build failure when it ran
             """)
             exit(1)
         elif self.build_status == "failed" and not success:
-            print(f"""
+            LOGGER.error(f"""
             Fail to publish data:
            {self.__dict__}
             Exiting with status code 1 due to build failure when it ran and fail in data publishment
@@ -138,7 +102,7 @@ class Builder:
 
         except BaseException as error:
             endTime = datetime.datetime.now()
-            print(
+            LOGGER.error(
                 f"Fail to buid image '{imageName}' in path '{dockerFileDirectory}'\nError: {error}"
             )
             self.build_status = "failed"
@@ -187,7 +151,7 @@ class Builder:
             return None
         except BaseException as error:
 
-            print(
+            LOGGER.info(
                 f"Fail to login to docker repository \nError: {error}"
             )
             return error
@@ -199,10 +163,10 @@ if __name__ == "__main__":
     buildtest.create_docker_image(
         imageName="test3:latest",
     )
-    print(
+    LOGGER.info(
         buildtest.__dict__
     )
-    print(
+    LOGGER.info(
         buildtest.post_data_into_tenant(tenantUrl="https://mcmp-explore-jamesxavier2-mar16-220316202344.multicloud-ibm.com/", buildToken="")
     )
 

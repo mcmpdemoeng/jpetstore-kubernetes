@@ -1,6 +1,9 @@
 import os, requests
 import common_utils
+import logging
 
+logging.basicConfig(level=logging.INFO)
+LOGGER = logging.getLogger("OrderReader")
 
 
 ##TODO: We can wrap all this into a orderReader class
@@ -10,7 +13,7 @@ def get_order_details(tenant_user_id, tenant_system_user_api_key, order_number, 
     Returns a dictionary with 'db_password', 'service_instance_id' keys.
     Ends the process if an error occurs
     """
-    print("Reading order Details")
+    LOGGER.info("Reading order Details")
     ENDPOINT = f"{tenant_api_url}v5/api/orders/{order_number}/detail"
     headers = {
         "username": tenant_user_id, 
@@ -18,16 +21,16 @@ def get_order_details(tenant_user_id, tenant_system_user_api_key, order_number, 
     }
     response, isSuccessfulResponse, _  = common_utils.make_web_request( requestMethod=requests.get, headers=headers, url=ENDPOINT )
     if not isSuccessfulResponse:
-        print("Error: Fail to get service instance id")
+        LOGGER.error("Error: Fail to get service instance id")
         exit(1)
     
     isValidJson = common_utils.validateJSON( response.text )
     if not isValidJson:
-        print(f"Error: Expecting a json response from {ENDPOINT} and got:\n{response.text}")
+        LOGGER.error(f"Error: Expecting a json response from {ENDPOINT} and got:\n{response.text}")
         exit(1)
     data = response.json()
     details = parse_petstore_order_details( data )
-    print("Done reading order Details")
+    LOGGER.info("Done reading order Details")
     return details
 
 
@@ -57,14 +60,14 @@ def parse_petstore_order_details(jsonData):
         return data
 
     except:
-        print("Error: Fail to parse petstore order details (parse_petstore_order_details)")
-        print(f"Data to parse: \n{jsonData}")
+        LOGGER.error("Error: Fail to parse petstore order details (parse_petstore_order_details)")
+        LOGGER.error(f"Data to parse: \n{jsonData}")
         exit(1)
 
 
 def get_petstore_service_instance_details( tenant_system_user_id, tenant_system_user_api_key, service_instance_id, tenant_api_url, maxRetries=4, currentReties=0 ):
     
-    print("Reading service instace details")
+    LOGGER.info("Reading service instace details")
     ENDPOINT = f"{tenant_api_url}v3/api/services/azure/{service_instance_id}"
     headers = {
         "username": tenant_system_user_id, 
@@ -73,27 +76,27 @@ def get_petstore_service_instance_details( tenant_system_user_id, tenant_system_
     response, isSuccessfulResponse, _  = common_utils.make_web_request( requestMethod=requests.get, url=ENDPOINT, headers=headers )
     timeOutError = response.status_code == 504
     if timeOutError:
-        print("Warning: Time out getting petstore service instance details")
+        LOGGER.warning("Warning: Time out getting petstore service instance details")
         if currentReties >= maxRetries:
-            print(f"Error: time out error, tried {currentReties} times")
+            LOGGER.error(f"Error: time out error, tried {currentReties} times")
             exit(1)
         currentReties += 1
-        print("Retrying to get petstore service instance details")
+        LOGGER.info("Retrying to get petstore service instance details")
         get_petstore_service_instance_details( tenant_system_user_id, tenant_system_user_api_key, service_instance_id, tenant_api_url, currentReties=currentReties)
     
     if not isSuccessfulResponse:
-        print("Error:  'get_petstore_service_instance_details' func was unable to get a successful response")
+        LOGGER.error("Error:  'get_petstore_service_instance_details' func was unable to get a successful response")
         exit(1)
     
     isValidJson = common_utils.validateJSON( response.text )
     if not isValidJson:
-        print(f"Error: Expecting a json response from {ENDPOINT} and got:\n{response.text}")
+        LOGGER.error(f"Error: Expecting a json response from {ENDPOINT} and got:\n{response.text}")
         exit(1)
 
     data = response.json()
     
     details = parse_service_instance_details(data)
-    print("Done reading service instance details")
+    LOGGER.info("Done reading service instance details")
 
     return details
 
@@ -103,7 +106,7 @@ def parse_service_instance_details( jsonData ):
     kubeconfig = ""
     db_url = ""
     db_user = ""
-    print(f"Number of resources in order: {len(jsonData['resources'])}" )
+    LOGGER.info(f"Number of resources in order: {len(jsonData['resources'])}" )
 
     for resouce in jsonData["resources"]:
         # Get kubeconfig infor and FQDN
@@ -166,7 +169,7 @@ def read_petstore_order( tenantApiUrl, tenantUserId, tenantUserApikey, orderNumb
         }
 
 if __name__ == "__main__":
-    print(
+    LOGGER.info(
         read_petstore_order(
             tenantApiUrl="https://mcmp-redthread-test1aws-uiauto.multicloud-ibm.com/",
             tenantUserId="",
