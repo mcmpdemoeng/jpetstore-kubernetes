@@ -8,7 +8,7 @@ LOGGER = logging.getLogger("OrderReader")
 
 ##TODO: We can wrap all this into a orderReader class
 
-def get_order_details(tenant_user_id, tenant_system_user_api_key, order_number, tenant_api_url):
+def get_order_details(tenant_user_id, tenant_system_user_api_key, order_number, tenant_api_url, maxRetries=4, currentReties=0):
     """
     Returns a dictionary with 'db_password', 'service_instance_id' keys.
     Ends the process if an error occurs
@@ -20,6 +20,19 @@ def get_order_details(tenant_user_id, tenant_system_user_api_key, order_number, 
         "apikey": tenant_system_user_api_key
     }
     response, isSuccessfulResponse, _  = common_utils.make_web_request( requestMethod=requests.get, headers=headers, url=ENDPOINT )
+    
+    serverTimeout = response.status_code == 504
+
+    if serverTimeout:
+        LOGGER.warning("Warning: Time out getting petstore service instance id")
+        currentReties += 1
+        if currentReties <= maxRetries:
+            get_order_details( tenant_user_id, tenant_system_user_api_key, order_number, tenant_api_url, maxRetries, currentReties )
+    
+        else:
+            LOGGER.error(f"Fail to get service instance id, max retries reached '{maxRetries}'")
+            exit(1)
+    
     if not isSuccessfulResponse:
         LOGGER.error("Error: Fail to get service instance id")
         exit(1)
