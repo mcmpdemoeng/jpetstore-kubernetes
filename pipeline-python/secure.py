@@ -6,12 +6,13 @@ import uuid
 import logging
 import hashlib
 
-from common_utils import make_web_request, sanitazeTenantUrl
+from common_utils import make_web_request, sanitazeTenantUrl, LICENSES
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger("secure")
 
 PACKAGES = [ "crypto", "object-path", "serializer", "bind", "logger" ]
+
 SEVERITIES = [ "critical", "high", "low", "medium" ]
 LICENSE_STATUS = [ "Allowed", "Denied", "NeedApproval" ]
 
@@ -74,19 +75,21 @@ class Secure:
 
             date = datetime.utcnow().isoformat("T")+"Z"
             tenant_url = sanitazeTenantUrl(tenant_url)
-            ENDPOINT = f"{tenant_url}dash/api/dev_secops/v3/technical-services/license-scan?scannedBy=pip&scannedTime={date}"
+            ENDPOINT = f"{tenant_url}dash/api/dev_secops/v3/technical-services/license-scan?scannedBy=licenseFinder&scannedTime={date}"
             scan = {"dependency_licenses": []}
 
-            for _ in range(randint(5,10)):
+            for _ in range(randint(1,2)):
 
                 license = DependencyLicenseTemplate()
 
-                license.dependency_name = choice(PACKAGES)
+                licenseInfo = choice(LICENSES)
+
+                license.dependency_name = licenseInfo["Package Name"]
                 license.dependency_version = "v{0}.{1}.{2}".format(randint(0,16),randint(0,16),randint(0,16))
                 license.dependency_homepage = "https://www.github.com/{0}".format(license.dependency_name)
                 license.dependency_install_path = "/src/node_modules/{0}".format(license.dependency_name)
                 license.dependency_package_manager = "node"
-                license.license_name = str(uuid.uuid4())
+                license.license_name = licenseInfo['License Name']
                 license.license_link = "https://www.{0}.com/{1}".format(license.dependency_name,str(uuid.uuid4()))
                 license.status = choice( LICENSE_STATUS )
                 license.provider_href = "https://pypi.org/"
@@ -321,12 +324,12 @@ def publishSecureData(tenantUrl, secureToken):
 
 if __name__ == "__main__":
     secure =Secure()
-    print(
-        secure.publish_vulnerability_scan(
-            tenantUrl="https://mcmp-learn.multicloud-ibm.com",
-            secureToken="xBY-7RXdXRM0ZY3dNg4oMz8WMAQKBBbIf1vE_iLFYDW2tJMM43N0i1aKK4iVX4bQ"
-        )
-    )
+    # print(
+    #     secure.publish_vulnerability_scan(
+    #         tenantUrl="https://mcmp-learn.multicloud-ibm.com",
+    #         secureToken="xBY-7RXdXRM0ZY3dNg4oMz8WMAQKBBbIf1vE_iLFYDW2tJMM43N0i1aKK4iVX4bQ"
+    #     )
+    # )
     print(
         secure.publish_secure_licenses(
             tenant_url="https://mcmp-learn.multicloud-ibm.com",
