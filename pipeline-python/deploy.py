@@ -29,7 +29,7 @@ class Deploy:
         self.technicalserviceoverride = True
         self.status = status
         self.tool = "Jenkins"
-        self.release = f'release-2023.{time.strftime("%Y.%m.%d")}'
+        self.release = f'release-{time.strftime("%Y.%m.%d")}'
         self.environment = environment
         self.isproduction = isProduction
 
