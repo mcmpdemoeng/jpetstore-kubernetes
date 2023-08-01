@@ -1,8 +1,13 @@
 import argparse
 import os
 from jsonpath_ng.ext import parse
+import logging
 
 from common_utils import make_web_request, sanitazeTenantUrl
+
+logging.basicConfig(level=os.getenv('LOGGIN_LEVEL_NUMBER', 20 ))
+LOGGER = logging.getLogger("petstore-catalog-deploy")
+
 
 parser = argparse.ArgumentParser()
 
@@ -14,7 +19,7 @@ args = parser.parse_args()
 
 
 def get_service_invetory_id(tenantUrl: str, userid: str, apikey:str, orderNumber:str ) -> dict:
-    """Gets AKS cluster kubeconfig and routing zone url"""
+    """Gets serviceInventoryID"""
     
     tenantApiUrl = sanitazeTenantUrl( tenantUrl=tenantUrl, urlType='api')
     ENDPOINT = f"{tenantApiUrl}v5/api/orders/{orderNumber}/detail"
@@ -73,21 +78,21 @@ def create_file_with_content(file_path, content):
 
 
 def main():
-    print("Getting service inventory id")
+    LOGGER.info("Getting service inventory id")
     serviceInventoryId = get_service_invetory_id(tenantUrl=args.tenantApiUrl, userid=args.userid, apikey=args.apikey, orderNumber=args.orderID)
-    print(f"Done - {serviceInventoryId}")
+    LOGGER.info(f"Done - {serviceInventoryId}")
     
-    print("Getting infrastructure details ")
+    LOGGER.info("Getting infrastructure details ")
     kubeconfig, httpRoutingZone = read_infrastructure_details( tenantUrl=args.tenantApiUrl, userid=args.userid, apikey=args.apikey, serviceInventoryId=serviceInventoryId )
-    print("Done")
+    LOGGER.info("Done")
 
-    print(f"Creating ./kubeconfig file")
+    LOGGER.info(f"Creating ./kubeconfig file")
     create_file_with_content( "./kubeconfig", kubeconfig )
-    print("Done")
+    LOGGER.info("Done")
 
-    print(f"Creating ./httpRoutingZone file")
+    LOGGER.info(f"Creating ./httpRoutingZone file")
     create_file_with_content( "./httpRoutingZone",  httpRoutingZone )
-    print("Done")
+    LOGGER.info("Done")
 
 
 if __name__ == "__main__":
