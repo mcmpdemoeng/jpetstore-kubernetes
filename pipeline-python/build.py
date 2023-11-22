@@ -76,7 +76,7 @@ class Builder:
     def create_docker_image(self,  imageName="defaultName", dockerFileDirectory=".",   ):
 
         self.built_at = datetime.datetime.utcnow().isoformat("T") + "Z"
-        buildCommand = f"docker build -t {imageName} {dockerFileDirectory}"
+        buildCommand = f"sudo docker build -t {imageName} {dockerFileDirectory}"
         self.details = f"Image -> {imageName}"
         try:
             startTime = datetime.datetime.now()
@@ -139,7 +139,7 @@ class Builder:
         This function will return 'None' if completed successfully, otherwise an error string will be return
         """
 
-        loginCommand = f"docker login -u {dockerUser} -p {dockerPassoword}"
+        loginCommand = f"sudo docker login -u {dockerUser} -p {dockerPassoword}"
 
         # loginCommand = loginCommand.split(" ")
 
