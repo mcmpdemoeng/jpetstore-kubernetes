@@ -1,6 +1,7 @@
 #!/bin/bash
 #sleep 120
 
+#### 1 - 2
 echo "Updating order status..."
 if [[ -f ORDER_NUMBER.txt ]] && [[ $ORDER_NUMBER == "" ]]
 then
@@ -27,12 +28,13 @@ curl --request POST $API_URL \
 -H "${API_KEY}" \
 -H "Content-Type: application/json" \
 -d @payload.json
+### 1 - 2
 
 rm -f payload.json
 
 pip3 install --upgrade pip
 python3 -m pip install -r ../pipeline-common/publish_data/requirements.txt 
-
+### 3
 echo "Building application..."
 
 export JPETSTOREWEB="${DOCKER_USERNAME}/jpetstoreweb:${BUILD_NUMBER}"
@@ -66,7 +68,7 @@ else
 fi
 
 echo "$((enddate - startdate))" >> build_duration_time
-
+### 4
 export TENANT_SYSTEM_USER_NAME="${USER_ID}"
 export TENANT_SYSTEM_USER_API_KEY="${USER_API_KEY}"
 
@@ -145,14 +147,13 @@ deploy(){
   
   helm upgrade --install --wait --set image.repository=$DOCKER_USERNAME --set image.tag=$BUILD_NUMBER --set mysql.url=$mysql_url --set mysql.username=$mysql_user --set mysql.password=$mysql_password --set isDBAAS=True --set isLB=False --set httpHost=$petstore_host --namespace=$NAMESPACE --create-namespace $NAMESPACE --kubeconfig tmp_kube_config $JENKINS_HOME/modernpets/modernpets-0.1.5.tgz
   
-  echo "\n\nYour application is available at http://jpetstore-web.${petstore_host}\n\n"
+  echo "Your application is available at http://jpetstore-web.${petstore_host}"
   
   app=$(kubectl get  ingress -n $NAMESPACE --kubeconfig tmp_kube_config | base64 | tr -d '\r')
   app_decoded=$(kubectl get  ingress -n $NAMESPACE --kubeconfig tmp_kube_config | tr -d '\r')
   echo app running at $app_decoded
   chmod +x ../result.sh
   ../result.sh ${app}
-
 }
 
 
@@ -173,7 +174,7 @@ else
 fi
 
 echo "$((enddate - startdate))" >> deploy_duration_time
-
+### 4
 
 export TENANT_SYSTEM_USER_NAME="${USER_ID}"
 export TENANT_SYSTEM_USER_API_KEY="${USER_API_KEY}"

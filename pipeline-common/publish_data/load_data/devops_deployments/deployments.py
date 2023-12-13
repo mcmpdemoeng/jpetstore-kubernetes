@@ -15,7 +15,7 @@ from common_utils.constants import (
     DEPLOY_TOKEN,
     TOOL
 )
-
+import time
 import json, requests, traceback
 from random import randint
 
@@ -49,10 +49,9 @@ def post_deployment_data(tenant_url, bearer_token):
         body.technicalserviceoverride = True
         body.endpoint_hostname = DEPLOYMENT_HOSTNAME
         body.endpoint_technical_service_id = DEPLOYMENT_SERVICE_ID
-        body.release = f"{randint(5,11)}.{randint(0,22)}.{randint(0,22)}"
+        body.release = f'release-2023-{time.strftime("%w")}'
         body.environment = "production"
         body.isproduction = True
-
         headers = {
             "Authorization": "TOKEN " + DEVOPS_DEPLOYMENTS_TOKEN,
             "Content-Type": "application/json",

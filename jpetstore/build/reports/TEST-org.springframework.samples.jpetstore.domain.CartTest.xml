@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" failures="0" hostname="Joses-MacBook-Pro.local" name="org.springframework.samples.jpetstore.domain.CartTest" skipped="0" tests="4" time="0.256" timestamp="2023-02-13T15:21:36">
+  <properties>
+    <property name="ant.library.dir" value="/usr/local/Cellar/ant/1.10.12/libexec/lib" />
+    <property name="spring.root" value="springroot" />
+    <property name="ant.file.type" value="file" />
+    <property name="java.specification.version" value="18" />
+    <property name="ant.project.name" value="jpetstore" />
+    <property name="sun.jnu.encoding" value="UTF-8" />
+    <property name="java.class.path" value="/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/build/cobertura:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/junit/junit-4.4.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/dist/spring.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/.classes:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/build/test:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/apache-jakarta-oro.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/asm-5.0.1.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/asm-analysis-5.0.1.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/asm-commons-5.0.1.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/asm-tree-5.0.1.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/asm-util-5.0.1.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/cobertura-2.1.1.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/commons-lang3-3.3.2.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/hamcrest-core-1.3.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/jaxen-1.1.4.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/jetty-6.1.14.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/jetty-util-6.1.14.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/junit-4.11.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/logback-classic-1.0.13.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/logback-core-1.0.13.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/oro-2.0.8.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/servlet-api-2.5-6.1.14.jar:/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/springroot/lib/cobertura/slf4j-api-1.7.5.jar:/usr/local/Cellar/ant/1.10.12/libexec/lib/ant-launcher.jar:/usr/local/Cellar/ant/1.10.12/libexec/lib/ant.jar:/usr/local/Cellar/ant/1.10.12/libexec/lib/ant-junit.jar:/usr/local/Cellar/ant/1.10.12/libexec/lib/ant-junit4.jar" />
+    <property name="test.src.dir" value="test" />
+    <property name="java.vm.vendor" value="Homebrew" />
+    <property name="sun.arch.data.model" value="64" />
+    <property name="test.reports" value="build/reports" />
+    <property name="test.build.dir" value="build/test" />
+    <property name="java.vendor.url" value="https://github.com/Homebrew/homebrew-core/issues" />
+    <property name="net.sourceforge.cobertura.datafile" value="/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/cobertura.ser" />
+    <property name="java.vm.specification.version" value="18" />
+    <property name="os.name" value="Mac OS X" />
+    <property name="sun.java.launcher" value="SUN_STANDARD" />
+    <property name="user.country" value="CR" />
+    <property name="sun.boot.library.path" value="/usr/local/Cellar/openjdk/18.0.1.1/libexec/openjdk.jdk/Contents/Home/lib" />
+    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner org.springframework.samples.jpetstore.domain.CartTest skipNonTests=false filtertrace=true haltOnError=false haltOnFailure=true formatter=org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter showoutput=false outputtoformatters=true logfailedtests=true threadid=0 logtestlistenerevents=false formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/build/reports/TEST-org.springframework.samples.jpetstore.domain.CartTest.xml crashfile=/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/junitvmwatcher2868446697453715028.properties propsfile=/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/junit7749193081880867880.properties" />
+    <property name="jdk.debug" value="release" />
+    <property name="sun.cpu.endian" value="little" />
+    <property name="user.home" value="/Users/mariobv" />
+    <property name="user.language" value="en" />
+    <property name="java.specification.vendor" value="Oracle Corporation" />
+    <property name="java.version.date" value="2022-04-22" />
+    <property name="java.home" value="/usr/local/Cellar/openjdk/18.0.1.1/libexec/openjdk.jdk/Contents/Home" />
+    <property name="basedir" value="/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore" />
+    <property name="file.separator" value="/" />
+    <property name="java.vm.compressedOopsMode" value="Zero based" />
+    <property name="line.separator" value="&#xa;" />
+    <property name="ant.java.version" value="18" />
+    <property name="java.specification.name" value="Java Platform API Specification" />
+    <property name="java.vm.specification.vendor" value="Oracle Corporation" />
+    <property name="name" value="jpetstore" />
+    <property name="ant.file.type.jpetstore" value="file" />
+    <property name="apple.awt.application.name" value="JUnitTestRunner" />
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers" />
+    <property name="java.runtime.version" value="18.0.1.1+0" />
+    <property name="user.name" value="mariobv" />
+    <property name="ant.file" value="/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/build.xml" />
+    <property name="path.separator" value=":" />
+    <property name="client.dir" value="client" />
+    <property name="os.version" value="13.0" />
+    <property name="weblib.dir" value="war/WEB-INF/lib" />
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment" />
+    <property name="file.encoding" value="UTF-8" />
+    <property name="ant.project.invoked-targets" value="runtest" />
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM" />
+    <property name="cobertura.dir" value="build/cobertura" />
+    <property name="java.vendor.version" value="Homebrew" />
+    <property name="dist.dir" value="dist" />
+    <property name="build.dir" value=".classes" />
+    <property name="ant.core.lib" value="/usr/local/Cellar/ant/1.10.12/libexec/lib/ant.jar" />
+    <property name="java.vendor.url.bug" value="https://github.com/Homebrew/homebrew-core/issues" />
+    <property name="java.io.tmpdir" value="/var/folders/_j/vx53k3wn7hs_xb4pktwx3p3h0000gn/T/" />
+    <property name="java.version" value="18.0.1.1" />
+    <property name="user.dir" value="/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore" />
+    <property name="os.arch" value="x86_64" />
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification" />
+    <property name="ant.home" value="/usr/local/Cellar/ant/1.10.12/libexec" />
+    <property name="war.dir" value="war" />
+    <property name="native.encoding" value="UTF-8" />
+    <property name="ant.file.jpetstore" value="/Users/mariobv/Desktop/workspace/jpetstore-kubernetes/jpetstore/build.xml" />
+    <property name="ant.version" value="Apache Ant(TM) version 1.10.12 compiled on October 13 2021" />
+    <property name="java.library.path" value="/Users/mariobv/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:." />
+    <property name="java.vendor" value="Homebrew" />
+    <property name="java.vm.info" value="mixed mode, sharing" />
+    <property name="java.vm.version" value="18.0.1.1+0" />
+    <property name="sun.io.unicode.encoding" value="UnicodeBig" />
+    <property name="java.class.version" value="62.0" />
+    <property name="src.dir" value="src" />
+    <property name="ant.project.default-target" value="usage" />
+  </properties>
+  <testcase classname="org.springframework.samples.jpetstore.domain.CartTest" name="addItemToCartVerify" time="0.161" />
+  <testcase classname="org.springframework.samples.jpetstore.domain.CartTest" name="newCart" time="0.001" />
+  <testcase classname="org.springframework.samples.jpetstore.domain.CartTest" name="addInvalidItemToCart" time="0.001" />
+  <testcase classname="org.springframework.samples.jpetstore.domain.CartTest" name="addItemToCart" time="0.001" />
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

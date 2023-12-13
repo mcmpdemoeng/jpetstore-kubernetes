@@ -10,13 +10,26 @@ data:
     groups:
     - name: devopscube demo alert
       rules:
+      - alert: NodeCPUUsage 
+        annotations:
+          summary: NodeCPUUsage
+          description: "node {{ $labels.kubernetes_io_hostname }} is using more cpu"
+          namespace: "{{ $labels.namespace }}"
+          node: "{{ $labels.kubernetes_io_hostname }}"
+        expr:  (sum(rate(container_cpu_usage_seconds_total{id="/",container!="POD"}[1m])) by (kubernetes_io_hostname) / sum(machine_cpu_cores) by (kubernetes_io_hostname)  * 100) > 1 
+        for: 1m
+        labels: 
+          severity: critical
+          node: "{{ $labels.kubernetes_io_hostname }}"
+          namespace: "monitoring"
+          pod: "jpetstoreweb"
       - alert: High CPU Usage
         expr: (sum(rate(container_cpu_usage_secord_total[3m])) BY (instance,namespace,pod) * 100) > 30
         for: 5s
         labels:
           severity: critical
-          namespace: "{{ $labels.namespace }}"
-          pod: "{{ $labels.pod }}"
+          namespace: "monitoring"
+          pod: "jpetstoreweb"
         annotations: 
           summary: High CPU Usage
           description: "pod is using more cpu"
@@ -29,15 +42,6 @@ data:
           pod: "{{ $labels.pod }}"
         annotations:
           summary: High Memory Usage
-      - alert: High CPU load
-        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 10
-        for: 0m
-        labels:
-          severity: critical
-          namespace: "{{ $labels.namespace }}"
-          pod: "{{ $labels.pod }}"
-        annotations:
-          summary: "CPU load is > 20%\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
       - alert: High incoming request on network
         expr: sum by (instance) (rate(node_network_receive_bytes_total[2m])) / 1024 > 1
         for: 0m

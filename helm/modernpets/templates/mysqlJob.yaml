@@ -8,7 +8,7 @@ spec:
     spec:
       containers:
       - name: jpetstoredb
-        image: "{{ .Values.image.repository }}/jpetstoredb:latest"
+        image: "{{ .Values.image.repository }}/jpetstore-db:latest"
         command: ["python",  "/src/create_db.py"]
         env:
           - name: mysqlUrl

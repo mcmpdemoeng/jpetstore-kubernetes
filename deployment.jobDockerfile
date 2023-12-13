@@ -1,0 +1,25 @@
+# Use a base image with Helm and other dependencies
+## REQUIRE 
+## ENV: mysql_url(host)  mysql_user  mysql_password  kubeconfig  fqdn  namespace
+
+## docker build . -t petdepl && docker run -e mysql_url='mysqldb-a1f11642ac2d4445c1a0cd4a23a9698c.mysql.database.azure.com' -e mysql_user=db_admin -e mysql_password='Mcmprocks!!333' -e kubeconfig="$(cat kubeconfig)" -e fqdn='cd2b2429a22440cea84c.eastus.aksapp.io' -e namespace='jpetstore'   petdepl
+
+FROM ubuntu:latest
+
+# Install curl and bash (used by Helm)
+#RUN apk add --update --no-cache curl bash
+RUN apt update -y && apt install curl -y
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+RUN chmod +x kubectl
+RUN mv kubectl /usr/local/bin
+# Install Helm (adjust the version as needed)
+RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+RUN chmod 700 get_helm.sh
+RUN ./get_helm.sh
+
+# # Set the working directory
+WORKDIR /app
+
+COPY .  .
+# Run Helm commands (replace with your specific Helm commands)
+CMD [ "sh", "JobDeploymentAKS.sh" ]
